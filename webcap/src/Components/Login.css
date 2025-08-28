@@ -1,0 +1,239 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(rgba(214, 184, 184, 0.6), rgba(214, 184, 184, 0.6)), url('../assets/Indak.jpg') no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.login-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  padding: 20px 40px;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logo-text {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.login-box {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 60px 50px;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  backdrop-filter: none;
+}
+
+.login-title {
+  color: white;
+  font-size: 3rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-subtitle {
+  color: #cccccc;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.form-box {
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 15px;
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  backdrop-filter: blur(10px);
+}
+
+.input-group {
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-input {
+  width: 100%;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-input::placeholder {
+  color: #999;
+}
+
+.login-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #4CAF50;
+}
+
+/* Password input container styles */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: 'Arial', sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  background: #45a049;
+}
+
+.login-footer {
+  color: white;
+  font-size: 1rem;
+  margin-top: 30px;
+  font-family: 'Arial', sans-serif;
+}
+
+.login-link {
+  color: #a0855b;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.login-link:hover {
+  color: #8a7350;
+}
+
+@media (max-width: 768px) {
+  .login-header {
+    padding: 15px 20px;
+  }
+  
+  .login-box {
+    padding: 40px 30px;
+    margin: 20px;
+  }
+  
+  .form-box {
+    padding: 25px 20px;
+  }
+  
+  .login-title {
+    font-size: 2.5rem;
+  }
+  
+  .login-subtitle {
+    font-size: 1rem;
+  }
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.demo-credentials {
+  background-color: #e7f3ff;
+  border: 1px solid #b8daff;
+  border-radius: 4px;
+  padding: 15px;
+  margin: 20px 0;
+  font-size: 0.85rem;
+}
+
+.demo-credentials p {
+  margin: 5px 0;
+  color: #004080;
+}
+
+.demo-credentials p:first-child {
+  margin-top: 0;
+  font-weight: bold;
+}

@@ -1,0 +1,261 @@
+/* UserRatings.css */
+
+.user-ratings-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+  
+  .user-ratings-content {
+    margin-left: 280px;
+    flex: 1;
+    padding: 40px;
+    box-sizing: border-box;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .user-ratings-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .user-ratings-card {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-ratings-card-title {
+    font-size: 1.5rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .user-ratings-description {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+  
+  /* Ratings Table */
+  .ratings-table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+  }
+  
+  .ratings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .ratings-table th,
+  .ratings-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    color: #333;
+  }
+  
+  .ratings-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .ratings-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* Table Cell Styling */
+  .timestamp-cell {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #6c757d;
+    min-width: 160px;
+  }
+  
+  .user-id-cell {
+    font-weight: 600;
+    color: #495057;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    padding: 8px 12px !important;
+    font-family: 'Courier New', monospace;
+  }
+  
+  .figure-cell {
+    font-weight: 500;
+    color: #333;
+    max-width: 200px;
+    word-wrap: break-word;
+  }
+  
+  .rating-cell {
+    text-align: center;
+    min-width: 100px;
+  }
+  
+  /* Rating Badges */
+  .rating-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 70px;
+    justify-content: center;
+  }
+  
+  .rating-badge.excellent {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .rating-badge.good {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+  
+  .rating-badge.average {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+  }
+  
+  .rating-badge.poor {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  /* Rating Statistics */
+  .rating-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #007bff;
+  }
+  
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  /* Center the middle stats (total and average) */
+  .stat-item.center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .user-ratings-content {
+      margin-left: 0;
+      padding: 20px;
+    }
+    
+    .user-ratings-title {
+      font-size: 2rem;
+    }
+    
+    .ratings-table-container {
+      overflow-x: scroll;
+    }
+    
+    .ratings-table th,
+    .ratings-table td {
+      padding: 10px 8px;
+      font-size: 0.9rem;
+    }
+    
+    .timestamp-cell {
+      min-width: 140px;
+      font-size: 0.8rem;
+    }
+    
+    .rating-stats {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .stat-item {
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+    }
+    
+    .stat-item.center {
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .user-ratings-card {
+      padding: 20px;
+    }
+    
+    .ratings-table th,
+    .ratings-table td {
+      padding: 8px 6px;
+    }
+    
+    .figure-cell {
+      max-width: 120px;
+      font-size: 0.85rem;
+    }
+    
+    .rating-badge {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      min-width: 60px;
+    }
+  }

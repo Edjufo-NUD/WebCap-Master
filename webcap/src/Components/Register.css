@@ -1,0 +1,212 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(rgba(214, 184, 184, 0.6), rgba(214, 184, 184, 0.6)), url('../assets/Indak.jpg') no-repeat center center/cover;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.register-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  padding: 20px 40px;
+}
+
+.register-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logo-text {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.register-box {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 50px 40px;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  backdrop-filter: none;
+}
+
+.register-title {
+  color: white;
+  font-size: 3rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-subtitle {
+  color: #cccccc;
+  font-size: 1.2rem;
+  margin-bottom: 35px;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.form-box {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.input-group {
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-input {
+  width: 100%;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-input::placeholder {
+  color: #999;
+}
+
+.register-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #4CAF50;
+}
+
+/* Password input container styles */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.register-button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-family: 'Arial', sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.register-button:hover {
+  background: #45a049;
+}
+
+.register-footer {
+  color: white;
+  font-size: 1rem;
+  margin-top: 25px;
+  font-family: 'Arial', sans-serif;
+}
+
+.register-link {
+  color: #a0855b;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.register-link:hover {
+  color: #8a7350;
+}
+
+@media (max-width: 768px) {
+  .register-header {
+    padding: 15px 20px;
+  }
+  
+  .register-box {
+    padding: 40px 30px;
+    margin: 20px;
+  }
+  
+  .form-box {
+    padding: 25px 20px;
+  }
+  
+  .register-title {
+    font-size: 2.5rem;
+  }
+  
+  .register-subtitle {
+    font-size: 1rem;
+  }
+  
+  .register-form {
+    gap: 18px;
+  }
+}
