@@ -41,7 +41,7 @@ const ManageDance = () => {
     title: '',
     region: '',
     history: '',
-    description: ''
+    references: ''
   });
 
   // Load dances from localStorage
@@ -62,7 +62,7 @@ const ManageDance = () => {
           dateAdded: dance.uploadDate || new Date().toISOString(),
           duration: '3:45', // Default duration
           thumbnail: dance.image?.url || '/api/placeholder/150/100', // Use uploaded image or placeholder
-          description: dance.description,
+          references: dance.references,
           history: dance.history,
           region: dance.region,
           previewVideo: dance.previewVideo,
@@ -111,7 +111,7 @@ if (error) {
     // 1. Fetch dances
     const { data: dancesData, error: dancesError } = await supabase
       .from("dances")
-      .select("id, title, island, user_id, created_at");
+      .select("id, title, island, user_id, created_at, history, references");
 
     // 2. Fetch users (for uploader info)
     const { data: usersData, error: usersError } = await supabase
@@ -146,6 +146,9 @@ if (error) {
         dateAdded: d.created_at,
         duration: "3:45",
         thumbnail: imageMap[d.id] || "/api/placeholder/150/100",
+        history: d.history || "",
+        references: d.references || "",
+        region: d.island || "", // for consistency in edit modal
       }));
 
       setDances(merged);
@@ -206,21 +209,36 @@ if (error) {
   const currentDances = sortedDances.slice(indexOfFirstDance, indexOfLastDance);
   const totalPages = Math.ceil(sortedDances.length / dancesPerPage);
 
-  const handleDeleteDance = (danceId) => {
-    // Remove from state
-    setDances(prev => prev.filter(dance => dance.id !== danceId));
-    
-    // Remove from localStorage
+  // --- DELETE FUNCTION ---
+const handleDeleteDance = async (danceId) => {
+  setLoading(true);
+  try {
+    // 1. Delete from Supabase (dances table)
+    const { error: deleteDanceError } = await supabase
+      .from("dances")
+      .delete()
+      .eq("id", danceId);
+
+    // 2. Delete related images (optional, if you want to clean up)
+    await supabase.from("dance_images").delete().eq("dance_id", danceId);
+
+    // 3. Delete from localStorage
     const storedDances = localStorage.getItem('uploadedDances');
     if (storedDances) {
       const uploadedDances = JSON.parse(storedDances);
       const updatedDances = uploadedDances.filter(dance => dance.id !== danceId);
       localStorage.setItem('uploadedDances', JSON.stringify(updatedDances));
     }
-    
-    setShowDeleteModal(false);
-    setDanceToDelete(null);
-  };
+
+    // 4. Remove from UI state
+    setDances(prev => prev.filter(dance => dance.id !== danceId));
+  } catch (error) {
+    console.error("Error deleting dance:", error);
+  }
+  setShowDeleteModal(false);
+  setDanceToDelete(null);
+  setLoading(false);
+};
 
   const handleEdit = (dance) => {
     setSelectedDance(dance);
@@ -228,7 +246,7 @@ if (error) {
       title: dance.title || '',
       region: dance.region || '',
       history: dance.history || '',
-      description: dance.description || ''
+      references: dance.references || ''
     });
     setShowEditModal(true);
   };
@@ -240,55 +258,68 @@ if (error) {
     }));
   };
 
-  const handleSaveEdit = () => {
-    if (!selectedDance) return;
+  // --- EDIT FUNCTION ---
+const handleSaveEdit = async () => {
+  if (!selectedDance) return;
+  setLoading(true);
 
-    // Update the dance in state
-    const updatedDances = dances.map(dance => {
+  // 1. Update in Supabase
+  const { error: updateError } = await supabase
+    .from("dances")
+    .update({
+      title: editForm.title,
+      island: editForm.region,
+      history: editForm.history,
+      references: editForm.references
+    })
+    .eq("id", selectedDance.id);
+
+  // 2. Update in localStorage
+  const storedDances = localStorage.getItem('uploadedDances');
+  if (storedDances) {
+    const uploadedDances = JSON.parse(storedDances);
+    const updatedStoredDances = uploadedDances.map(dance => {
       if (dance.id === selectedDance.id) {
         return {
           ...dance,
           title: editForm.title,
           region: editForm.region,
-          category: editForm.region, // Update category to match region
           history: editForm.history,
-          description: editForm.description
+          references: editForm.references
         };
       }
       return dance;
     });
-    
-    setDances(updatedDances);
+    localStorage.setItem('uploadedDances', JSON.stringify(updatedStoredDances));
+  }
 
-    // Update localStorage
-    const storedDances = localStorage.getItem('uploadedDances');
-    if (storedDances) {
-      const uploadedDances = JSON.parse(storedDances);
-      const updatedStoredDances = uploadedDances.map(dance => {
-        if (dance.id === selectedDance.id) {
-          return {
-            ...dance,
-            title: editForm.title,
-            region: editForm.region,
-            history: editForm.history,
-            description: editForm.description
-          };
-        }
-        return dance;
-      });
-      localStorage.setItem('uploadedDances', JSON.stringify(updatedStoredDances));
+  // 3. Update UI state
+  const updatedDances = dances.map(dance => {
+    if (dance.id === selectedDance.id) {
+      return {
+        ...dance,
+        title: editForm.title,
+        region: editForm.region,
+        category: editForm.region,
+        history: editForm.history,
+        references: editForm.references
+      };
     }
+    return dance;
+  });
+  setDances(updatedDances);
 
-    // Close modal
-    setShowEditModal(false);
-    setSelectedDance(null);
-    setEditForm({
-      title: '',
-      region: '',
-      history: '',
-      description: ''
-    });
-  };
+  // 4. Close modal and reset
+  setShowEditModal(false);
+  setSelectedDance(null);
+  setEditForm({
+    title: '',
+    region: '',
+    history: '',
+    references: ''
+  });
+  setLoading(false);
+};
 
   const handleCancelEdit = () => {
     setShowEditModal(false);
@@ -297,7 +328,7 @@ if (error) {
       title: '',
       region: '',
       history: '',
-      description: ''
+      references: ''
     });
   };
 
@@ -325,7 +356,7 @@ if (error) {
       dateAdded: dance.uploadDate || new Date().toISOString(),
       duration: '3:45',
       thumbnail: dance.image?.url || '/api/placeholder/150/100',
-      description: dance.description,
+      references: dance.references,
       history: dance.history,
       region: dance.region,
       previewVideo: dance.previewVideo,
@@ -345,6 +376,28 @@ if (error) {
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
   }, []);
+
+  // Add this function inside your component
+const isEditChanged = () => {
+  if (!selectedDance) return false;
+  return (
+    editForm.title.trim() !== (selectedDance.title || '').trim() ||
+    editForm.region.trim() !== (selectedDance.region || selectedDance.island || selectedDance.category || '').trim() ||
+    editForm.history.trim() !== (selectedDance.history || '').trim() ||
+    editForm.references.trim() !== (selectedDance.references || '').trim()
+  );
+};
+
+  useEffect(() => {
+    if (showEditModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showEditModal]);
 
   return (
     <div className="manage-dance-container">
@@ -531,79 +584,103 @@ if (error) {
         {/* Edit Modal */}
         {showEditModal && selectedDance && (
           <div className="modal-overlay" onClick={handleModalOverlayClick}>
-            <div className="modal edit-modal">
-              <div className="modal-body">
-                <div className="form-group">
-                  <label htmlFor="edit-title">Dance Title</label>
-                  <input
-                    id="edit-title"
-                    type="text"
-                    value={editForm.title}
-                    onChange={(e) => handleEditFormChange('title', e.target.value)}
-                    className="form-input"
-                    placeholder="Enter dance title"
-                  />
-                </div>
+            <div
+      className="modal edit-modal"
+      onClick={e => e.stopPropagation()} // Prevent overlay click from closing modal when clicking inside
+    >
+      <div className="modal-body">
+        <div className="form-group">
+          <label htmlFor="edit-title">Dance Title</label>
+          <input
+            id="edit-title"
+            type="text"
+            value={editForm.title}
+            onChange={(e) => handleEditFormChange('title', e.target.value)}
+            className="form-input"
+            placeholder="Enter dance title"
+            required
+          />
+        </div>
 
-                <div className="form-group">
-                  <label htmlFor="edit-region">Island/Region</label>
-                  <select
-                    id="edit-region"
-                    value={editForm.region}
-                    onChange={(e) => handleEditFormChange('region', e.target.value)}
-                    className="form-select"
-                  >
-                    <option value="">Select Island/Region</option>
-                    <option value="luzon">Luzon</option>
-                    <option value="visayas">Visayas</option>
-                    <option value="mindanao">Mindanao</option>
-                  </select>
-                </div>
+        <div className="form-group">
+          <label htmlFor="edit-region">Island/Region</label>
+          <select
+            id="edit-region"
+            value={editForm.region}
+            onChange={(e) => handleEditFormChange('region', e.target.value)}
+            className="form-select"
+            required
+          >
+            <option value="">Select Island/Region</option>
+            <option value="Luzon">Luzon</option>
+            <option value="Visayas">Visayas</option>
+            <option value="Mindanao">Mindanao</option>
+          </select>
+        </div>
 
-                <div className="form-group">
-                  <label htmlFor="edit-history">History</label>
-                  <textarea
-                    id="edit-history"
-                    value={editForm.history}
-                    onChange={(e) => handleEditFormChange('history', e.target.value)}
-                    className="form-textarea"
-                    placeholder="Enter dance history..."
-                    rows="4"
-                  />
-                </div>
+        <div className="form-group">
+          <label htmlFor="edit-history">History</label>
+          <textarea
+            id="edit-history"
+            value={editForm.history}
+            onChange={(e) => handleEditFormChange('history', e.target.value)}
+            className="form-textarea"
+            placeholder="Enter dance history..."
+            rows="4"
+            required
+            style={{
+              minHeight: '120px',
+              maxHeight: '240px',
+              overflowY: 'auto',
+              resize: 'vertical'
+            }}
+          />
+        </div>
 
-                <div className="form-group">
-                  <label htmlFor="edit-description">Description</label>
-                  <textarea
-                    id="edit-description"
-                    value={editForm.description}
-                    onChange={(e) => handleEditFormChange('description', e.target.value)}
-                    className="form-textarea"
-                    placeholder="Enter dance description..."
-                    rows="4"
-                  />
-                </div>
-              </div>
-              
-              <div className="modal-actions">
-                <button 
-                  className="btn btn-primary"
-                  onClick={handleSaveEdit}
-                  disabled={!editForm.title.trim()}
-                >
-                  <Check size={16} />
-                  Save Changes
-                </button>
-                <button 
-                  className="btn btn-cancel"
-                  onClick={handleCancelEdit}
-                >
-                  <X size={16} />
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
+        <div className="form-group">
+          <label htmlFor="edit-references">References</label>
+          <textarea
+            id="edit-references"
+            value={editForm.references}
+            onChange={(e) => handleEditFormChange('references', e.target.value)}
+            className="form-textarea"
+            placeholder="Enter dance references..."
+            rows="4"
+            required
+            style={{
+              minHeight: '120px',
+              maxHeight: '240px',
+              overflowY: 'auto',
+              resize: 'vertical'
+            }}
+          />
+        </div>
+      </div>
+      <div className="modal-actions">
+        <button
+          className="btn btn-primary"
+          onClick={handleSaveEdit}
+          disabled={
+            !editForm.title.trim() ||
+            !editForm.region.trim() ||
+            !editForm.history.trim() ||
+            !editForm.references.trim() ||
+            !isEditChanged()
+          }
+        >
+          <Check size={16} />
+          Save Changes
+        </button>
+        <button
+          className="btn btn-cancel"
+          onClick={handleCancelEdit}
+        >
+          <X size={16} />
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
         )}
 
         {/* Delete Confirmation Modal */}

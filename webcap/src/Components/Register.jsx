@@ -3,7 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndakHamakaLogo from "../assets/IndakHamakaLogo.png";
 import "./Register.css";
-import { supabase } from "../supabasebaseClient"; // Import Supabase client
+import { supabase } from "../supabasebaseClient"; // Make sure this path is correct
+
+// Snackbar component for feedback
+const Snackbar = ({ message, type, onClose }) => (
+  <div
+    className={`snackbar ${type}`}
+    onClick={onClose}
+    role="alert"
+    aria-live="assertive"
+  >
+    {message}
+  </div>
+);
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -12,55 +24,118 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [snackbar, setSnackbar] = useState({ message: "", type: "" });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const showSnackbar = (message, type) => {
+    setSnackbar({ message, type });
+    setTimeout(() => setSnackbar({ message: "", type: "" }), 3000);
+  };
+
+  const validatePassword = (password) => password.length >= 8;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    console.log("Register form submitted"); // Debug: confirm handler runs
 
-    // Check if passwords match
+    if (username.length < 6) {
+      showSnackbar("Username must be at least 6 characters!", "error");
+      setLoading(false);
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      showSnackbar("Password must be at least 8 characters.", "error");
+      setLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      showSnackbar("Passwords do not match!", "error");
+      setLoading(false);
       return;
     }
 
-    // Check password strength (optional)
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters long!");
-      return;
-    }
+    try {
+      // Check if username or email already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from("users")
+        .select("id")
+        .or(`username.eq.${username},email.eq.${email}`)
+        .maybeSingle();
 
-    // Register user with Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+      if (checkError) {
+        console.error("Supabase checkError:", checkError);
+        throw checkError;
+      }
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+      if (existingUser) {
+        console.error("User already exists:", existingUser);
+        showSnackbar("Username or email already exists!", "error");
+        setLoading(false);
+        return;
+      }
 
-    // Insert user info into users table
-    const { user } = data;
-    const { error: dbError } = await supabase
-      .from("users")
-      .insert([
+      // Sign up with Supabase Auth
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
         {
-          id: user?.id || data?.user?.id, // Supabase user id
-          username,
           email,
-          role: "user", // default role
-          status: "active",
-        },
-      ]);
+          password,
+          options: {
+            data: { display_name: username },
+          },
+        }
+      );
 
-    if (dbError) {
-      alert(dbError.message);
-      return;
+      if (signUpError || !signUpData?.user) {
+        console.error("Supabase signUpError:", signUpError, signUpData);
+        showSnackbar(
+          `Auth error: ${signUpError?.message || "Signup failed"}`,
+          "error"
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Get authenticated user
+      const {
+        data: { user },
+        error: userFetchError,
+      } = await supabase.auth.getUser();
+
+      if (userFetchError || !user) {
+        console.error("Supabase userFetchError:", userFetchError, user);
+        showSnackbar(
+          `Error retrieving user info: ${userFetchError?.message}`,
+          "error"
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Update username in users table
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ username })
+        .eq("id", user.id);
+
+      if (updateError) {
+        console.error("Supabase updateError:", updateError);
+        showSnackbar(`Error updating username: ${updateError.message}`, "error");
+        setLoading(false);
+        return;
+      }
+
+      showSnackbar("Registration successful! Redirecting...", "success");
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (err) {
+      console.error("Registration error:", err); // Debug: log errors
+      showSnackbar(`Unexpected error: ${err.message}`, "error");
+    } finally {
+      setLoading(false);
     }
-
-    alert("Registration successful! Please login with your credentials.");
-    navigate("/login");
   };
 
   return (
@@ -161,8 +236,8 @@ const Register = () => {
                 </div>
               </div>
 
-              <button type="submit" className="register-button">
-                Register
+              <button type="submit" className="register-button" disabled={loading}>
+                {loading ? "Registering..." : "Register"}
               </button>
             </form>
 
@@ -178,6 +253,13 @@ const Register = () => {
           </div>
         </div>
       </div>
+      {snackbar.message && (
+        <Snackbar
+          message={snackbar.message}
+          type={snackbar.type}
+          onClose={() => setSnackbar({ message: "", type: "" })}
+        />
+      )}
     </div>
   );
 };

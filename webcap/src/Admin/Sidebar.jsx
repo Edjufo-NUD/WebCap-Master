@@ -67,6 +67,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
     setShowLogoutModal(false);
     localStorage.clear();
     navigate("/login");
+    window.location.reload(); // Force reload to reset app state
   };
 
   const cancelLogout = () => {

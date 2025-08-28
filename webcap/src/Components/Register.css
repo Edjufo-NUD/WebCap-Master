@@ -210,3 +210,33 @@
     gap: 18px;
   }
 }
+
+/* Snackbar styles */
+.snackbar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 250px;
+  background: #323232;
+  color: #fff;
+  padding: 16px 32px;
+  border-radius: 8px;
+  z-index: 9999;
+  font-size: 1rem;
+  opacity: 0.97;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: opacity 0.3s;
+}
+.snackbar.success {
+  background: #43a047;
+}
+.snackbar.error {
+  background: #e53935;
+}
+.snackbar.info {
+  background: #1976d2;
+}
+.snackbar.warning {
+  background: #ffa000;
+}

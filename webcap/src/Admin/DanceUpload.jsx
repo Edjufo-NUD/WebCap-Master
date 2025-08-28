@@ -1,22 +1,23 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Admin/Sidebar";
 import "./DanceUpload.css";
-import { supabase } from "../supabasebaseClient"; // Import supabase client
+import { supabase } from "../supabasebaseClient";
 
 const DanceUpload = () => {
-  const navigate = useNavigate(); // Add this hook
+  const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("dance-upload");
   const [formData, setFormData] = useState({
     title: "",
     history: "",
-    description: "",
-    region: "" // Added region field
+    references: "",
+    region: ""
   });
   const [previewVideo, setPreviewVideo] = useState(null);
   const [figureVideos, setFigureVideos] = useState([]);
   const [danceImage, setDanceImage] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Add loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', type: '' });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,23 +29,27 @@ const DanceUpload = () => {
 
   const handleFileUpload = (file, type) => {
     const fileUrl = URL.createObjectURL(file);
-    
+
     switch (type) {
       case 'preview':
         setPreviewVideo({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
         break;
       case 'figures':
-        const newFigure = { 
-          id: Date.now(), 
-          file, 
-          url: fileUrl, 
-          name: file.name, 
-          size: formatFileSize(file.size) 
+        // Only allow one file at a time
+        const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newFigure = {
+          id: uniqueId,
+          file,
+          url: fileUrl,
+          name: file.name,
+          size: formatFileSize(file.size)
         };
         setFigureVideos(prev => [...prev, newFigure]);
         break;
       case 'image':
         setDanceImage({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+        break;
+      default:
         break;
     }
   };
@@ -88,15 +93,15 @@ const DanceUpload = () => {
   const handleDrop = (e, type) => {
     e.preventDefault();
     e.currentTarget.classList.remove('dragover');
-    
+
     const files = Array.from(e.dataTransfer.files);
-    
+
     if (type === 'figures') {
-      files.forEach(file => {
-        if (file.type.startsWith('video/')) {
-          handleFileUpload(file, type);
-        }
-      });
+      // Only allow one file at a time for figures
+      const file = files[0];
+      if (file && file.type.startsWith('video/')) {
+        handleFileUpload(file, type);
+      }
     } else {
       const file = files[0];
       if (file) {
@@ -109,78 +114,99 @@ const DanceUpload = () => {
     }
   };
 
-  const saveDanceToStorage = (danceData) => {
-    // Get existing dances from localStorage
-    const existingDances = JSON.parse(localStorage.getItem('uploadedDances') || '[]');
-    
-    // Add new dance to the array
-    const updatedDances = [...existingDances, danceData];
-    
-    // Save back to localStorage
-    localStorage.setItem('uploadedDances', JSON.stringify(updatedDances));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    showSnackbar('Uploading Video', 'loading');
 
     try {
       // Validate required fields
-      if (!formData.title || !formData.description || !formData.region) {
+      if (!formData.title || !formData.references || !formData.region) {
         alert('Please fill in all required fields');
         setIsSubmitting(false);
         return;
       }
+      if (!previewVideo) {
+        alert('Preview video is required.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (figureVideos.length < 1) {
+        alert('At least 1 figure video is required.');
+        setIsSubmitting(false);
+        return;
+      }
+      if (!danceImage) {
+        alert('Dance image is required.');
+        setIsSubmitting(false);
+        return;
+      }
 
-      // Create dance object with all data
-      const danceData = {
-        id: Date.now(), // Simple ID generation
-        title: formData.title,
-        history: formData.history,
-        description: formData.description,
-        region: formData.region,
-        previewVideo: previewVideo,
-        figureVideos: figureVideos,
-        image: danceImage,
-        uploadDate: new Date().toISOString(),
-        status: 'uploaded'
-      };
+      // --- Check if dance title already exists ---
+      const { data: existingDance, error: titleCheckError } = await supabase
+        .from('dances')
+        .select('id')
+        .eq('title', formData.title)
+        .maybeSingle();
 
-      // Log the data (in real app, this would be sent to backend)
-      console.log('Uploading dance:', danceData);
+      if (titleCheckError) throw titleCheckError;
+      if (existingDance) {
+        showSnackbar('A dance with this title already exists.', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+      // --- End title check ---
 
       // 1. Upload main video
-      const mainVideoUpload = await supabase.storage.from('dances').upload(`public/${danceData.id}_main.mp4`, previewVideo.file);
-      const mainVideoUrl = supabase.storage.from('dances').getPublicUrl(mainVideoUpload.data.path).data.publicUrl;
+      const mainVideoPath = `main_videos/${Date.now()}_${previewVideo.file.name}`;
+      const { data: mainVideoData, error: mainVideoError } = await supabase
+        .storage
+        .from('dances')
+        .upload(mainVideoPath, previewVideo.file);
+
+      if (mainVideoError) throw mainVideoError;
+      const mainVideoUrl = supabase.storage.from('dances').getPublicUrl(mainVideoData.path).data.publicUrl;
 
       // 2. Upload figure videos
-      const figureVideoFiles = danceData.figureVideos.map(video => video.file);
       const figureVideoUrls = [];
-      for (const file of figureVideoFiles) {
-        const upload = await supabase.storage.from('dances').upload(`public/${danceData.id}_figure_${file.name}`, file);
-        figureVideoUrls.push(supabase.storage.from('dances').getPublicUrl(upload.data.path).data.publicUrl);
+      for (let i = 0; i < figureVideos.length; i++) {
+        const file = figureVideos[i].file;
+        const figurePath = `figures/${Date.now()}_${file.name}`;
+        const { data, error } = await supabase
+          .storage
+          .from('dances')
+          .upload(figurePath, file);
+        if (error) throw error;
+        figureVideoUrls.push(supabase.storage.from('dances').getPublicUrl(data.path).data.publicUrl);
       }
 
-      // 3. Upload images
-      const imageFiles = [danceData.image.file];
-      const imageUrls = [];
-      for (const file of imageFiles) {
-        const upload = await supabase.storage.from('dances').upload(`public/${danceData.id}_image_${file.name}`, file);
-        imageUrls.push(supabase.storage.from('dances').getPublicUrl(upload.data.path).data.publicUrl);
-      }
+      // 3. Upload image
+      const imagePath = `images/${Date.now()}_${danceImage.file.name}`;
+      const { data: imageData, error: imageError } = await supabase
+        .storage
+        .from('dances')
+        .upload(imagePath, danceImage.file);
+      if (imageError) throw imageError;
+      const imageUrl = supabase.storage.from('dances').getPublicUrl(imageData.path).data.publicUrl;
 
       // 4. Insert dance record
       const { data: userData } = await supabase.auth.getUser();
       const userId = userData?.user?.id;
-      const { data: dance } = await supabase.from('dances').insert([{
-        user_id: userId,
-        title: danceData.title,
-        history: danceData.history,
-        description: danceData.description,
-        region: danceData.region,
-        preview_video_url: mainVideoUrl,
-        island: danceData.region,
-      }]).select().single();
+      if (!userId) throw new Error("User not authenticated");
+
+      const { data: dance, error: danceError } = await supabase
+        .from('dances')
+        .insert([{
+          user_id: userId,
+          title: formData.title,
+          history: formData.history,
+          references: formData.references,
+          main_video_url: mainVideoUrl,
+          island: formData.region,
+        }])
+        .select()
+        .single();
+      if (danceError) throw danceError;
 
       // 5. Insert figure videos
       for (let i = 0; i < figureVideoUrls.length; i++) {
@@ -191,43 +217,77 @@ const DanceUpload = () => {
         }]);
       }
 
-      // 6. Insert images
-      for (let i = 0; i < imageUrls.length; i++) {
-        await supabase.from('dance_images').insert([{
-          dance_id: dance.id,
-          image_url: imageUrls[i],
-          position: i,
-        }]);
-      }
+      // 6. Insert image
+      await supabase.from('dance_images').insert([{
+        dance_id: dance.id,
+        image_url: imageUrl,
+        position: 0,
+      }]);
 
-      // Show success message
-      alert('Dance uploaded successfully!');
-
-      // Navigate to ManageDance page
+      showSnackbar('Upload successful. The dance has been uploaded.', 'success');
       navigate('/manage-dance');
-
     } catch (error) {
       console.error('Upload error:', error);
-      alert('There was an error uploading the dance. Please try again.');
+      showSnackbar('Upload failed. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
+      if (snackbar.type === 'loading') setSnackbar({ open: false, message: '', type: '' });
+    }
+  };
+
+  const truncateFileName = (name, maxLength = 18) => {
+    if (name.length <= maxLength) return name;
+    const extIndex = name.lastIndexOf('.');
+    const ext = extIndex !== -1 ? name.slice(extIndex) : '';
+    return name.slice(0, maxLength - 3 - ext.length) + '...' + ext;
+  };
+
+  const showSnackbar = (message, type = 'info', duration = 3000) => {
+    setSnackbar({ open: true, message, type });
+    if (type !== 'loading') {
+      setTimeout(() => setSnackbar({ open: false, message: '', type: '' }), duration);
     }
   };
 
   return (
     <div className="dance-upload-container">
+      {snackbar.open && (
+        <div
+          className={`snackbar ${snackbar.type}`}
+          style={{
+            position: 'fixed',
+            bottom: 32,
+            right: 32,
+            maxWidth: 360,
+            minWidth: 220,
+            zIndex: 9999,
+            padding: '18px 28px',
+            textAlign: 'left',
+            fontWeight: 600,
+            fontSize: '1.1rem',
+            background: snackbar.type === 'loading' ? '#fffbe6' : snackbar.type === 'success' ? '#e6ffed' : '#f0f0f0',
+            color: snackbar.type === 'loading' ? '#8a6d3b' : snackbar.type === 'success' ? '#155724' : '#333',
+            borderRadius: 10,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.13)',
+            border: '1px solid #eee',
+            transition: 'opacity 0.3s'
+          }}
+        >
+          {snackbar.message}
+        </div>
+      )}
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
-      
+
       <div className="dance-upload-content">
         <h1 className="dance-upload-title">Upload Dance</h1>
-        
+
         <form className="dance-upload-form" onSubmit={handleSubmit}>
           {/* Basic Information Section */}
           <div className="form-section">
             <h2 className="form-section-title">
               Dance Information
             </h2>
-            
+
             <div className="form-group">
               <label className="form-label" htmlFor="title">Dance Title</label>
               <input
@@ -271,22 +331,35 @@ const DanceUpload = () => {
                 onChange={handleInputChange}
                 placeholder="Tell us about the history and origins of this dance"
                 rows="4"
+                required
                 disabled={isSubmitting}
+                style={{
+                  minHeight: '120px',
+                  maxHeight: '240px',
+                  overflowY: 'auto',
+                  resize: 'vertical'
+                }}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="description">Description</label>
+              <label className="form-label" htmlFor="references">References</label>
               <textarea
-                id="description"
-                name="description"
+                id="references"
+                name="references"
                 className="form-textarea"
-                value={formData.description}
+                value={formData.references}
                 onChange={handleInputChange}
-                placeholder="Describe the dance, its characteristics, and techniques"
+                placeholder="Enter the references for this dance"
                 rows="4"
                 required
                 disabled={isSubmitting}
+                style={{
+                  minHeight: '120px',
+                  maxHeight: '240px',
+                  overflowY: 'auto',
+                  resize: 'vertical'
+                }}
               />
             </div>
           </div>
@@ -296,7 +369,7 @@ const DanceUpload = () => {
             <h2 className="form-section-title">
               Video Preview
             </h2>
-            
+
             <div
               className="upload-area"
               onDragOver={handleDragOver}
@@ -308,7 +381,7 @@ const DanceUpload = () => {
               <div className="upload-text">Upload Preview Video</div>
               <div className="upload-subtext">Drag and drop a video file or click to browse</div>
             </div>
-            
+
             <input
               type="file"
               id="preview-video-input"
@@ -325,9 +398,9 @@ const DanceUpload = () => {
                     <span className="file-name">{previewVideo.name}</span>
                     <span className="file-size">{previewVideo.size}</span>
                   </div>
-                  <button 
-                    type="button" 
-                    className="remove-file-btn" 
+                  <button
+                    type="button"
+                    className="remove-file-btn"
                     onClick={removePreviewVideo}
                     disabled={isSubmitting}
                   >
@@ -347,7 +420,7 @@ const DanceUpload = () => {
             <h2 className="form-section-title">
               Upload Figures
             </h2>
-            
+
             <div
               className="upload-area"
               onDragOver={handleDragOver}
@@ -356,26 +429,29 @@ const DanceUpload = () => {
               onClick={() => !isSubmitting && document.getElementById('figures-input').click()}
             >
               <div className="upload-icon">Videos</div>
-              <div className="upload-text">Upload Figure Videos</div>
-              <div className="upload-subtext">Drag and drop multiple video files or click to browse</div>
+              <div className="upload-text">Upload Figure Video</div>
+              <div className="upload-subtext">Drag and drop a video file or click to browse (one at a time)</div>
             </div>
-            
+
             <input
               type="file"
               id="figures-input"
               className="file-input"
               accept="video/*"
-              multiple
+              // No 'multiple'
               onChange={(e) => {
-                Array.from(e.target.files).forEach(file => handleFileUpload(file, 'figures'));
+                if (e.target.files[0]) handleFileUpload(e.target.files[0], 'figures');
               }}
               disabled={isSubmitting}
             />
 
             {figureVideos.length > 0 && (
               <div className="figures-grid">
-                {figureVideos.map((video) => (
+                {figureVideos.map((video, idx) => (
                   <div key={video.id} className="figure-item">
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                      Figure {idx + 1}
+                    </div>
                     <button
                       type="button"
                       className="figure-remove-btn"
@@ -389,7 +465,7 @@ const DanceUpload = () => {
                       <source src={video.url} type={video.file.type} />
                     </video>
                     <div className="file-info">
-                      <div className="file-name">{video.name}</div>
+                      <div className="file-name">{truncateFileName(video.name)}</div>
                       <div className="file-size">{video.size}</div>
                     </div>
                   </div>
@@ -403,7 +479,7 @@ const DanceUpload = () => {
             <h2 className="form-section-title">
               Upload Image
             </h2>
-            
+
             <div
               className="upload-area"
               onDragOver={handleDragOver}
@@ -415,7 +491,7 @@ const DanceUpload = () => {
               <div className="upload-text">Upload Dance Image</div>
               <div className="upload-subtext">Drag and drop an image file or click to browse</div>
             </div>
-            
+
             <input
               type="file"
               id="image-input"
@@ -432,9 +508,9 @@ const DanceUpload = () => {
                     <span className="file-name">{danceImage.name}</span>
                     <span className="file-size">{danceImage.size}</span>
                   </div>
-                  <button 
-                    type="button" 
-                    className="remove-file-btn" 
+                  <button
+                    type="button"
+                    className="remove-file-btn"
                     onClick={removeDanceImage}
                     disabled={isSubmitting}
                   >

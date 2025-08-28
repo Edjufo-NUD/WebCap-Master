@@ -30,11 +30,10 @@ const Navbar = () => {
   };
 
   const handleLogoutConfirm = () => {
-    // Clear authentication data
     localStorage.clear();
-    sessionStorage.clear();
-    navigate('/login');
     setShowLogoutModal(false);
+    navigate('/login');
+    window.location.reload(); // Force reload to reset app state
   };
 
   const handleLogoutCancel = () => {
@@ -91,7 +90,7 @@ const Navbar = () => {
             {/* Profile Dropdown */}
             <div className="profile-dropdown">
               <button 
-                className={`profile-button${isProfileDropdownOpen ? ' profile-button-open' : ''}`}
+                className="profile-button"
                 onClick={toggleProfileDropdown}
               >
                 <User size={20} />

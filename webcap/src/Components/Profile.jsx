@@ -4,6 +4,18 @@ import Navbar from '../Components/Navbar';
 import './Profile.css';
 import { supabase } from '../supabasebaseClient';
 
+// Snackbar component
+const Snackbar = ({ message, type, onClose }) => (
+  <div
+    className={`snackbar ${type}`}
+    onClick={onClose}
+    role="alert"
+    aria-live="assertive"
+  >
+    {message}
+  </div>
+);
+
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -13,21 +25,26 @@ const Profile = () => {
   });
   const [editData, setEditData] = useState({ ...profileData });
   const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({ message: '', type: '' });
 
-  // Get user info from localStorage and then fetch from Supabase
+  // Snackbar helper
+  const showSnackbar = (message, type) => {
+    setSnackbar({ message, type });
+    setTimeout(() => setSnackbar({ message: '', type: '' }), 3000);
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       setLoading(true);
-      // Get user id from localStorage
       const userId = localStorage.getItem('user_id');
       if (!userId) {
         setLoading(false);
         return;
       }
-      // Fetch user info from Supabase
+
       const { data, error } = await supabase
         .from('users')
-        .select('username, email, created_at') // <-- removed phone
+        .select('username, email, created_at')
         .eq('id', userId)
         .single();
 
@@ -64,19 +81,40 @@ const Profile = () => {
       setLoading(false);
       return;
     }
-    // Update user info in Supabase
-    const { error } = await supabase
+
+    // Check if username or email is already taken
+    const { data: existingUser, error: checkError } = await supabase
       .from('users')
-      .update({
-        username: editData.name,
-        email: editData.email
-      })
+      .select('id')
+      .or(`username.eq.${editData.name},email.eq.${editData.email}`)
+      .neq('id', userId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Check error:', checkError);
+    }
+
+    if (existingUser) {
+      showSnackbar('Username or email is already taken!', 'error');
+      setLoading(false);
+      return;
+    }
+
+    // Update user info
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ username: editData.name, email: editData.email })
       .eq('id', userId);
 
-    if (!error) {
+    if (updateError) {
+      console.error('Update error:', updateError);
+      showSnackbar('Error updating profile.', 'error');
+    } else {
       setProfileData({ ...editData });
       setIsEditing(false);
+      showSnackbar('Profile updated successfully!', 'success');
     }
+
     setLoading(false);
   };
 
@@ -102,6 +140,11 @@ const Profile = () => {
         </div>
 
         <div className="profile-card">
+          {loading && (
+  <div className="loading-overlay">
+    <div className="spinner"></div>
+  </div>
+)}
           <div className="profile-avatar">
             <div className="avatar-circle">
               <User size={60} />
@@ -110,24 +153,27 @@ const Profile = () => {
 
           <div className="profile-info">
             <div className="profile-actions">
-              {!isEditing ? (
-                <button className="btn-edit" onClick={handleEdit} disabled={loading}>
+              {!loading && !isEditing ? (
+                <button className="btn-edit" onClick={handleEdit}>
                   <Edit3 size={16} />
                   Edit Profile
                 </button>
-              ) : (
+              ) : null}
+
+              {!loading && isEditing ? (
                 <div className="edit-actions">
-                  <button className="btn-save" onClick={handleSave} disabled={loading}>
+                  <button className="btn-save" onClick={handleSave}>
                     <Save size={16} />
                     Save
                   </button>
-                  <button className="btn-cancel" onClick={handleCancel} disabled={loading}>
+                  <button className="btn-cancel" onClick={handleCancel}>
                     <X size={16} />
                     Cancel
                   </button>
                 </div>
-              )}
+              ) : null}
             </div>
+
 
             {loading ? (
               <div style={{ textAlign: 'center', margin: '30px 0' }}>Loading profile...</div>
@@ -136,7 +182,7 @@ const Profile = () => {
                 <div className="field-group">
                   <label className="field-label">
                     <User size={16} />
-                    Full Name
+                    Username
                   </label>
                   {isEditing ? (
                     <input
@@ -181,6 +227,14 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {snackbar.message && (
+        <Snackbar
+          message={snackbar.message}
+          type={snackbar.type}
+          onClose={() => setSnackbar({ message: '', type: '' })}
+        />
+      )}
     </div>
   );
 };

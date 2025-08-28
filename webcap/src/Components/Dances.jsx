@@ -24,7 +24,7 @@ const Dances = () => {
       setLoading(true);
       const { data: dancesData, error: dancesError } = await supabase
         .from('dances')
-        .select('id, title, island, references, history')
+        .select('id, title, island, references, history, main_video_url') // <-- add main_video_url
         .order('created_at', { ascending: false });
 
       const { data: imagesData, error: imagesError } = await supabase
@@ -108,6 +108,41 @@ const Dances = () => {
     setMainVideoUrl('');
     setImages([]);
   };
+
+  useEffect(() => {
+    if (showPreview) {
+      // Prevent background scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore scroll
+      document.body.style.overflow = '';
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showPreview]);
+
+  // Prevent scroll bubbling outside modal
+  useEffect(() => {
+    if (!showPreview) return;
+
+    const preventScroll = (e) => {
+      // Only prevent if not inside modal-content
+      const modalContent = document.querySelector('.modal-content');
+      if (modalContent && !modalContent.contains(e.target)) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('wheel', preventScroll, { passive: false });
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+
+    return () => {
+      document.removeEventListener('wheel', preventScroll, { passive: false });
+      document.removeEventListener('touchmove', preventScroll, { passive: false });
+    };
+  }, [showPreview]);
 
   return (
     <div className="dances-page">
@@ -228,7 +263,14 @@ const Dances = () => {
       {showPreview && selectedDance && (
         <div className="preview-modal">
           <div className="modal-backdrop" onClick={closePreview}></div>
-          <div className="modal-content" style={{ padding: 0, overflow: 'hidden' }}>
+          <div
+            className="modal-content"
+            style={{
+              padding: 0,
+              overflow: 'auto', // allow scroll inside modal
+              maxHeight: '90vh', // limit modal height
+            }}
+          >
             {/* Thumbnail image at the very top, fills the modal width and height */}
             {selectedDance.image_url && (
               <div style={{
@@ -289,20 +331,20 @@ const Dances = () => {
               </div>
 
               {/* Main Video */}
-              {mainVideoUrl && (
-                <div className="modal-section">
-                  <h3>Main Video</h3>
+              {selectedDance.main_video_url && (
+                <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
+                  <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
                   <video
-                    src={mainVideoUrl}
+                    src={selectedDance.main_video_url}
                     controls
                     style={{
                       width: '100%',
-                      maxWidth: 320,
-                      height: 180,
-                      borderRadius: 8,
-                      marginBottom: 16,
+                      maxWidth: 520,
+                      height: 320,
+                      borderRadius: 12,
                       background: '#000',
-                      objectFit: 'cover'
+                      objectFit: 'cover',
+                      boxShadow: '0 4px 24px #0002'
                     }}
                   >
                     Your browser does not support the video tag.
