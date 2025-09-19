@@ -18,7 +18,7 @@ import warMartialImage from '../assets/WarMartial.jpg';
 // Dance images
 import tiniklingImage from '../assets/tinikling.jpg';
 import maglalatikImage from '../assets/maglalatik.jpg';
-import bangaImage from '../assets/Banga.JPG';
+import bangaImage from '../assets/Banga.jpg';
 import palayImage from '../assets/Palay.jpg';
 import pandanggoImage from '../assets/pandanggo.jpg';
 import sayawSaBangkoImage from '../assets/SayawSaBangko.jpg';
@@ -31,7 +31,7 @@ import carinosaImage from '../assets/carinosa.jpg';
 import rigodonImage from '../assets/Rigodon.jpeg';
 import laJotaImage from '../assets/LaJota.jpg';
 import mazurkaImage from '../assets/Mazurka.jpg';
-import bendianImage from '../assets/Bendian.JPG';
+import bendianImage from '../assets/Bendian.jpg';
 import tayawImage from '../assets/Tayaw.png';
 import kalapawImage from '../assets/kalapaw.png';
 import squareDanceImage from '../assets/SquareDance.jpg';
