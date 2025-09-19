@@ -49,7 +49,7 @@ import sayawSaBangkoImage from '../assets/SayawSaBangko.jpg';
 import itikItikImage from '../assets/itik-itik.jpg';
 import maramionImage from '../assets/Maramion.jpg';
 import singkilImage from '../assets/singkil.jpg';
-import kuratsaImage from '../assets/Kuratsa.jpg';
+import kuratsaImage from '../assets/kuratsa.jpg';
 import carinosaImage from '../assets/carinosa.jpg';
 import rigodonImage from '../assets/Rigodon.jpeg';
 import laJotaImage from '../assets/LaJota.jpg';
