@@ -1,11 +1,35 @@
+// src/pages/Culture.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Clock, Users, Star, Play, BookOpen, Camera, Music, X, Calendar, Award, Users2, Volume2, Heart, Palette, Scroll } from 'lucide-react';
+import {
+  MapPin,
+  Clock,
+  Users,
+  Star,
+  Play,
+  BookOpen,
+  Camera,
+  Music,
+  X,
+  Calendar,
+  Award,
+  Users2,
+  Volume2,
+  Heart,
+  Palette,
+  Scroll,
+  ChevronDown,
+  ChevronRight
+} from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import './Culture.css';
+
+// Region images
 import luzonImage from '../assets/Luzon.jpg';
 import visayasImage from '../assets/Visayas.jpg';
 import mindanaoImage from '../assets/Map_of_Mindanao.jpg';
+
+// Classification images
 import countrysideImage from '../assets/Countryside.jpg';
 import occupationalImage from '../assets/Occupational.jpeg';
 import mimeticImage from '../assets/Mimetic.jpg';
@@ -24,9 +48,8 @@ import pandanggoImage from '../assets/pandanggo.jpg';
 import sayawSaBangkoImage from '../assets/SayawSaBangko.jpg';
 import itikItikImage from '../assets/itik-itik.jpg';
 import maramionImage from '../assets/Maramion.jpg';
-import tinikling2Image from '../assets/tinikling.jpg';
 import singkilImage from '../assets/singkil.jpg';
-import kuratsaImage from '../assets/kuratsa.jpg';
+import kuratsaImage from '../assets/Kuratsa.jpg';
 import carinosaImage from '../assets/carinosa.jpg';
 import rigodonImage from '../assets/Rigodon.jpeg';
 import laJotaImage from '../assets/LaJota.jpg';
@@ -53,7 +76,8 @@ const Culture = () => {
   const folkDanceClassifications = [
     {
       category: 'Countryside Dances (Rural/Agricultural)',
-      description: 'Dances that reflect rural life, agricultural practices, and the connection between Filipinos and their land.',
+      description:
+        'Dances that reflect rural life, agricultural practices, and the connection between Filipinos and their land.',
       image: countrysideImage,
       dances: [
         {
@@ -94,14 +118,16 @@ const Culture = () => {
     },
     {
       category: 'Occupational Dances',
-      description: 'Dances that depict various occupations and trades, showcasing the dignity of labor.',
+      description:
+        'Dances that depict various occupations and trades, showcasing the dignity of labor.',
       image: occupationalImage,
       dances: [
         {
           name: 'Pandanggo sa Ilaw',
           origin: 'Mindoro',
           description: 'Balances oil lamps while performing graceful movements',
-          culturalContext: 'Represents the fishermen\'s practice of using lights to attract fish',
+          culturalContext:
+            "Represents the fishermen's practice of using lights to attract fish",
           image: pandanggoImage
         },
         {
@@ -115,14 +141,16 @@ const Culture = () => {
           name: 'Itik-Itik',
           origin: 'Surigao del Sur',
           description: 'Mimics the movements of ducks',
-          culturalContext: 'Represents rice farming and the ducks that help in pest control',
+          culturalContext:
+            'Represents rice farming and the ducks that help in pest control',
           image: itikItikImage
         },
         {
           name: 'Maramion',
           origin: 'Antique',
           description: 'Depicts the movements of honey gatherers',
-          culturalContext: 'Shows the dangerous but rewarding work of collecting wild honey',
+          culturalContext:
+            'Shows the dangerous but rewarding work of collecting wild honey',
           image: maramionImage
         }
       ],
@@ -135,27 +163,31 @@ const Culture = () => {
     },
     {
       category: 'Mimetic Dances (Nature and Animals)',
-      description: 'Dances that imitate natural phenomena, animals, and environmental elements.',
+      description:
+        'Dances that imitate natural phenomena, animals, and environmental elements.',
       image: mimeticImage,
       dances: [
         {
           name: 'Itik-Itik',
           origin: 'Surigao del Sur',
           description: 'Imitates duck movements - waddling, flapping, splashing',
-          culturalContext: 'Connection between humans and nature in rice farming communities',
+          culturalContext:
+            'Connection between humans and nature in rice farming communities',
           image: itikItikImage
         },
         {
           name: 'Tinikling',
           origin: 'Leyte',
-          description: 'Mimics tikling birds navigating through grass and bamboo',
+          description:
+            'Mimics tikling birds navigating through grass and bamboo',
           culturalContext: 'Represents harmony between humans and wildlife',
           image: tiniklingImage
         },
         {
           name: 'Singkil',
           origin: 'Maranao',
-          description: 'Imitates birds gracefully moving through a forest',
+          description:
+            'Imitates birds gracefully moving through a forest',
           culturalContext: 'Royal court dance inspired by natural elegance',
           image: singkilImage
         },
@@ -163,7 +195,8 @@ const Culture = () => {
           name: 'Kuratsa',
           origin: 'Visayas',
           description: 'Mimics courtship behavior of birds',
-          culturalContext: 'Natural courtship patterns reflected in human dance',
+          culturalContext:
+            'Natural courtship patterns reflected in human dance',
           image: kuratsaImage
         }
       ],
@@ -176,28 +209,33 @@ const Culture = () => {
     },
     {
       category: 'Spanish Influence Dances',
-      description: 'Dances that evolved from Spanish colonial period, blending European forms with Filipino sensibilities.',
+      description:
+        'Dances that evolved from Spanish colonial period, blending European forms with Filipino sensibilities.',
       image: spanishImage,
       dances: [
         {
           name: 'Cariñosa',
           origin: 'National dance',
           description: 'Courtship dance with fans and handkerchiefs',
-          culturalContext: 'Spanish colonial courtship customs adapted to Filipino values',
+          culturalContext:
+            'Spanish colonial courtship customs adapted to Filipino values',
           image: carinosaImage
         },
         {
           name: 'Rigodon',
           origin: 'European ballroom',
           description: 'Formal ballroom dance for special occasions',
-          culturalContext: 'Spanish aristocratic traditions in Filipino social events',
+          culturalContext:
+            'Spanish aristocratic traditions in Filipino social events',
           image: rigodonImage
         },
         {
           name: 'La Jota',
           origin: 'Spanish Jota',
-          description: 'Lively dance with castanets and flowing movements',
-          culturalContext: 'Spanish regional dance adapted to Filipino celebrations',
+          description:
+            'Lively dance with castanets and flowing movements',
+          culturalContext:
+            'Spanish regional dance adapted to Filipino celebrations',
           image: laJotaImage
         },
         {
@@ -210,8 +248,10 @@ const Culture = () => {
         {
           name: 'Pandanggo',
           origin: 'Spanish Fandango',
-          description: 'Various regional adaptations of Spanish fandango',
-          culturalContext: 'Spanish dance forms localized to Filipino regions',
+          description:
+            'Various regional adaptations of Spanish fandango',
+          culturalContext:
+            'Spanish dance forms localized to Filipino regions',
           image: pandanggoImage
         }
       ],
@@ -224,35 +264,43 @@ const Culture = () => {
     },
     {
       category: 'Cordillera Dances (Mountain Province)',
-      description: 'Dances from the mountainous northern regions, preserving ancient tribal traditions.',
+      description:
+        'Dances from the mountainous northern regions, preserving ancient tribal traditions.',
       image: cordilleraImage,
       dances: [
         {
           name: 'Bendian',
           origin: 'Benguet',
-          description: 'Circle dance celebrating community unity and thanksgiving',
-          culturalContext: 'Ritual dance for harvest festivals and important ceremonies',
+          description:
+            'Circle dance celebrating community unity and thanksgiving',
+          culturalContext:
+            'Ritual dance for harvest festivals and important ceremonies',
           image: bendianImage
         },
         {
           name: 'Tayaw',
           origin: 'Ifugao',
-          description: 'Ritual dance performed during rice planting and harvest',
-          culturalContext: 'Sacred dance connecting community to ancestral spirits',
+          description:
+            'Ritual dance performed during rice planting and harvest',
+          culturalContext:
+            'Sacred dance connecting community to ancestral spirits',
           image: tayawImage
         },
         {
           name: 'Kalapaw',
           origin: 'Kalinga',
           description: 'Courtship dance of the Kalinga people',
-          culturalContext: 'Traditional courtship within tribal customs',
+          culturalContext:
+            'Traditional courtship within tribal customs',
           image: kalapawImage
         },
         {
           name: 'Salidsid',
           origin: 'Kalinga',
-          description: 'Courtship dance where dancers move like flowing water',
-          culturalContext: 'Represents the gentle flow of mountain streams',
+          description:
+            'Courtship dance where dancers move like flowing water',
+          culturalContext:
+            'Represents the gentle flow of mountain streams',
           image: bangaImage
         }
       ],
@@ -265,35 +313,40 @@ const Culture = () => {
     },
     {
       category: 'Western Influence Dances',
-      description: 'Dances introduced during American period and later, showing modern adaptations.',
+      description:
+        'Dances introduced during American period and later, showing modern adaptations.',
       image: westernInfluenceImage,
       dances: [
         {
           name: 'Square Dance',
           origin: 'American introduction',
           description: 'Group dance with caller directing movements',
-          culturalContext: 'American cultural influence in Filipino social dancing',
+          culturalContext:
+            'American cultural influence in Filipino social dancing',
           image: squareDanceImage
         },
         {
           name: 'Polka',
           origin: 'European via America',
           description: 'Lively couple dance with hopping steps',
-          culturalContext: 'Western social dancing adapted to Filipino celebrations',
+          culturalContext:
+            'Western social dancing adapted to Filipino celebrations',
           image: polkaImage
         },
         {
           name: 'Waltz',
           origin: 'European ballroom',
           description: 'Elegant three-step ballroom dance',
-          culturalContext: 'Formal Western dancing in Filipino high society',
+          culturalContext:
+            'Formal Western dancing in Filipino high society',
           image: waltzImage
         },
         {
           name: 'Swing',
           origin: 'American jazz era',
           description: 'Energetic partner dance with jazz music',
-          culturalContext: 'Modern American cultural influence post-WWII',
+          culturalContext:
+            'Modern American cultural influence post-WWII',
           image: swingImage
         }
       ],
@@ -306,35 +359,40 @@ const Culture = () => {
     },
     {
       category: 'Religious and Ceremonial Dances',
-      description: 'Dances with spiritual significance, performed during religious festivals and ceremonies.',
+      description:
+        'Dances with spiritual significance, performed during religious festivals and ceremonies.',
       image: religiousCeremonialImage,
       dances: [
         {
           name: 'Singkil',
           origin: 'Maranao',
           description: 'Royal dance depicting Islamic epic stories',
-          culturalContext: 'Sacred dance preserving Islamic cultural heritage',
+          culturalContext:
+            'Sacred dance preserving Islamic cultural heritage',
           image: singkilImage
         },
         {
           name: 'Dugso',
           origin: 'Bukidnon',
           description: 'Ceremonial dance for healing and thanksgiving',
-          culturalContext: 'Indigenous spiritual practice through movement',
+          culturalContext:
+            'Indigenous spiritual practice through movement',
           image: dugsoImage
         },
         {
           name: 'Subli',
           origin: 'Batangas',
           description: 'Religious dance honoring the Holy Cross',
-          culturalContext: 'Catholic devotion expressed through traditional movement',
+          culturalContext:
+            'Catholic devotion expressed through traditional movement',
           image: subliImage
         },
         {
           name: 'Sinulog',
           origin: 'Cebu',
           description: 'Festival dance honoring Santo Niño',
-          culturalContext: 'Christian faith integrated with pre-colonial ritual',
+          culturalContext:
+            'Christian faith integrated with pre-colonial ritual',
           image: sinulogImage
         }
       ],
@@ -354,28 +412,35 @@ const Culture = () => {
           name: 'Maglalatik',
           origin: 'Laguna',
           description: 'Mock battle dance using coconut shells',
-          culturalContext: 'Commemorates historical battles and warrior traditions',
+          culturalContext:
+            'Commemorates historical battles and warrior traditions',
           image: maglalatikImage
         },
         {
           name: 'Kappa Malong-Malong',
           origin: 'Maranao',
-          description: 'Demonstrates various uses of the traditional malong',
-          culturalContext: 'Shows practical and ceremonial aspects of traditional dress',
+          description:
+            'Demonstrates various uses of the traditional malong',
+          culturalContext:
+            'Shows practical and ceremonial aspects of traditional dress',
           image: malongMalongImage
         },
         {
           name: 'Sagayan',
           origin: 'Maranao',
-          description: 'Epic warrior dance with shields and weapons',
-          culturalContext: 'Preserves stories of legendary Maranao heroes',
+          description:
+            'Epic warrior dance with shields and weapons',
+          culturalContext:
+            'Preserves stories of legendary Maranao heroes',
           image: sagayanImage
         },
         {
           name: 'Binaylan',
           origin: 'Higaonon',
-          description: 'Depicts the movements of a hen protecting her chicks',
-          culturalContext: 'Represents protective instincts and defense of community',
+          description:
+            'Depicts the movements of a hen protecting her chicks',
+          culturalContext:
+            'Represents protective instincts and defense of community',
           image: binaylanImage
         }
       ],
@@ -394,42 +459,56 @@ const Culture = () => {
       name: 'Luzon',
       image: luzonImage,
       dances: [
-        { 
-          name: 'Tinikling', 
-          culturalMeaning: 'Represents Filipino resilience and agility, mimicking the tikling bird avoiding bamboo traps set by farmers',
-          musicalConnection: 'Bamboo poles create work rhythms that echo traditional agricultural activities',
-          communityRole: 'Performed at harvest festivals to celebrate agricultural abundance and community cooperation'
+        {
+          name: 'Tinikling',
+          culturalMeaning:
+            'Represents Filipino resilience and agility, mimicking the tikling bird avoiding bamboo traps set by farmers',
+          musicalConnection:
+            'Bamboo poles create work rhythms that echo traditional agricultural activities',
+          communityRole:
+            'Performed at harvest festivals to celebrate agricultural abundance and community cooperation'
         },
-        { 
-          name: 'Cariñosa', 
-          culturalMeaning: 'Embodies Filipino courtship values of respect, patience, and romantic pursuit within community oversight',
-          musicalConnection: 'Rondalla music with Spanish guitars adapted to Filipino romantic sensibilities',
-          communityRole: 'Social dance that teaches proper courtship behavior and gender interactions'
+        {
+          name: 'Cariñosa',
+          culturalMeaning:
+            'Embodies Filipino courtship values of respect, patience, and romantic pursuit within community oversight',
+          musicalConnection:
+            'Rondalla music with Spanish guitars adapted to Filipino romantic sensibilities',
+          communityRole:
+            'Social dance that teaches proper courtship behavior and gender interactions'
         },
-        { 
-          name: 'Pandanggo sa Ilaw', 
-          culturalMeaning: 'Celebrates Filipino ingenuity and the symbolic triumph of light over darkness',
-          musicalConnection: 'Waltz rhythm adapted to showcase grace and skill in balancing oil lamps',
-          communityRole: 'Performed during religious festivals to honor saints and spiritual illumination'
+        {
+          name: 'Pandanggo sa Ilaw',
+          culturalMeaning:
+            'Celebrates Filipino ingenuity and the symbolic triumph of light over darkness',
+          musicalConnection:
+            'Waltz rhythm adapted to showcase grace and skill in balancing oil lamps',
+          communityRole:
+            'Performed during religious festivals to honor saints and spiritual illumination'
         }
       ],
-      description: 'Northern and central Philippines showcase Spanish colonial influences mixed with indigenous traditions.',
+      description:
+        'Northern and central Philippines showcase Spanish colonial influences mixed with indigenous traditions.',
       highlights: ['Rice terraces ceremonies', 'Courtship dances', 'Festival celebrations'],
       detailedInfo: {
-        overview: 'Luzon, the largest island in the Philippines, is home to diverse cultural traditions that reflect centuries of indigenous heritage and Spanish colonial influence. From the mountainous Cordilleras to the bustling streets of Manila, Luzon showcases a rich tapestry of folk dances and cultural practices.',
+        overview:
+          'Luzon, the largest island in the Philippines, is home to diverse cultural traditions that reflect centuries of indigenous heritage and Spanish colonial influence. From the mountainous Cordilleras to the bustling streets of Manila, Luzon showcases a rich tapestry of folk dances and cultural practices.',
         population: '57.8 million',
         provinces: '38 provinces',
         languages: ['Tagalog', 'Ilocano', 'Kapampangan', 'Bicolano'],
         culturalDanceConnections: [
           {
             culturalValue: 'Bayanihan (Community Spirit)',
-            danceExpression: 'Group formations in Tinikling require community cooperation',
-            meaning: 'Dancers must work together or everyone fails - mirrors Filipino communal values'
+            danceExpression:
+              'Group formations in Tinikling require community cooperation',
+            meaning:
+              'Dancers must work together or everyone fails - mirrors Filipino communal values'
           },
           {
-            culturalValue: 'Pakikipagkunware (Accommodation)', 
+            culturalValue: 'Pakikipagkunware (Accommodation)',
             danceExpression: 'Gentle, non-aggressive movements in Cariñosa',
-            meaning: 'Dance reflects Filipino preference for harmony over confrontation'
+            meaning:
+              'Dance reflects Filipino preference for harmony over confrontation'
           },
           {
             culturalValue: 'Religious Devotion',
@@ -455,29 +534,40 @@ const Culture = () => {
       name: 'Visayas',
       image: visayasImage,
       dances: [
-        { 
-          name: 'Sinulog', 
-          culturalMeaning: 'Sacred dance honoring Santo Niño, blending Catholic devotion with indigenous ritual movements',
-          musicalConnection: 'Drum beats and native instruments create hypnotic rhythms for spiritual connection',
-          communityRole: 'Unifies diverse communities through shared religious celebration and cultural identity'
+        {
+          name: 'Sinulog',
+          culturalMeaning:
+            'Sacred dance honoring Santo Niño, blending Catholic devotion with indigenous ritual movements',
+          musicalConnection:
+            'Drum beats and native instruments create hypnotic rhythms for spiritual connection',
+          communityRole:
+            'Unifies diverse communities through shared religious celebration and cultural identity'
         },
-        { 
-          name: 'Kuratsa', 
-          culturalMeaning: 'Playful courtship dance showcasing flirtation balanced with respect and traditional gender roles',
-          musicalConnection: 'Lively folk music with guitar and percussion encourages spirited but controlled interaction',
-          communityRole: 'Social dance that allows young people to interact within culturally acceptable boundaries'
+        {
+          name: 'Kuratsa',
+          culturalMeaning:
+            'Playful courtship dance showcasing flirtation balanced with respect and traditional gender roles',
+          musicalConnection:
+            'Lively folk music with guitar and percussion encourages spirited but controlled interaction',
+          communityRole:
+            'Social dance that allows young people to interact within culturally acceptable boundaries'
         },
-        { 
-          name: 'Subli', 
-          culturalMeaning: 'Devotional dance combining Catholic prayer with indigenous healing and thanksgiving rituals',
-          musicalConnection: 'Sacred chants and traditional instruments bridge Spanish religious music with native spirituality',
-          communityRole: 'Performed during religious festivals to express collective faith and cultural continuity'
+        {
+          name: 'Subli',
+          culturalMeaning:
+            'Devotional dance combining Catholic prayer with indigenous healing and thanksgiving rituals',
+          musicalConnection:
+            'Sacred chants and traditional instruments bridge Spanish religious music with native spirituality',
+          communityRole:
+            'Performed during religious festivals to express collective faith and cultural continuity'
         }
       ],
-      description: 'Central islands blend Christian traditions with pre-colonial rituals and vibrant festivals.',
+      description:
+        'Central islands blend Christian traditions with pre-colonial rituals and vibrant festivals.',
       highlights: ['Religious festivals', 'Warrior dances', 'Maritime traditions'],
       detailedInfo: {
-        overview: 'The Visayas region, composed of beautiful islands in central Philippines, is renowned for its vibrant festivals, deeply rooted Catholic traditions, and dynamic folk dances. The region serves as the cultural heartland where ancient traditions meet Spanish colonial influences.',
+        overview:
+          'The Visayas region, composed of beautiful islands in central Philippines, is renowned for its vibrant festivals, deeply rooted Catholic traditions, and dynamic folk dances. The region serves as the cultural heartland where ancient traditions meet Spanish colonial influences.',
         population: '20.3 million',
         provinces: '16 provinces',
         languages: ['Cebuano', 'Hiligaynon', 'Waray', 'Boholano'],
@@ -485,17 +575,22 @@ const Culture = () => {
           {
             culturalValue: 'Religious Syncretism',
             danceExpression: 'Catholic and indigenous elements merged in Sinulog',
-            meaning: 'Filipino ability to adapt foreign religions while maintaining ancestral spiritual practices'
+            meaning:
+              'Filipino ability to adapt foreign religions while maintaining ancestral spiritual practices'
           },
           {
             culturalValue: 'Joyful Celebration',
-            danceExpression: 'Exuberant movements and colorful costumes in festival dances',
-            meaning: 'Filipino resilience expressed through celebration despite historical hardships'
+            danceExpression:
+              'Exuberant movements and colorful costumes in festival dances',
+            meaning:
+              'Filipino resilience expressed through celebration despite historical hardships'
           },
           {
             culturalValue: 'Maritime Heritage',
-            danceExpression: 'Flowing movements that mirror ocean waves and island life',
-            meaning: 'Connection to sea-based livelihood and inter-island cultural exchange'
+            danceExpression:
+              'Flowing movements that mirror ocean waves and island life',
+            meaning:
+              'Connection to sea-based livelihood and inter-island cultural exchange'
           }
         ],
         famousFestivals: [
@@ -504,7 +599,7 @@ const Culture = () => {
           { name: 'Sandugo Festival', location: 'Bohol', description: 'Blood compact commemoration' }
         ],
         culturalSites: [
-          'Magellan\'s Cross',
+          "Magellan's Cross",
           'Chocolate Hills',
           'Boracay Island',
           'Siquijor Island'
@@ -516,190 +611,72 @@ const Culture = () => {
       name: 'Mindanao',
       image: mindanaoImage,
       dances: [
-        { 
-          name: 'Singkil', 
-          culturalMeaning: 'Royal court dance depicting the epic romance of Princess Gandingan, showcasing Maranao nobility and grace',
-          musicalConnection: 'Kulintang gong ensemble creates intricate melodies that guide the dancers\' regal movements',
-          communityRole: 'Preserves Maranao epic traditions while displaying cultural sophistication and artistic mastery'
+        {
+          name: 'Singkil',
+          culturalMeaning:
+            'Royal court dance depicting the epic romance of Princess Gandingan, showcasing Maranao nobility and grace',
+          musicalConnection:
+            "Kulintang gong ensemble creates intricate melodies that guide the dancers' regal movements",
+          communityRole:
+            'Preserves Maranao epic traditions while displaying cultural sophistication and artistic mastery'
         },
-        { 
-          name: 'Pagdiwata', 
-          culturalMeaning: 'Spiritual healing dance invoking ancestral spirits and natural forces for community protection',
-          musicalConnection: 'Sacred drums and chants create trance-like states for spiritual communication',
-          communityRole: 'Maintains connection to pre-Islamic spiritual traditions and indigenous healing practices'
+        {
+          name: 'Pagdiwata',
+          culturalMeaning:
+            'Spiritual healing dance invoking ancestral spirits and natural forces for community protection',
+          musicalConnection:
+            'Sacred drums and chants create trance-like states for spiritual communication',
+          communityRole:
+            'Maintains connection to pre-Islamic spiritual traditions and indigenous healing practices'
         },
-        { 
-          name: 'Kappa Malong-Malong', 
-          culturalMeaning: 'Demonstrates the versatility of the malong garment, celebrating Maranao textile artistry and practicality',
-          musicalConnection: 'Rhythmic accompaniment follows the graceful manipulation of the traditional tube skirt',
-          communityRole: 'Teaches traditional clothing usage while showcasing regional textile craftsmanship'
+        {
+          name: 'Kappa Malong-Malong',
+          culturalMeaning:
+            'Demonstrates the versatility of the malong garment, celebrating Maranao textile artistry and practicality',
+          musicalConnection:
+            'Rhythmic accompaniment follows the graceful manipulation of the traditional tube skirt',
+          communityRole:
+            'Teaches traditional clothing usage while showcasing regional textile craftsmanship'
         }
       ],
-      description: 'Southern Philippines preserve rich Islamic and indigenous cultural heritage.',
+      description:
+        'Southern Philippines preserve rich Islamic and indigenous cultural heritage.',
       highlights: ['Royal court dances', 'Tribal ceremonies', 'Epic storytelling'],
       detailedInfo: {
-        overview: 'Mindanao, the second-largest island, is a melting pot of cultures where Islamic traditions, indigenous practices, and Christian influences converge. Known for its royal court dances and epic storytelling traditions, Mindanao preserves some of the Philippines\' most ancient cultural practices.',
+        overview:
+          "Mindanao, the second-largest island, is a melting pot of cultures where Islamic traditions, indigenous practices, and Christian influences converge. Known for its royal court dances and epic storytelling traditions, Mindanao preserves some of the Philippines' most ancient cultural practices.",
         population: '26.3 million',
         provinces: '27 provinces',
         languages: ['Cebuano', 'Maranao', 'Maguindanaoan', 'Tausug'],
         culturalDanceConnections: [
           {
             culturalValue: 'Royal Elegance (Kadatuan)',
-            danceExpression: 'Precise, controlled movements in Singkil that reflect aristocratic bearing',
-            meaning: 'Dance preserves memory of pre-colonial Filipino kingdoms and sophisticated court culture'
+            danceExpression:
+              'Precise, controlled movements in Singkil that reflect aristocratic bearing',
+            meaning:
+              'Dance preserves memory of pre-colonial Filipino kingdoms and sophisticated court culture'
           },
           {
             culturalValue: 'Spiritual Connection (Babaylan Tradition)',
-            danceExpression: 'Ritualistic movements in Pagdiwata that invoke spiritual forces',
-            meaning: 'Maintains indigenous shamanic traditions alongside Islamic and Christian practices'
+            danceExpression:
+              'Ritualistic movements in Pagdiwata that invoke spiritual forces',
+            meaning:
+              'Maintains indigenous shamanic traditions alongside Islamic and Christian practices'
           },
           {
             culturalValue: 'Practical Wisdom',
-            danceExpression: 'Multiple uses of malong demonstrated through dance',
-            meaning: 'Filipino ingenuity in creating multi-functional cultural artifacts'
+            danceExpression:
+              'Multiple uses of malong demonstrated through dance',
+            meaning:
+              'Filipino ingenuity in creating multi-functional cultural artifacts'
           }
         ],
         famousFestivals: [
-          { name: 'Kadayawan Festival', location: 'Davao City', description: 'Thanksgiving celebration for nature\'s gifts' },
+          { name: 'Kadayawan Festival', location: 'Davao City', description: "Thanksgiving celebration for nature's gifts" },
           { name: 'Shariff Kabunsuan Festival', location: 'Cotabato', description: 'Islamic cultural celebration' },
           { name: 'Lanzones Festival', location: 'Camiguin', description: 'Fruit harvest festival' }
         ],
-        culturalSites: [
-          'Lake Sebu',
-          'Mount Apo',
-          'Enchanted River',
-          'Masjid Al-Dahab'
-        ]
-      }
-    }
-  ];
-
-  const culturalElements = [
-    {
-      icon: Music,
-      title: 'Traditional Music in Dance',
-      description: 'Kulintang, rondalla, and bamboo instruments create the rhythmic soul of Filipino folk dances.',
-      detailedInfo: {
-        overview: 'Filipino traditional music forms the rhythmic foundation of folk dances, creating an immersive cultural experience that connects dancers and audiences to their ancestral heritage.',
-        danceApplications: [
-          {
-            dance: 'Singkil',
-            instrument: 'Kulintang ensemble',
-            culturalFunction: 'Royal court music elevates dance to ceremonial art form, each gong pattern tells stories of heroism and romance',
-            rhythmicMeaning: 'Complex polyrhythms mirror the intricate steps of royal court dancers'
-          },
-          {
-            dance: 'Tinikling', 
-            instrument: 'Bamboo poles as percussion',
-            culturalFunction: 'Work rhythms transformed into celebratory dance',
-            rhythmicMeaning: 'Clicking bamboo mimics sounds of rural labor turned into joyful expression'
-          },
-          {
-            dance: 'Cariñosa',
-            instrument: 'Rondalla string ensemble',
-            culturalFunction: 'Spanish-influenced music for social courtship dancing',
-            rhythmicMeaning: 'Melodic strings guide gentle, respectful romantic interactions'
-          }
-        ],
-        instruments: [
-          { name: 'Kulintang', description: 'Ancient gong ensemble from Mindanao, creates melodic patterns for royal court dances like Singkil' },
-          { name: 'Rondalla', description: 'String ensemble with bandurria, laud, and guitar, accompanies Spanish-influenced dances like Cariñosa' },
-          { name: 'Gangsa', description: 'Flat gongs from the Cordilleras, used in ritual and ceremonial dances like Bendian' },
-          { name: 'Bamboo Instruments', description: 'Angklung, tongatong, and bumbong create percussive rhythms for folk dances like Tinikling' }
-        ],
-        characteristics: [
-          'Polyrhythmic patterns that guide complex dance movements',
-          'Call and response sections between musicians and dancers',
-          'Improvisation within traditional structures allows personal expression',
-          'Integration of indigenous and colonial musical elements creates unique Filipino sound'
-        ],
-        significance: 'Music serves as the heartbeat of Filipino culture, with each rhythm telling stories of love, war, harvest, and spiritual beliefs passed down through generations of dancers and musicians.'
-      }
-    },
-    {
-      icon: Users,
-      title: 'Community Spirit Through Dance',
-      description: 'Bayanihan - the Filipino spirit of unity expressed through synchronized group performances.',
-      detailedInfo: {
-        overview: 'Bayanihan embodies the Filipino spirit of unity and cooperation, where communities come together to support one another, beautifully expressed through collective dance performances that strengthen social bonds.',
-        danceManifestations: [
-          {
-            principle: 'Pakikipagkapwa (Shared Identity)',
-            danceExpression: 'Synchronized group movements in all folk dances',
-            culturalMeaning: 'Individual success depends on group harmony - no one dances alone'
-          },
-          {
-            principle: 'Utang na Loob (Debt of Gratitude)',
-            danceExpression: 'Teaching dances to younger generations',
-            culturalMeaning: 'Older community members pass on cultural knowledge as gift to future'
-          },
-          {
-            principle: 'Kapamilya (Treating Others as Family)',
-            danceExpression: 'Inclusive participation regardless of skill level',
-            culturalMeaning: 'Community dances welcome all participants, building inclusive identity'
-          }
-        ],
-        principles: [
-          { name: 'Pakikipagkapwa', description: 'Shared identity and interconnectedness among community members expressed through unified dance movements' },
-          { name: 'Utang na Loob', description: 'Debt of gratitude that binds communities together through cultural transmission' },
-          { name: 'Kapamilya', description: 'Treating others as family, regardless of blood relations, through inclusive dance participation' },
-          { name: 'Pakikipagkunware', description: 'Accommodating others even at personal sacrifice, shown in dance partner consideration' }
-        ],
-        expressions: [
-          'Group dances performed during fiestas and celebrations create community unity',
-          'Collective preparation of costumes and props builds social cooperation', 
-          'Intergenerational teaching of dance traditions strengthens cultural bonds',
-          'Community fundraising for cultural events demonstrates shared responsibility'
-        ],
-        significance: 'The bayanihan spirit ensures that Filipino cultural traditions survive and thrive, with entire communities taking responsibility for preserving their heritage through participatory dance traditions.'
-      }
-    },
-    {
-      icon: BookOpen,
-      title: 'Oral Traditions Through Movement',
-      description: 'Epic stories and cultural wisdom preserved through choreographed dance narratives.',
-      detailedInfo: {
-        overview: 'Filipino oral traditions preserve ancient wisdom, historical events, and cultural values through storytelling dances that serve as living libraries of indigenous knowledge.',
-        epics: [
-          { name: 'Darangen', description: 'Maranao epic telling the adventures of Prince Bantugan, performed through Singkil dance' },
-          { name: 'Hudhud', description: 'Ifugao harvest songs and epic chants accompanying rice terrace rituals' },
-          { name: 'Ullalim', description: 'Kalinga epic about heroic deeds, performed during peace pacts' },
-          { name: 'Biag ni Lam-ang', description: 'Ilocano epic of supernatural hero, expressed through various folk dances' }
-        ],
-        storytelling: [
-          'Dance movements that mimic narrative elements',
-          'Costumes and props that represent story characters',
-          'Musical accompaniment that enhances dramatic tension',
-          'Audience participation in familiar story segments'
-        ],
-        significance: 'Oral traditions through dance ensure that historical events, moral lessons, and cultural wisdom remain alive and accessible to new generations, creating an unbroken chain of cultural memory.'
-      }
-    },
-    {
-      icon: Camera,
-      title: 'Visual Arts in Dance Costume',
-      description: 'Traditional textiles, jewelry, and ceremonial dress that communicate cultural identity.',
-      detailedInfo: {
-        overview: 'Filipino visual arts in dance encompass elaborate costumes, symbolic accessories, and intricate designs that communicate cultural identity, social status, and spiritual beliefs.',
-        costumes: [
-          { name: 'Baro\'t Saya', description: 'Traditional Filipino dress with butterfly sleeves, worn in Spanish-influenced dances' },
-          { name: 'Malong', description: 'Tubular garment from Mindanao, versatile clothing used in Muslim dances' },
-          { name: 'Bahag', description: 'Traditional loincloth worn by male dancers in indigenous mountain dances' },
-          { name: 'Terno', description: 'Formal Filipino dress with distinctive sleeve design for elegant ballroom dances' }
-        ],
-        accessories: [
-          'Fans (abaniko) representing courtship and grace',
-          'Bamboo poles for percussive dance elements',
-          'Colored scarves (pañuelo) for dramatic effect',
-          'Traditional jewelry indicating social status'
-        ],
-        patterns: [
-          'Geometric designs representing natural elements',
-          'Floral motifs symbolizing fertility and growth',
-          'Tribal patterns indicating clan and regional identity',
-          'Religious symbols reflecting spiritual beliefs'
-        ],
-        significance: 'Visual elements in Filipino dance serve as a non-verbal language that communicates complex cultural narratives, making each performance a feast for the eyes and a lesson in history.'
+        culturalSites: ['Lake Sebu', 'Mount Apo', 'Enchanted River', 'Masjid Al-Dahab']
       }
     }
   ];
@@ -710,7 +687,7 @@ const Culture = () => {
       representativeDances: ['Cariñosa', 'Pandanggo sa Ilaw', 'La Jota'],
       culturalValues: [
         'Men must show patience and persistence in courtship',
-        'Women demonstrate grace while maintaining modesty', 
+        'Women demonstrate grace while maintaining modesty',
         'Community oversight ensures proper moral behavior',
         'Physical contact is minimal and respectful'
       ],
@@ -720,7 +697,8 @@ const Culture = () => {
         'Eye contact patterns that show interest while maintaining propriety',
         'Group formations that provide community supervision'
       ],
-      modernRelevance: 'These dances teach traditional Filipino values about romantic relationships and gender interactions that influence contemporary Filipino courtship culture.'
+      modernRelevance:
+        'These dances teach traditional Filipino values about romantic relationships and gender interactions that influence contemporary Filipino courtship culture.'
     },
     {
       culturalTheme: 'Resilience and Adaptability (Lakas ng Loob)',
@@ -737,7 +715,8 @@ const Culture = () => {
         'Balance and coordination skills that mirror life skills',
         'Group encouragement and support for individual performers'
       ],
-      modernRelevance: 'These dances prepare participants for life challenges while building confidence and community support systems.'
+      modernRelevance:
+        'These dances prepare participants for life challenges while building confidence and community support systems.'
     },
     {
       culturalTheme: 'Spiritual Connection (Pananampalataya)',
@@ -754,7 +733,8 @@ const Culture = () => {
         'Seasonal timing that connects to agricultural and religious cycles',
         'Elder leadership in ceremonial aspects'
       ],
-      modernRelevance: 'These dances maintain Filipino spiritual traditions while adapting to contemporary religious practices.'
+      modernRelevance:
+        'These dances maintain Filipino spiritual traditions while adapting to contemporary religious practices.'
     }
   ];
 
@@ -762,89 +742,330 @@ const Culture = () => {
     {
       period: 'Pre-Colonial Era',
       year: 'Before 1521',
-      description: 'Indigenous tribes develop ritual dances for harvests, hunting, and spiritual ceremonies.',
+      description:
+        'Indigenous tribes develop ritual dances for harvests, hunting, and spiritual ceremonies.',
       dances: ['Bendian', 'Dugso', 'Pagdiwata'],
       culturalDanceContext: {
-        purpose: 'Dances served as communication with spirits, nature, and ancestors through movement',
-        community: 'Entire tribes participated in seasonal ceremonies that strengthened social bonds',
-        preservation: 'Oral tradition kept dance knowledge alive across generations without written records',
-        meaning: 'Movement patterns encoded agricultural knowledge, spiritual beliefs, and tribal identity',
-        instruments: 'Indigenous drums, gongs, and natural materials created sacred rhythms',
-        costumes: 'Natural materials and tribal symbols indicated clan identity and spiritual roles'
+        purpose:
+          'Dances served as communication with spirits, nature, and ancestors through movement',
+        community:
+          'Entire tribes participated in seasonal ceremonies that strengthened social bonds',
+        preservation:
+          'Oral tradition kept dance knowledge alive across generations without written records',
+        meaning:
+          'Movement patterns encoded agricultural knowledge, spiritual beliefs, and tribal identity',
+        instruments:
+          'Indigenous drums, gongs, and natural materials created sacred rhythms',
+        costumes:
+          'Natural materials and tribal symbols indicated clan identity and spiritual roles'
       },
-      modernRelevance: 'These ancient dances maintain connection to pre-colonial Filipino spirituality and environmental awareness in contemporary performances.'
+      modernRelevance:
+        'These ancient dances maintain connection to pre-colonial Filipino spirituality and environmental awareness in contemporary performances.'
     },
     {
       period: 'Spanish Colonial',
-      year: '1521-1898', 
-      description: 'Spanish influence introduces European dance forms merged with local traditions.',
+      year: '1521-1898',
+      description:
+        'Spanish influence introduces European dance forms merged with local traditions.',
       dances: ['Cariñosa', 'Rigodon', 'Pandanggo'],
       culturalDanceContext: {
-        purpose: 'Social dances for courtship and community celebration within Catholic framework',
-        adaptation: 'European dance forms modified to fit Filipino cultural values and physical expression',
+        purpose:
+          'Social dances for courtship and community celebration within Catholic framework',
+        adaptation:
+          'European dance forms modified to fit Filipino cultural values and physical expression',
         resistance: 'Indigenous movement elements preserved within colonial dance structures',
-        meaning: 'Cultural fusion created uniquely Filipino interpretations of European social customs',
-        instruments: 'Spanish guitars and European instruments adapted to Filipino musical sensibilities',
-        costumes: 'Colonial formal wear combined with traditional Filipino textile patterns and techniques'
+        meaning:
+          'Cultural fusion created uniquely Filipino interpretations of European social customs',
+        instruments:
+          'Spanish guitars and European instruments adapted to Filipino musical sensibilities',
+        costumes:
+          'Colonial formal wear combined with traditional Filipino textile patterns and techniques'
       },
-      modernRelevance: 'Colonial-era dances demonstrate Filipino cultural adaptability while maintaining distinct identity.'
+      modernRelevance:
+        'Colonial-era dances demonstrate Filipino cultural adaptability while maintaining distinct identity.'
     },
     {
       period: 'American Period',
       year: '1898-1946',
-      description: 'Folk dances preserved and documented, becoming symbols of national identity.',
+      description:
+        'Folk dances preserved and documented, becoming symbols of national identity.',
       dances: ['Tinikling', 'Singkil', 'La Jota'],
       culturalDanceContext: {
-        purpose: 'Cultural preservation during foreign occupation became form of peaceful resistance',
-        documentation: 'First systematic recording and standardization of traditional dance forms',
-        nationalism: 'Folk dances became symbols of Filipino cultural independence and unique identity',
-        meaning: 'Performance of traditional dances asserted cultural autonomy and historical continuity',
-        education: 'Introduction of folk dance into formal education system for cultural transmission',
-        modernization: 'Traditional dances adapted for stage performance and cultural presentation'
+        purpose:
+          'Cultural preservation during foreign occupation became form of peaceful resistance',
+        documentation:
+          'First systematic recording and standardization of traditional dance forms',
+        nationalism:
+          'Folk dances became symbols of Filipino cultural independence and unique identity',
+        meaning:
+          'Performance of traditional dances asserted cultural autonomy and historical continuity',
+        education:
+          'Introduction of folk dance into formal education system for cultural transmission',
+        modernization:
+          'Traditional dances adapted for stage performance and cultural presentation'
       },
-      modernRelevance: 'This period established folk dance as essential component of Filipino national identity and educational curriculum.'
+      modernRelevance:
+        'This period established folk dance as essential component of Filipino national identity and educational curriculum.'
     },
     {
       period: 'Modern Era',
       year: '1946-Present',
-      description: 'Contemporary choreographers revitalize traditional dances for new generations.',
+      description:
+        'Contemporary choreographers revitalize traditional dances for new generations.',
       dances: ['Modern interpretations', 'Fusion styles', 'Cultural preservation'],
       culturalDanceContext: {
-        purpose: 'Keeping traditions alive while making them relevant to modern Filipino and global audiences',
-        innovation: 'New choreographic approaches while respecting traditional cultural meanings and values',
-        education: 'Folk dance integration into school curricula and cultural education programs',
-        globalization: 'Filipino folk dances performed worldwide by diaspora communities maintaining cultural connections',
-        technology: 'Digital documentation and online instruction expanding access to traditional knowledge',
-        fusion: 'Contemporary artists creating new works that honor traditional forms while addressing modern themes'
+        purpose:
+          'Keeping traditions alive while making them relevant to modern Filipino and global audiences',
+        innovation:
+          'New choreographic approaches while respecting traditional cultural meanings and values',
+        education:
+          'Folk dance integration into school curricula and cultural education programs',
+        globalization:
+          'Filipino folk dances performed worldwide by diaspora communities maintaining cultural connections',
+        technology:
+          'Digital documentation and online instruction expanding access to traditional knowledge',
+        fusion:
+          'Contemporary artists creating new works that honor traditional forms while addressing modern themes'
       },
-      modernRelevance: 'Contemporary folk dance practice maintains cultural connection in globalized world while evolving for new generations.'
+      modernRelevance:
+        'Contemporary folk dance practice maintains cultural connection in globalized world while evolving for new generations.'
     }
   ];
 
+  // --- Modal helpers
   const openModal = (region) => {
     setSelectedRegion(region);
     document.body.style.overflow = 'hidden';
   };
-
   const closeModal = () => {
     setSelectedRegion(null);
     document.body.style.overflow = 'unset';
   };
-
   const openElementModal = (element) => {
     setSelectedElement(element);
     document.body.style.overflow = 'hidden';
   };
-
   const closeElementModal = () => {
     setSelectedElement(null);
     document.body.style.overflow = 'unset';
   };
 
+  // === Collapsible Timeline state & toggle ===
+  const [openTimeline, setOpenTimeline] = useState(() => new Set(timeline.map((_, i) => i))); // default all open
+  const toggleTimeline = (idx) => {
+    setOpenTimeline((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const culturalElements = [
+    {
+      icon: Music,
+      title: 'Traditional Music in Dance',
+      description:
+        'Kulintang, rondalla, and bamboo instruments create the rhythmic soul of Filipino folk dances.',
+      detailedInfo: {
+        overview:
+          'Filipino traditional music forms the rhythmic foundation of folk dances, creating an immersive cultural experience that connects dancers and audiences to their ancestral heritage.',
+        danceApplications: [
+          {
+            dance: 'Singkil',
+            instrument: 'Kulintang ensemble',
+            culturalFunction:
+              'Royal court music elevates dance to ceremonial art form, each gong pattern tells stories of heroism and romance',
+            rhythmicMeaning:
+              'Complex polyrhythms mirror the intricate steps of royal court dancers'
+          },
+          {
+            dance: 'Tinikling',
+            instrument: 'Bamboo poles as percussion',
+            culturalFunction: 'Work rhythms transformed into celebratory dance',
+            rhythmicMeaning:
+              'Clicking bamboo mimics sounds of rural labor turned into joyful expression'
+          },
+          {
+            dance: 'Cariñosa',
+            instrument: 'Rondalla string ensemble',
+            culturalFunction: 'Spanish-influenced music for social courtship dancing',
+            rhythmicMeaning:
+              'Melodic strings guide gentle, respectful romantic interactions'
+          }
+        ],
+        instruments: [
+          {
+            name: 'Kulintang',
+            description:
+              'Ancient gong ensemble from Mindanao, creates melodic patterns for royal court dances like Singkil'
+          },
+          {
+            name: 'Rondalla',
+            description:
+              'String ensemble with bandurria, laud, and guitar, accompanies Spanish-influenced dances like Cariñosa'
+          },
+          {
+            name: 'Gangsa',
+            description:
+              'Flat gongs from the Cordilleras, used in ritual and ceremonial dances like Bendian'
+          },
+          {
+            name: 'Bamboo Instruments',
+            description:
+              'Angklung, tongatong, and bumbong create percussive rhythms for folk dances like Tinikling'
+          }
+        ],
+        characteristics: [
+          'Polyrhythmic patterns that guide complex dance movements',
+          'Call and response sections between musicians and dancers',
+          'Improvisation within traditional structures allows personal expression',
+          'Integration of indigenous and colonial musical elements creates unique Filipino sound'
+        ],
+        significance:
+          'Music serves as the heartbeat of Filipino culture, with each rhythm telling stories of love, war, harvest, and spiritual beliefs passed down through generations of dancers and musicians.'
+      }
+    },
+    {
+      icon: Users,
+      title: 'Community Spirit Through Dance',
+      description:
+        'Bayanihan - the Filipino spirit of unity expressed through synchronized group performances.',
+      detailedInfo: {
+        overview:
+          'Bayanihan embodies the Filipino spirit of unity and cooperation, where communities come together to support one another, beautifully expressed through collective dance performances that strengthen social bonds.',
+        danceManifestations: [
+          {
+            principle: 'Pakikipagkapwa (Shared Identity)',
+            danceExpression: 'Synchronized group movements in all folk dances',
+            culturalMeaning:
+              'Individual success depends on group harmony - no one dances alone'
+          },
+          {
+            principle: 'Utang na Loob (Debt of Gratitude)',
+            danceExpression: 'Teaching dances to younger generations',
+            culturalMeaning:
+              'Older community members pass on cultural knowledge as gift to future'
+          },
+          {
+            principle: 'Kapamilya (Treating Others as Family)',
+            danceExpression: 'Inclusive participation regardless of skill level',
+            culturalMeaning:
+              'Community dances welcome all participants, building inclusive identity'
+          }
+        ],
+        principles: [
+          {
+            name: 'Pakikipagkapwa',
+            description:
+              'Shared identity and interconnectedness among community members expressed through unified dance movements'
+          },
+          {
+            name: 'Utang na Loob',
+            description:
+              'Debt of gratitude that binds communities together through cultural transmission'
+          },
+          {
+            name: 'Kapamilya',
+            description:
+              'Treating others as family, regardless of blood relations, through inclusive dance participation'
+          },
+          {
+            name: 'Pakikipagkunware',
+            description:
+              'Accommodating others even at personal sacrifice, shown in dance partner consideration'
+          }
+        ],
+        expressions: [
+          'Group dances performed during fiestas and celebrations create community unity',
+          'Collective preparation of costumes and props builds social cooperation',
+          'Intergenerational teaching of dance traditions strengthens cultural bonds',
+          'Community fundraising for cultural events demonstrates shared responsibility'
+        ],
+        significance:
+          'The bayanihan spirit ensures that Filipino cultural traditions survive and thrive, with entire communities taking responsibility for preserving their heritage through participatory dance traditions.'
+      }
+    },
+    {
+      icon: BookOpen,
+      title: 'Oral Traditions Through Movement',
+      description:
+        'Epic stories and cultural wisdom preserved through choreographed dance narratives.',
+      detailedInfo: {
+        overview:
+          'Filipino oral traditions preserve ancient wisdom, historical events, and cultural values through storytelling dances that serve as living libraries of indigenous knowledge.',
+        epics: [
+          {
+            name: 'Darangen',
+            description:
+              'Maranao epic telling the adventures of Prince Bantugan, performed through Singkil dance'
+          },
+          {
+            name: 'Hudhud',
+            description:
+              'Ifugao harvest songs and epic chants accompanying rice terrace rituals'
+          },
+          {
+            name: 'Ullalim',
+            description:
+              'Kalinga epic about heroic deeds, performed during peace pacts'
+          },
+          {
+            name: 'Biag ni Lam-ang',
+            description:
+              'Ilocano epic of supernatural hero, expressed through various folk dances'
+          }
+        ],
+        storytelling: [
+          'Dance movements that mimic narrative elements',
+          'Costumes and props that represent story characters',
+          'Musical accompaniment that enhances dramatic tension',
+          'Audience participation in familiar story segments'
+        ],
+        significance:
+          'Oral traditions through dance ensure that historical events, moral lessons, and cultural wisdom remain alive and accessible to new generations, creating an unbroken chain of cultural memory.'
+      }
+    },
+    {
+      icon: Camera,
+      title: 'Visual Arts in Dance Costume',
+      description:
+        'Traditional textiles, jewelry, and ceremonial dress that communicate cultural identity.',
+      detailedInfo: {
+        overview:
+          'Filipino visual arts in dance encompass elaborate costumes, symbolic accessories, and intricate designs that communicate cultural identity, social status, and spiritual beliefs.',
+        costumes: [
+          {
+            name: "Baro't Saya",
+            description:
+              'Traditional Filipino dress with butterfly sleeves, worn in Spanish-influenced dances'
+          },
+          { name: 'Malong', description: 'Tubular garment from Mindanao, versatile clothing used in Muslim dances' },
+          { name: 'Bahag', description: 'Traditional loincloth worn by male dancers in indigenous mountain dances' },
+          { name: 'Terno', description: 'Formal Filipino dress with distinctive sleeve design for elegant ballroom dances' }
+        ],
+        accessories: [
+          'Fans (abaniko) representing courtship and grace',
+          'Bamboo poles for percussive dance elements',
+          'Colored scarves (pañuelo) for dramatic effect',
+          'Traditional jewelry indicating social status'
+        ],
+        patterns: [
+          'Geometric designs representing natural elements',
+          'Floral motifs symbolizing fertility and growth',
+          'Tribal patterns indicating clan and regional identity',
+          'Religious symbols reflecting spiritual beliefs'
+        ],
+        significance:
+          'Visual elements in Filipino dance serve as a non-verbal language that communicates complex cultural narratives, making each performance a feast for the eyes and a lesson in history.'
+      }
+    }
+  ];
+
   return (
     <div className="culture">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="culture-hero">
         <div className="culture-hero-background">
@@ -857,13 +1078,13 @@ const Culture = () => {
               <span className="culture-highlight"> Heritage</span>
             </h1>
             <p className="culture-hero-description">
-              Discover the living heritage of the Philippines through traditional folk dances that preserve our ancestors' wisdom, 
-              values, and stories. Each graceful movement in Cariñosa teaches respect and courtship traditions. 
-              Every rhythmic step in Tinikling demonstrates Filipino resilience and community cooperation. 
-              From the royal court elegance of Singkil to the harvest celebrations of rural dances, 
-              experience how these cultural treasures continue to shape Filipino identity across three distinct regions. 
-              Journey through centuries of tradition where Spanish colonial influences, indigenous spirituality, 
-              and modern adaptations create a unique tapestry of movement, music, and meaning that connects 
+              Discover the living heritage of the Philippines through traditional folk dances that preserve our ancestors' wisdom,
+              values, and stories. Each graceful movement in Cariñosa teaches respect and courtship traditions.
+              Every rhythmic step in Tinikling demonstrates Filipino resilience and community cooperation.
+              From the royal court elegance of Singkil to the harvest celebrations of rural dances,
+              experience how these cultural treasures continue to shape Filipino identity across three distinct regions.
+              Journey through centuries of tradition where Spanish colonial influences, indigenous spirituality,
+              and modern adaptations create a unique tapestry of movement, music, and meaning that connects
               past generations to present communities and future cultural preservation.
             </p>
           </div>
@@ -879,13 +1100,13 @@ const Culture = () => {
               The fundamental components that make Filipino folk dances unique and meaningful
             </p>
           </div>
-          
+
           <div className="elements-grid">
             {culturalElements.map((element, index) => {
               const IconComponent = element.icon;
               return (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="element-card clickable"
                   onClick={() => openElementModal(element)}
                 >
@@ -914,7 +1135,7 @@ const Culture = () => {
               Each dance movement, costume, and rhythm carries deep cultural meaning that connects us to Filipino values and traditions
             </p>
           </div>
-          
+
           <div className="connections-grid">
             {danceCultureConnections.map((connection, index) => (
               <div key={index} className="connection-card">
@@ -924,7 +1145,7 @@ const Culture = () => {
                   </div>
                   <h3 className="connection-theme">{connection.culturalTheme}</h3>
                 </div>
-                
+
                 <div className="connection-dances">
                   <h4>Representative Dances:</h4>
                   <div className="dance-pills">
@@ -933,7 +1154,7 @@ const Culture = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="connection-values">
                   <h4>Cultural Values Expressed:</h4>
                   <ul className="values-list">
@@ -942,7 +1163,7 @@ const Culture = () => {
                     ))}
                   </ul>
                 </div>
-                
+
                 <div className="connection-relevance">
                   <p className="relevance-text">{connection.modernRelevance}</p>
                 </div>
@@ -961,7 +1182,7 @@ const Culture = () => {
               Understanding the rich diversity of Filipino folk dances through their traditional categories and cultural origins
             </p>
           </div>
-          
+
           <div className="classifications-grid">
             {folkDanceClassifications.map((classification, index) => (
               <div key={index} className="classification-card">
@@ -973,7 +1194,7 @@ const Culture = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="classification-content">
                   <div className="classification-header">
                     <div className="classification-title-section">
@@ -981,7 +1202,7 @@ const Culture = () => {
                       <p className="classification-description">{classification.description}</p>
                     </div>
                   </div>
-                  
+
                   <div className="classification-characteristics">
                     <h4>Key Characteristics:</h4>
                     <div className="characteristics-list-grid">
@@ -993,7 +1214,7 @@ const Culture = () => {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div className="classification-dances">
                     <h4>Representative Dances:</h4>
                     <div className="dances-showcase">
@@ -1021,12 +1242,11 @@ const Culture = () => {
                       ))}
                     </div>
                   </div>
+
                 </div>
               </div>
             ))}
           </div>
-          
-          
         </div>
       </section>
 
@@ -1039,14 +1259,14 @@ const Culture = () => {
               Each region of the Philippines offers distinct cultural traditions and dance forms
             </p>
           </div>
-          
+
           <div className="regions-grid">
             {culturalRegions.map((region) => (
               <div key={region.id} className="region-card">
                 <div className="region-image">
                   <img src={region.image} alt={region.name} />
                   <div className="region-overlay">
-                    <button 
+                    <button
                       className="explore-button"
                       onClick={() => openModal(region)}
                     >
@@ -1063,7 +1283,7 @@ const Culture = () => {
                     </div>
                   </div>
                   <p className="region-description">{region.description}</p>
-                  
+
                   <div className="region-dances">
                     <h4>Traditional Dances & Their Cultural Meaning:</h4>
                     <div className="enhanced-dance-list">
@@ -1090,7 +1310,7 @@ const Culture = () => {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div className="region-highlights">
                     <h4>Cultural Highlights:</h4>
                     <ul>
@@ -1115,51 +1335,75 @@ const Culture = () => {
               Journey through the historical development of Filipino folk dance traditions
             </p>
           </div>
-          
+
           <div className="timeline">
-            {timeline.map((period, index) => (
-              <div key={index} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
-                <div className="timeline-content">
-                  <div className="timeline-period">
-                    <h3>{period.period}</h3>
-                    <span className="timeline-year">{period.year}</span>
-                  </div>
-                  <p className="timeline-description">{period.description}</p>
-                  
-                  <div className="timeline-cultural-context">
-                    <h4>Cultural-Dance Context:</h4>
-                    <div className="context-grid">
-                      <div className="context-item">
-                        <strong>Purpose:</strong> {period.culturalDanceContext?.purpose}
+            {timeline.map((period, index) => {
+              const isOpen = openTimeline.has(index);
+              return (
+                <div key={index} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
+                  <div className="timeline-content">
+                    <div className="timeline-period-row">
+                      <div className="timeline-period">
+                        <h3>{period.period}</h3>
+                        <span className="timeline-year">{period.year}</span>
                       </div>
-                      <div className="context-item">
-                        <strong>Community Role:</strong> {period.culturalDanceContext?.community}
-                      </div>
-                      <div className="context-item">
-                        <strong>Cultural Meaning:</strong> {period.culturalDanceContext?.meaning}
-                      </div>
+
+                      {/* Arrow beside the clock */}
+                      <button
+                        type="button"
+                        className="timeline-toggle"
+                        onClick={() => toggleTimeline(index)}
+                        aria-expanded={isOpen}
+                        aria-controls={`timeline-panel-${index}`}
+                        title={isOpen ? 'Collapse' : 'Expand'}
+                      >
+                        {isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                      </button>
                     </div>
+
+                    {/* Collapsible content */}
+                    {isOpen && (
+                      <div id={`timeline-panel-${index}`} className="timeline-panel">
+                        <p className="timeline-description">{period.description}</p>
+
+                        <div className="timeline-cultural-context">
+                          <h4>Cultural-Dance Context:</h4>
+                          <div className="context-grid">
+                            <div className="context-item">
+                              <strong>Purpose:</strong> {period.culturalDanceContext?.purpose}
+                            </div>
+                            <div className="context-item">
+                              <strong>Community Role:</strong> {period.culturalDanceContext?.community}
+                            </div>
+                            <div className="context-item">
+                              <strong>Cultural Meaning:</strong> {period.culturalDanceContext?.meaning}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="timeline-dances">
+                          <strong>Notable Dances:</strong>
+                          <div className="timeline-dance-list">
+                            {period.dances.map((dance, danceIndex) => (
+                              <span key={danceIndex} className="timeline-dance">{dance}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="timeline-relevance">
+                          <strong>Modern Relevance:</strong>
+                          <p className="relevance-note">{period.modernRelevance}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="timeline-dances">
-                    <strong>Notable Dances:</strong>
-                    <div className="timeline-dance-list">
-                      {period.dances.map((dance, danceIndex) => (
-                        <span key={danceIndex} className="timeline-dance">{dance}</span>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="timeline-relevance">
-                    <strong>Modern Relevance:</strong>
-                    <p className="relevance-note">{period.modernRelevance}</p>
+
+                  <div className="timeline-marker">
+                    <Clock size={20} />
                   </div>
                 </div>
-                <div className="timeline-marker">
-                  <Clock size={20} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1168,7 +1412,6 @@ const Culture = () => {
       {selectedRegion && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            
             <div className="modal-header">
               <img src={selectedRegion.image} alt={selectedRegion.name} className="modal-image" />
               <div className="modal-header-content">
@@ -1276,10 +1519,13 @@ const Culture = () => {
       {selectedElement && (
         <div className="modal-overlay" onClick={closeElementModal}>
           <div className="element-modal-content" onClick={(e) => e.stopPropagation()}>
-            
             <div className="element-modal-header">
               <div className="element-modal-icon">
-                <selectedElement.icon size={60} />
+                {/* FIX: render dynamic icon component correctly */}
+                {(() => {
+                  const Icon = selectedElement.icon;
+                  return <Icon size={60} />;
+                })()}
               </div>
               <div className="element-modal-header-content">
                 <h2 className="element-modal-title">{selectedElement.title}</h2>
@@ -1438,10 +1684,10 @@ const Culture = () => {
                 <div className="element-modal-section">
                   <h3>Storytelling Elements</h3>
                   <div className="storytelling-list">
-                    {selectedElement.detailedInfo.storytelling.map((element, index) => (
+                    {selectedElement.detailedInfo.storytelling.map((el, index) => (
                       <div key={index} className="storytelling-item">
                         <div className="storytelling-bullet">•</div>
-                        <span>{element}</span>
+                        <span>{el}</span>
                       </div>
                     ))}
                   </div>
