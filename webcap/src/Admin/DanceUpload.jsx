@@ -11,7 +11,11 @@ const DanceUpload = () => {
     title: "",
     history: "",
     references: "",
-    region: ""
+    region: "",
+    duration: "",
+    performers: "",
+    music: "",
+    costumes: ""
   });
   const [previewVideo, setPreviewVideo] = useState(null);
   const [figureVideos, setFigureVideos] = useState([]);
@@ -121,7 +125,7 @@ const DanceUpload = () => {
 
     try {
       // Validate required fields
-      if (!formData.title || !formData.references || !formData.region) {
+      if (!formData.title || !formData.references || !formData.region || !formData.duration || !formData.performers || !formData.music || !formData.costumes) {
         alert('Please fill in all required fields');
         setIsSubmitting(false);
         return;
@@ -203,6 +207,10 @@ const DanceUpload = () => {
           references: formData.references,
           main_video_url: mainVideoUrl,
           island: formData.region,
+          duration: formData.duration,
+          performers: formData.performers,
+          music: formData.music,
+          costumes: formData.costumes
         }])
         .select()
         .single();
@@ -249,6 +257,16 @@ const DanceUpload = () => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    // Prevent form submit on Enter for all inputs except textarea
+    if (
+      e.key === "Enter" &&
+      e.target.tagName !== "TEXTAREA"
+    ) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="dance-upload-container">
       {snackbar.open && (
@@ -281,7 +299,11 @@ const DanceUpload = () => {
       <div className="dance-upload-content">
         <h1 className="dance-upload-title">Upload Dance</h1>
 
-        <form className="dance-upload-form" onSubmit={handleSubmit}>
+        <form
+          className="dance-upload-form"
+          onSubmit={handleSubmit}
+          onKeyDown={handleKeyDown}
+        >
           {/* Basic Information Section */}
           <div className="form-section">
             <h2 className="form-section-title">
@@ -319,6 +341,66 @@ const DanceUpload = () => {
                 <option value="visayas">Visayas</option>
                 <option value="mindanao">Mindanao</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="duration">Duration</label>
+              <input
+                type="text"
+                id="duration"
+                name="duration"
+                className="form-input"
+                value={formData.duration}
+                onChange={handleInputChange}
+                placeholder="e.g. 5-7 minutes"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="performers">Performers</label>
+              <input
+                type="text"
+                id="performers"
+                name="performers"
+                className="form-input"
+                value={formData.performers}
+                onChange={handleInputChange}
+                placeholder="e.g. 2-4 dancers"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="music">Music & Instruments</label>
+              <input
+                type="text"
+                id="music"
+                name="music"
+                className="form-input"
+                value={formData.music}
+                onChange={handleInputChange}
+                placeholder="e.g. Traditional Tausug kulintang ensemble"
+                required
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="costumes">Traditional Costumes</label>
+              <input
+                type="text"
+                id="costumes"
+                name="costumes"
+                className="form-input"
+                value={formData.costumes}
+                onChange={handleInputChange}
+                placeholder="e.g. Elaborate Muslim royal attire with intricate embroidery"
+                required
+                disabled={isSubmitting}
+              />
             </div>
 
             <div className="form-group">

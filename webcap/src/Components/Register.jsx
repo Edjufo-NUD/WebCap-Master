@@ -33,21 +33,22 @@ const Register = () => {
     setTimeout(() => setSnackbar({ message: "", type: "" }), 3000);
   };
 
-  const validatePassword = (password) => password.length >= 8;
+  const validatePassword = (password) => password.length >= 8 && password.length <= 24;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log("Register form submitted"); // Debug: confirm handler runs
 
-    if (username.length < 6) {
-      showSnackbar("Username must be at least 6 characters!", "error");
+    // Username validation: min 6, max 16
+    if (username.length < 6 || username.length > 16) {
+      showSnackbar("Username must be between 6 and 16 characters!", "error");
       setLoading(false);
       return;
     }
 
+    // Password validation: min 8, max 24
     if (!validatePassword(password)) {
-      showSnackbar("Password must be at least 8 characters.", "error");
+      showSnackbar("Password must be between 8 and 24 characters.", "error");
       setLoading(false);
       return;
     }
@@ -59,79 +60,53 @@ const Register = () => {
     }
 
     try {
-      // Check if username or email already exists
-      const { data: existingUser, error: checkError } = await supabase
-        .from("users")
-        .select("id")
-        .or(`username.eq.${username},email.eq.${email}`)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error("Supabase checkError:", checkError);
-        throw checkError;
-      }
-
-      if (existingUser) {
-        console.error("User already exists:", existingUser);
-        showSnackbar("Username or email already exists!", "error");
-        setLoading(false);
-        return;
-      }
-
-      // Sign up with Supabase Auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp(
-        {
-          email,
-          password,
-          options: {
-            data: { display_name: username },
+      // Step 1: Sign up in Supabase Auth and set display_name
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: username, // save username in Auth metadata
           },
+        },
+      });
+
+      if (signUpError) {
+        console.error("Supabase signUp error:", signUpError);
+        showSnackbar(
+          `Auth error: ${signUpError.message || JSON.stringify(signUpError)}`,
+          "error"
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Insert into your custom users table (mirror username from Auth)
+      if (signUpData?.user?.id) {
+        const { error: dbError } = await supabase.from("users").insert([
+          {
+            id: signUpData.user.id, // link to auth.users.id
+            username: signUpData.user.user_metadata.display_name, // always mirrors Auth
+            email,
+            role: "user", // default role
+            status: "active", // default status
+          },
+        ]);
+
+        if (dbError) {
+          console.error("Insert into users failed:", dbError.message);
+          showSnackbar(`User profile creation failed: ${dbError.message}`, "error");
+          setLoading(false);
+          return;
         }
+      }
+
+      showSnackbar(
+        "Registration successful! Please check your email to confirm your account.",
+        "success"
       );
-
-      if (signUpError || !signUpData?.user) {
-        console.error("Supabase signUpError:", signUpError, signUpData);
-        showSnackbar(
-          `Auth error: ${signUpError?.message || "Signup failed"}`,
-          "error"
-        );
-        setLoading(false);
-        return;
-      }
-
-      // Get authenticated user
-      const {
-        data: { user },
-        error: userFetchError,
-      } = await supabase.auth.getUser();
-
-      if (userFetchError || !user) {
-        console.error("Supabase userFetchError:", userFetchError, user);
-        showSnackbar(
-          `Error retrieving user info: ${userFetchError?.message}`,
-          "error"
-        );
-        setLoading(false);
-        return;
-      }
-
-      // Update username in users table
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ username })
-        .eq("id", user.id);
-
-      if (updateError) {
-        console.error("Supabase updateError:", updateError);
-        showSnackbar(`Error updating username: ${updateError.message}`, "error");
-        setLoading(false);
-        return;
-      }
-
-      showSnackbar("Registration successful! Redirecting...", "success");
       setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
-      console.error("Registration error:", err); // Debug: log errors
       showSnackbar(`Unexpected error: ${err.message}`, "error");
     } finally {
       setLoading(false);
@@ -243,11 +218,8 @@ const Register = () => {
 
             <p className="register-footer">
               Already have an account?{" "}
-              <span
-                onClick={() => navigate("/login")}
-                className="register-link"
-              >
-                Sign In
+              <span onClick={() => navigate("/login")} className="register-link">
+                Login
               </span>
             </p>
           </div>

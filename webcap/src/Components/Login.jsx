@@ -17,14 +17,20 @@ const Login = () => {
     setError("");
 
     if (email && password) {
-      // Login with Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        setError("Invalid email or password. Please try again.");
+        if (
+          error.message &&
+          error.message.toLowerCase().includes("email not confirmed")
+        ) {
+          setError("Please confirm your email before logging in.");
+        } else {
+          setError("Invalid email or password. Please try again.");
+        }
         return;
       }
 
@@ -141,9 +147,30 @@ const Login = () => {
 
               {error && <div className="error-message">{error}</div>}
 
+              <div style={{ textAlign: "right", marginBottom: "8px" }}>
+                <a
+                  href="#"
+                  style={{
+                    color: "#0d6efd", // Bootstrap blue
+                    fontSize: "14px",
+                    textDecoration: "underline",
+                    background: "none",
+                    border: "none",
+                    padding: -50,
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate("/forgot-password");
+                  }}
+                >
+                  Forgot password?
+                </a>
+              </div>
               <button type="submit" className="login-button">
                 Login
               </button>
+              <div style={{ textAlign: "right", marginTop: "8px" }}></div>
             </form>
 
             <p className="login-footer">

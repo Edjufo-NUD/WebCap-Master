@@ -14,6 +14,8 @@ import Analytics from "./Admin/Analytics";
 import UserRatings from "./Admin/UserRatings";
 import ManageDance from "./Admin/ManageDance";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import ForgotPassword from "./Components/ForgotPassword";
+import ResetPassword from "./Components/ResetPassword";
 
 // Get session and role from localStorage
 const accessToken = localStorage.getItem("access_token");
@@ -157,6 +159,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Forgot Password route */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Catch all unknown routes */}
         <Route path="*" element={<Navigate to="/" />} />

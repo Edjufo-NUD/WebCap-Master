@@ -20,6 +20,12 @@ CREATE TABLE dances (
     island VARCHAR
 );
 
+-- Add new columns to the dances table
+ALTER TABLE dances ADD COLUMN duration VARCHAR;
+ALTER TABLE dances ADD COLUMN performers VARCHAR;
+ALTER TABLE dances ADD COLUMN music VARCHAR;
+ALTER TABLE dances ADD COLUMN costumes VARCHAR;
+
 -- DANCE_IMAGES table
 CREATE TABLE dance_images (
     id UUID PRIMARY KEY,

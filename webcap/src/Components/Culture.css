@@ -1722,3 +1722,1258 @@
     font-size: 1.5rem;
   }
 }
+
+/* ADD THESE STYLES to your Culture.css file (around line 800): */
+
+/* Culture-Dance Connections Section */
+.culture-dance-connections {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+  width: 100vw;
+}
+
+.connections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2.5rem;
+  margin-top: 3rem;
+}
+
+.connection-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.connection-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #a0855b, #fbbf24);
+}
+
+.connection-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(160, 133, 91, 0.2);
+}
+
+.connection-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.connection-icon {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.connection-theme {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.connection-dances h4,
+.connection-values h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dance-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dance-pill {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.values-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.values-list li {
+  color: #718096;
+  margin-bottom: 0.6rem;
+  padding-left: 1.2rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.values-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #a0855b;
+  font-weight: bold;
+}
+
+.relevance-text {
+  color: #4a5568;
+  font-style: italic;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  background: rgba(160, 133, 91, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #a0855b;
+}
+
+.connection-explore-btn {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.connection-explore-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(160, 133, 91, 0.3);
+}
+
+/* Enhanced Dance Cards in Regional Section */
+.enhanced-dance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.enhanced-dance-card {
+  background: rgba(160, 133, 91, 0.05);
+  border-radius: 12px;
+  padding: 1.2rem;
+  border-left: 4px solid #a0855b;
+  transition: all 0.3s ease;
+}
+
+.enhanced-dance-card:hover {
+  background: rgba(160, 133, 91, 0.1);
+  transform: translateX(5px);
+}
+
+.dance-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.dance-name {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1.1rem;
+}
+
+.dance-cultural-icon {
+  color: #a0855b;
+}
+
+.dance-meaning {
+  color: #4a5568;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.dance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dance-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  font-size: 0.9rem;
+  color: #718096;
+  line-height: 1.4;
+}
+
+.dance-detail svg {
+  color: #a0855b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Cultural Dance Integration in Modal */
+.cultural-dance-integration {
+  background: linear-gradient(135deg, rgba(160, 133, 91, 0.05), rgba(251, 191, 36, 0.05));
+  border-radius: 15px;
+  padding: 2rem;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+}
+
+.cultural-connections-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cultural-connection-item {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  border-left: 4px solid #a0855b;
+  transition: all 0.3s ease;
+}
+
+.cultural-connection-item:hover {
+  background: rgba(160, 133, 91, 0.02);
+  transform: translateX(3px);
+}
+
+.connection-value {
+  color: #2d3748;
+  font-size: 1.1rem;
+  margin-bottom: 0.8rem;
+}
+
+.connection-dance {
+  color: #4a5568;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.connection-meaning {
+  color: #718096;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.connection-meaning em {
+  color: #a0855b;
+}
+
+/* Dance Applications Grid */
+.dance-applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.dance-application-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 15px;
+  padding: 2rem;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dance-application-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(160, 133, 91, 0.15);
+}
+
+.application-header {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.dance-name-badge {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.instrument-badge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.application-function,
+.application-meaning {
+  margin-bottom: 1rem;
+}
+
+.application-function strong,
+.application-meaning strong {
+  color: #2d3748;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.application-function p,
+.application-meaning p {
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Enhanced Timeline Styles */
+.timeline-cultural-context {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.timeline-cultural-context h4 {
+  color: #fbbf24;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.context-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.context-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #fbbf24;
+}
+
+.context-item strong {
+  color: #fbbf24;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.timeline-relevance {
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-left: 4px solid #fbbf24;
+}
+
+.timeline-relevance strong {
+  color: #fbbf24;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.relevance-note {
+  color: #e5e7eb;
+  line-height: 1.6;
+  margin: 0.5rem 0 0 0;
+  font-style: italic;
+}
+
+/* Responsive Design for New Components */
+@media (max-width: 768px) {
+  .culture-dance-connections {
+    padding: 4rem 0;
+  }
+  
+  .connections-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .connection-card {
+    padding: 2rem;
+  }
+  
+  .connection-theme {
+    font-size: 1.2rem;
+  }
+  
+  .dance-applications-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .application-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .enhanced-dance-list {
+    gap: 1rem;
+  }
+  
+  .enhanced-dance-card {
+    padding: 1rem;
+  }
+  
+  .dance-details {
+    gap: 0.8rem;
+  }
+  
+  .context-grid {
+    gap: 0.8rem;
+  }
+  
+  .cultural-connections-grid {
+    gap: 1rem;
+  }
+  
+  .cultural-connection-item {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .connection-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.8rem;
+  }
+  
+  .connection-icon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .connection-theme {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  
+  .dance-pills {
+    justify-content: center;
+  }
+  
+  .dance-detail {
+    align-items: flex-start;
+  }
+  
+  .dance-name-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .timeline-cultural-context {
+    padding: 1rem;
+  }
+  
+  .context-item {
+    padding: 0.8rem;
+  }
+}
+
+/* Animation for smooth transitions */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.connection-card,
+.enhanced-dance-card,
+.dance-application-card {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+/* Hover effects for better interactivity */
+.dance-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(160, 133, 91, 0.3);
+}
+
+.cultural-connection-item:hover .connection-meaning em {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+/* Enhanced focus states for accessibility */
+.connection-explore-btn:focus,
+.dance-pill:focus {
+  outline: 2px solid #a0855b;
+  outline-offset: 2px;
+}
+
+/* Additional visual enhancements */
+.connection-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(160, 133, 91, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30px, 30px);
+  pointer-events: none;
+}
+
+/* Folk Dance Classifications Section */
+.folk-dance-classifications {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  width: 100vw;
+}
+
+.classifications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
+  gap: 3rem;
+  margin-top: 4rem;
+}
+
+.classification-card {
+  background: white;
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+  position: relative;
+}
+
+.classification-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 60px rgba(160, 133, 91, 0.2);
+}
+
+.classification-image {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.classification-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.classification-card:hover .classification-image img {
+  transform: scale(1.05);
+}
+
+.classification-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(160, 133, 91, 0.8), rgba(251, 191, 36, 0.6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+}
+
+.classification-icon {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.classification-content {
+  padding: 3rem;
+}
+
+.classification-header {
+  margin-bottom: 2.5rem;
+}
+
+.classification-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.classification-description {
+  color: #4a5568;
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.classification-characteristics {
+  background: rgba(160, 133, 91, 0.05);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  border-left: 4px solid #a0855b;
+}
+
+.classification-characteristics h4 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.characteristics-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.characteristic-item-simple {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.8rem;
+  background: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.characteristic-item-simple:hover {
+  background: rgba(160, 133, 91, 0.05);
+  transform: translateX(3px);
+}
+
+.characteristic-bullet-simple {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.characteristic-item-simple span {
+  color: #4a5568;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.classification-dances h4 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dances-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.dance-showcase-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 15px;
+  overflow: hidden;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.dance-showcase-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(160, 133, 91, 0.15);
+}
+
+.dance-image {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.dance-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.dance-showcase-card:hover .dance-image img {
+  transform: scale(1.1);
+}
+
+.dance-image-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.8rem;
+}
+
+.dance-showcase-origin {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(160, 133, 91, 0.3);
+}
+
+.dance-content {
+  padding: 1.8rem;
+}
+
+.dance-showcase-header {
+  margin-bottom: 1rem;
+}
+
+.dance-showcase-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+  display: block;
+}
+
+.dance-showcase-description {
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+  font-size: 0.95rem;
+}
+
+.dance-showcase-context {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  background: rgba(160, 133, 91, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #a0855b;
+}
+
+.context-icon {
+  color: #a0855b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.context-text {
+  color: #2d3748;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+
+
+/* Responsive Design for Classifications */
+@media (max-width: 768px) {
+  .folk-dance-classifications {
+    padding: 4rem 0;
+  }
+  
+  .classifications-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .classification-content {
+    padding: 2rem;
+  }
+  
+  .classification-title {
+    font-size: 1.5rem;
+  }
+  
+  .characteristics-list-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dances-showcase {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dance-content {
+    padding: 1.5rem;
+  }
+  
+  
+}/* Folk Dance Classifications Section */
+.folk-dance-classifications {
+  padding: 6rem 0;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  width: 100vw;
+}
+
+.classifications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 3rem;
+  margin-top: 4rem;
+}
+
+.classification-card {
+  background: white;
+  border-radius: 25px;
+  padding: 3rem;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.classification-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #a0855b, #fbbf24);
+}
+
+.classification-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 60px rgba(160, 133, 91, 0.2);
+}
+
+.classification-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.classification-icon {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 10px 25px rgba(160, 133, 91, 0.3);
+}
+
+.classification-title-section {
+  flex: 1;
+}
+
+.classification-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.classification-description {
+  color: #4a5568;
+  line-height: 1.7;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.classification-characteristics {
+  background: rgba(160, 133, 91, 0.05);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  border-left: 4px solid #a0855b;
+}
+
+.classification-characteristics h4 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.characteristics-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.characteristic-item-simple {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.8rem;
+  background: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.characteristic-item-simple:hover {
+  background: rgba(160, 133, 91, 0.05);
+  transform: translateX(3px);
+}
+
+.characteristic-bullet-simple {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.characteristic-item-simple span {
+  color: #4a5568;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.classification-dances h4 {
+  color: #2d3748;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dances-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.dance-showcase-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 15px;
+  padding: 1.8rem;
+  border: 1px solid rgba(160, 133, 91, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.dance-showcase-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(160, 133, 91, 0.15);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.dance-showcase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dance-showcase-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.dance-showcase-origin {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.dance-showcase-description {
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+  font-size: 0.95rem;
+}
+
+.dance-showcase-context {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  background: rgba(160, 133, 91, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid #a0855b;
+}
+
+.context-icon {
+  color: #a0855b;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.context-text {
+  color: #2d3748;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.classification-summary {
+  margin-top: 4rem;
+  background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  border-radius: 25px;
+  padding: 3rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.classification-summary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(100px, -100px);
+}
+
+.summary-card {
+  position: relative;
+  z-index: 1;
+}
+
+.summary-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.summary-icon {
+  background: linear-gradient(135deg, #a0855b, #fbbf24);
+  border-radius: 20px;
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+.summary-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.summary-content p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+}
+
+.summary-stat {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fbbf24;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #cbd5e0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive Design for Classifications */
+@media (max-width: 768px) {
+  .folk-dance-classifications {
+    padding: 4rem 0;
+  }
+  
+  .classifications-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .classification-card {
+    padding: 2rem;
+  }
+  
+  .classification-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .classification-icon {
+    align-self: center;
+    width: 70px;
+    height: 70px;
+  }
+  
+  .classification-title {
+    font-size: 1.5rem;
+  }
+  
+  .characteristics-list-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dances-showcase {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dance-showcase-card {
+    padding: 1.5rem;
+  }
+  
+  .dance-showcase-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .summary-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .summary-content h3 {
+    font-size: 1.5rem;
+  }
+  
+  .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .classification-summary {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .classification-card {
+    padding: 1.5rem;
+  }
+  
+  .classification-title {
+    font-size: 1.3rem;
+  }
+  
+  .classification-description {
+    font-size: 1rem;
+  }
+  
+  .classification-characteristics {
+    padding: 1.5rem;
+  }
+  
+  .dance-showcase-card {
+    padding: 1.2rem;
+  }
+  
+  .dance-showcase-name {
+    font-size: 1.1rem;
+  }
+  
+  .summary-content h3 {
+    font-size: 1.3rem;
+  }
+  
+  .summary-content p {
+    font-size: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+}

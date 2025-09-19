@@ -81,10 +81,19 @@ body, html {
   margin: 0;
 }
 
+.search-filter .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
 .search-bar {
   position: relative;
-  max-width: 500px;
-  margin: 0 auto 2rem;
+  flex: 1;
+  max-width: 400px;
+  min-width: 250px;
 }
 
 .search-icon {
@@ -103,27 +112,26 @@ body, html {
   font-size: 1rem;
   transition: all 0.3s ease;
   background: #f9fafb;
-  color: #1f2937; /* Added explicit black text color */
+  color: #1f2937;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #8B5CF6;
+  border-color: #a0855b;
   background: white;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-  color: #1f2937; /* Ensure text stays black on focus */
+  box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+  color: #1f2937;
 }
 
 .search-input::placeholder {
-  color: #9ca3af; /* Gray placeholder text */
+  color: #9ca3af;
 }
 
 .filter-tabs {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 1rem;
-  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .filter-icon {
@@ -145,17 +153,60 @@ body, html {
   cursor: pointer;
   transition: all 0.3s ease;
   color: #374151;
+  min-width: 120px;
+  text-align: center;
+  flex: 0 0 auto;
 }
 
 .region-tab:hover {
-  border-color: #8B5CF6;
+  border-color: #a0855b;
   background: #f3f4f6;
 }
 
 .region-tab.active {
-  background: #8B5CF6;
+  background: #a0855b;
   color: white;
-  border-color: #8B5CF6;
+  border-color: #a0855b;
+}
+
+/* Updated Responsive Design */
+@media (max-width: 768px) {
+  .search-filter .container {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+  
+  .search-bar {
+    max-width: none;
+    min-width: auto;
+  }
+  
+  .filter-tabs {
+    justify-content: center;
+  }
+  
+  .region-tabs {
+    justify-content: center;
+  }
+  
+  .region-tab {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    min-width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .region-tab {
+    min-width: 80px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .region-tabs {
+    gap: 0.25rem;
+  }
 }
 
 /* Dances Grid Section - Full Width */
@@ -190,11 +241,40 @@ body, html {
   transition: all 0.3s ease;
   cursor: pointer;
   animation: slideInUp 0.6s ease-out;
+  position: relative;
 }
 
 .dance-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Featured Dance Styling */
+.featured-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(45deg, #a0855b, #8b7355);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+}
+
+.featured-badge-modal {
+  background: linear-gradient(45deg, #a0855b, #8b7355);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 @keyframes slideInUp {
@@ -219,6 +299,18 @@ body, html {
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+}
+
+.letter-circle {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #a0855b, #8b7355);
+  color: white;
+  font-size: 4rem;
+  font-weight: bold;
 }
 
 .dance-overlay {
@@ -254,7 +346,7 @@ body, html {
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #8B5CF6;
+  color: #a0855b;
 }
 
 .play-button:hover {
@@ -267,7 +359,7 @@ body, html {
   top: 1rem;
   right: 1rem;
   background: rgba(255, 255, 255, 0.9);
-  color: #8B5CF6;
+  color: #a0855b;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -357,7 +449,7 @@ body, html {
 }
 
 .learn-button {
-  background: #8B5CF6;
+  background: #a0855b;
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -369,7 +461,7 @@ body, html {
 }
 
 .learn-button:hover {
-  background: #7C3AED;
+  background: #8b7355;
   transform: translateY(-2px);
 }
 
@@ -421,8 +513,6 @@ body, html {
     transform: scale(1) translateY(0);
   }
 }
-
-/* Removed close button styles - modal closes by clicking outside */
 
 /* Modal Header - Full Width Image with Overlay */
 .modal-header {
@@ -519,6 +609,10 @@ body, html {
   font-size: 1rem;
 }
 
+.modal-section div {
+  color: #6b7280;
+}
+
 .steps-list {
   list-style: none;
   padding: 0;
@@ -532,6 +626,13 @@ body, html {
   border-left: 4px solid #a0855b;
   color: #374151;
   font-weight: 500;
+}
+
+.figure-box {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
 }
 
 /* Responsive Design for Modal */
