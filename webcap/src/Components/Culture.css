@@ -2977,3 +2977,33 @@
     font-size: 2rem;
   }
 }
+
+/* Arrow + slide animation for timeline */
+.timeline-period-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.timeline-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.timeline-toggle:hover { background: rgba(0,0,0,0.06); }
+
+.timeline-panel {
+  margin-top: 8px;
+  animation: tl-slide 200ms ease;
+}
+@keyframes tl-slide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
