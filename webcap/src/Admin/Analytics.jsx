@@ -96,7 +96,8 @@ const Analytics = () => {
       const scores = figureList.map((figName, idx) => {
         const arr = figureMap[figName] || [];
         const avg = arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
-        return { name: `Fig ${idx + 1}`, dances: avg };
+return { name: `Fig ${idx + 1}`, dances: parseFloat(avg.toFixed(2)) };
+
       });
 
       setScores(scores);

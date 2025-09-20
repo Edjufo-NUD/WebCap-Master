@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User, LogOut, AlertTriangle } from 'lucide-react';
-import logo from '../assets/IndakHamakaLogo.png';
+import logo from '../assets/FLIPinoNLogo.png';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -14,7 +14,7 @@ const Navbar = () => {
   const navItems = [
     { path: '/home', label: 'Home' },
     { path: '/dances', label: 'Folk Dances' },
-    { path: '/culture', label: 'Culture' },
+    { path: '/culture', label: 'Dance Tradition' },
     { path: '/about', label: 'About' }
   ];
 
