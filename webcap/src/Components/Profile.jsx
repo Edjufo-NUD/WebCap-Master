@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Calendar, Edit3, Save, X, Lock } from 'lucide-react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Navbar from '../Components/Navbar';
 import './Profile.css';
 import { supabase } from '../supabasebaseClient';
@@ -26,6 +27,7 @@ const Profile = () => {
   const [editData, setEditData] = useState({ ...profileData });
   const [loading, setLoading] = useState(true);
   const [snackbar, setSnackbar] = useState({ message: '', type: '' });
+
   const [showPasswordEdit, setShowPasswordEdit] = useState(false);
   const [passwordFields, setPasswordFields] = useState({
     current: '',
@@ -33,14 +35,20 @@ const Profile = () => {
     confirm: ''
   });
 
-  // Snackbar helper
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
+  };
+
   const showSnackbar = (message, type) => {
     setSnackbar({ message, type });
     setTimeout(() => setSnackbar({ message: '', type: '' }), 3000);
   };
-
-  const validatePassword = (password) => password.length >= 8 && password.length <= 24;
-  const validateUsername = (username) => username.length >= 6 && username.length <= 16;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -51,26 +59,25 @@ const Profile = () => {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('users')
         .select('username, email, created_at')
         .eq('id', userId)
         .single();
 
       if (data) {
+        const join = data.created_at
+          ? new Date(data.created_at).toLocaleString('default', { month: 'long', year: 'numeric' })
+          : '';
         setProfileData({
           name: data.username || '',
           email: data.email || '',
-          joinDate: data.created_at
-            ? new Date(data.created_at).toLocaleString('default', { month: 'long', year: 'numeric' })
-            : ''
+          joinDate: join
         });
         setEditData({
           name: data.username || '',
           email: data.email || '',
-          joinDate: data.created_at
-            ? new Date(data.created_at).toLocaleString('default', { month: 'long', year: 'numeric' })
-            : ''
+          joinDate: join
         });
       }
       setLoading(false);
@@ -84,12 +91,6 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
-    // Username validation
-    if (!validateUsername(editData.name)) {
-      showSnackbar('Username must be between 6 and 16 characters!', 'error');
-      return;
-    }
-
     setLoading(true);
     const userId = localStorage.getItem('user_id');
     if (!userId) {
@@ -97,7 +98,13 @@ const Profile = () => {
       return;
     }
 
-    // Check if username or email is already taken
+    // ✅ Username validation
+    if (editData.name.length < 6 || editData.name.length > 16) {
+      showSnackbar('Username must be between 6 and 16 characters.', 'error');
+      setLoading(false);
+      return;
+    }
+
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id')
@@ -105,7 +112,9 @@ const Profile = () => {
       .neq('id', userId)
       .maybeSingle();
 
-    if (checkError) console.error('Check error:', checkError);
+    if (checkError) {
+      console.error('Check error:', checkError);
+    }
 
     if (existingUser) {
       showSnackbar('Username or email is already taken!', 'error');
@@ -113,7 +122,6 @@ const Profile = () => {
       return;
     }
 
-    // Update user info
     const { error: updateError } = await supabase
       .from('users')
       .update({ username: editData.name, email: editData.email })
@@ -150,47 +158,77 @@ const Profile = () => {
     }));
   };
 
-  // Password change handler with validation
+  // Password change with re-authentication
   const handlePasswordSave = async () => {
     if (!passwordFields.current || !passwordFields.new || !passwordFields.confirm) {
       showSnackbar('Please fill in all password fields.', 'error');
       return;
     }
-
-    if (!validatePassword(passwordFields.new)) {
-      showSnackbar('New password must be between 8 and 24 characters.', 'error');
-      return;
-    }
-
     if (passwordFields.new !== passwordFields.confirm) {
       showSnackbar('New passwords do not match.', 'error');
       return;
     }
-
     if (passwordFields.current === passwordFields.new) {
-      showSnackbar(
-        'New password cannot be the same as the current password.',
-        'error'
-      );
+      showSnackbar('New password cannot be the same as the current password.', 'error');
       return;
     }
 
-    const { error } = await supabase.auth.updateUser(
-      { password: passwordFields.new },
-      { currentPassword: passwordFields.current } // Only works if your Supabase version supports it
-    );
-
-    if (error) {
-      showSnackbar(
-        error.message || 'Failed to update password. Please check your current password.',
-        'error'
-      );
+    // ✅ Password length validation
+    if (passwordFields.new.length < 8 || passwordFields.new.length > 24) {
+      showSnackbar('Password must be between 8 and 24 characters.', 'error');
       return;
     }
 
-    setShowPasswordEdit(false);
-    setPasswordFields({ current: '', new: '', confirm: '' });
-    showSnackbar('Password updated successfully!', 'success');
+    setLoading(true);
+
+    try {
+      const email = profileData.email || editData.email;
+      if (!email) {
+        showSnackbar('Could not determine your email to verify current password.', 'error');
+        setLoading(false);
+        return;
+      }
+
+      // Re-authenticate with current password
+      let signInResult;
+      if (typeof supabase.auth.signInWithPassword === 'function') {
+        signInResult = await supabase.auth.signInWithPassword({
+          email,
+          password: passwordFields.current
+        });
+      } else if (typeof supabase.auth.signIn === 'function') {
+        signInResult = await supabase.auth.signIn({
+          email,
+          password: passwordFields.current
+        });
+      }
+
+      if (signInResult?.error) {
+        showSnackbar('Current password is incorrect.', 'error');
+        setLoading(false);
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: passwordFields.new
+      });
+
+      if (updateError) {
+        showSnackbar(updateError.message || 'Failed to update password.', 'error');
+        setLoading(false);
+        return;
+      }
+
+      setShowPasswordEdit(false);
+      setPasswordFields({ current: '', new: '', confirm: '' });
+      setShowPasswords({ current: false, new: false, confirm: false });
+      showSnackbar('Password updated successfully!', 'success');
+    } catch (err) {
+      console.error('Password change error:', err);
+      showSnackbar('An unexpected error occurred. Try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -208,6 +246,7 @@ const Profile = () => {
               <div className="spinner"></div>
             </div>
           )}
+
           <div className="profile-avatar">
             <div className="avatar-circle">
               <User size={60} />
@@ -238,7 +277,9 @@ const Profile = () => {
             </div>
 
             {loading ? (
-              <div style={{ textAlign: 'center', margin: '30px 0' }}>Loading profile...</div>
+              <div style={{ textAlign: 'center', margin: '30px 0' }}>
+                Loading profile...
+              </div>
             ) : (
               <div className="profile-fields">
                 <div className="field-group">
@@ -252,7 +293,7 @@ const Profile = () => {
                       className="field-input"
                       value={editData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
-                      placeholder="Enter your full name"
+                      placeholder="Enter your username"
                     />
                   ) : (
                     <div className="field-value">{profileData.name}</div>
@@ -275,80 +316,120 @@ const Profile = () => {
                   <div className="field-value">{profileData.joinDate}</div>
                 </div>
 
-                {/* Edit Password Button and Fields */}
-                <div className="field-group">
-                  <label className="field-label" style={{ visibility: 'hidden' }}></label>
-                  {!showPasswordEdit ? (
-                    <button
-                      className="btn-edit"
-                      onClick={() => setShowPasswordEdit(true)}
-                    >
+                {/* Password Section */}
+                {!showPasswordEdit ? (
+                  <div className="field-group">
+                    <label className="field-label">
                       <Lock size={16} />
-                      Edit Password
-                    </button>
-                  ) : (
-                    <div>
-                      <div className="field-group">
-                        <label className="field-label">
-                          <Lock size={16} />
-                          Current Password
-                        </label>
+                      Password
+                    </label>
+                    <div
+                      className="field-value"
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                    >
+                      <span>••••••••</span>
+                      <button
+                        className="btn-edit-password"
+                        onClick={() => setShowPasswordEdit(true)}
+                      >
+                        <Lock size={14} />
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* Current Password */}
+                    <div className="field-group">
+                      <label className="field-label">
+                        <Lock size={16} />
+                        Current Password
+                      </label>
+                      <div className="password-input-container">
                         <input
-                          type="password"
-                          className="field-input"
+                          type={showPasswords.current ? 'text' : 'password'}
+                          className="field-input password-input"
                           placeholder="Current Password"
                           value={passwordFields.current}
                           onChange={e => handlePasswordFieldChange('current', e.target.value)}
                         />
+                        <button
+                          type="button"
+                          className="password-toggle-btn"
+                          onClick={() => togglePasswordVisibility('current')}
+                        >
+                          {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
+                        </button>
                       </div>
-                      <div className="field-group">
-                        <label className="field-label">
-                          <Lock size={16} />
-                          New Password
-                        </label>
+                    </div>
+
+                    {/* New Password */}
+                    <div className="field-group">
+                      <label className="field-label">
+                        <Lock size={16} />
+                        New Password
+                      </label>
+                      <div className="password-input-container">
                         <input
-                          type="password"
-                          className="field-input"
+                          type={showPasswords.new ? 'text' : 'password'}
+                          className="field-input password-input"
                           placeholder="New Password"
                           value={passwordFields.new}
                           onChange={e => handlePasswordFieldChange('new', e.target.value)}
                         />
+                        <button
+                          type="button"
+                          className="password-toggle-btn"
+                          onClick={() => togglePasswordVisibility('new')}
+                        >
+                          {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
+                        </button>
                       </div>
-                      <div className="field-group">
-                        <label className="field-label">
-                          <Lock size={16} />
-                          Confirm New Password
-                        </label>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div className="field-group">
+                      <label className="field-label">
+                        <Lock size={16} />
+                        Confirm New Password
+                      </label>
+                      <div className="password-input-container">
                         <input
-                          type="password"
-                          className="field-input"
+                          type={showPasswords.confirm ? 'text' : 'password'}
+                          className="field-input password-input"
                           placeholder="Confirm New Password"
                           value={passwordFields.confirm}
                           onChange={e => handlePasswordFieldChange('confirm', e.target.value)}
                         />
-                      </div>
-                      <div className="edit-actions" style={{ marginTop: '1rem' }}>
                         <button
-                          className="btn-save"
-                          onClick={handlePasswordSave}
+                          type="button"
+                          className="password-toggle-btn"
+                          onClick={() => togglePasswordVisibility('confirm')}
                         >
-                          <Save size={16} />
-                          Save
-                        </button>
-                        <button
-                          className="btn-cancel"
-                          onClick={() => {
-                            setShowPasswordEdit(false);
-                            setPasswordFields({ current: '', new: '', confirm: '' });
-                          }}
-                        >
-                          <X size={16} />
-                          Cancel
+                          {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
                         </button>
                       </div>
                     </div>
-                  )}
-                </div>
+
+                    <div className="password-actions">
+                      <button className="btn-save" onClick={handlePasswordSave}>
+                        <Save size={16} />
+                        Save Password
+                      </button>
+                      <button
+                        className="btn-cancel"
+                        onClick={() => {
+                          setShowPasswordEdit(false);
+                          setPasswordFields({ current: '', new: '', confirm: '' });
+                          setShowPasswords({ current: false, new: false, confirm: false });
+                        }}
+                      >
+                        <X size={16} />
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

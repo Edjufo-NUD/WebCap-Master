@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import IndakHamakaLogo from "../assets/IndakHamakaLogo.png";
+import IndakHamakaLogo from "../assets/FLIPinoNLogo.png";
 import "./Login.css";
 import { supabase } from "../supabasebaseClient";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Add this import

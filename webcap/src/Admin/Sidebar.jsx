@@ -10,7 +10,7 @@ import {
   Menu,
 } from "lucide-react";
 import { supabase } from "../supabasebaseClient";
-import IndakHamakaLogo from "../assets/IndakHamakaLogo.png";
+import FLIPinoLogo from "../assets/FLIPinoNLogo.png";
 import "./Sidebar.css";
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
@@ -91,7 +91,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <img
-              src={IndakHamakaLogo}
+              src={FLIPinoLogo}
               alt="FLIPino Logo"
               className="sidebar-logo-image"
             />

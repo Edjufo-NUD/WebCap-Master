@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import IndakHamakaLogo from "../assets/IndakHamakaLogo.png";
+import IndakHamakaLogo from "../assets/FLIPinoNLogo.png";
 import "./Register.css";
 import { supabase } from "../supabasebaseClient"; // Make sure this path is correct
 
