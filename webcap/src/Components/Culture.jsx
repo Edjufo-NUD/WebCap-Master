@@ -19,7 +19,8 @@ import {
   Palette,
   Scroll,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  ArrowUp
 } from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import './Culture.css';
@@ -72,6 +73,23 @@ const Culture = () => {
   const navigate = useNavigate();
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedElement, setSelectedElement] = useState(null);
+
+  // Scroll-to-top button state
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Show button when scrolled down
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 200);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to top handler
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const folkDanceClassifications = [
     {
@@ -1729,6 +1747,34 @@ const Culture = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Scroll to Top Button - always on right, responsive */}
+      {showScrollTop && (
+        <button
+          className="scroll-to-top-btn"
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            background: '#fff',
+            border: '1.5px solid #a0855b',
+            borderRadius: '50%',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'opacity 0.2s, width 0.2s, height 0.2s',
+          }}
+          aria-label="Scroll to top"
+        >
+          <ArrowUp size={window.innerWidth < 480 ? 20 : window.innerWidth < 900 ? 24 : 32} color="#ffffffff" />
+        </button>
       )}
     </div>
   );

@@ -465,6 +465,56 @@ body, html {
   transform: translateY(-2px);
 }
 
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  background: #a0855b;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(160, 133, 91, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.scroll-to-top:hover {
+  background: #8b7355;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(160, 133, 91, 0.4);
+}
+
+.scroll-to-top:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive for scroll button */
+@media (max-width: 768px) {
+  .scroll-to-top {
+    width: 48px;
+    height: 48px;
+    bottom: 1.5rem;
+    left: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-to-top {
+    width: 44px;
+    height: 44px;
+    bottom: 1rem;
+    left: 1rem;
+  }
+}
+
 /* Preview Modal */
 .preview-modal {
   position: fixed;
@@ -761,5 +811,44 @@ body, html {
   .region-tab {
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
+  }
+}
+
+/* Add to Dances.css */
+.news-ticker-bar {
+  width: 100%;
+  background: linear-gradient(90deg, #ffe9b3 0%, #fffbe6 100%);
+  color: #a0855b;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1.5px solid #f3e2b8;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.news-ticker-content {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: ticker-move 30s linear infinite;
+  font-family: inherit;
+  padding-left: 1.5rem;
+}
+
+@keyframes ticker-move {
+  0% { transform: translateX(100%);}
+  100% { transform: translateX(-100%);}
+}
+
+/* Responsive: font size smaller on mobile */
+@media (max-width: 600px) {
+  .news-ticker-bar {
+    font-size: 0.95rem;
+    padding: 0.35rem 0;
+  }
+  .news-ticker-content {
+    padding-left: 0.5rem;
   }
 }

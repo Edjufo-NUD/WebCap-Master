@@ -336,4 +336,55 @@
   background-color: #ffebee;
   color: #c62828; /* red */
 }
+/* === RESPONSIVE ADD-ONS (no visual changes) === */
 
+/* let the table area scroll horizontally on small screens */
+.users-table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* smooth iOS scrolling */
+  overscroll-behavior-inline: contain;
+}
+
+/* allow inner scroller to work inside flex layout */
+.user-management-content {
+  min-width: 0;
+}
+
+/* on phones, keep table wide and prevent wrapping so user can scroll right */
+@media (max-width: 640px) {
+  .users-table {
+    min-width: 880px; /* adjust if you want; keeps 5 columns readable */
+  }
+  .users-table th,
+  .users-table td {
+    white-space: nowrap; /* force horizontal scroll instead of wrapping */
+  }
+}
+
+/* --- PHONE-ONLY: force modal buttons to full width, same design --- */
+@media (max-width: 640px) {
+  /* make sure the container itself stretches */
+  .user-management-container .modal .modal-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* strongest override for your global .btn rules */
+  .user-management-container .modal .modal-actions .btn,
+  .user-management-container .modal .modal-actions .btn-save,
+  .user-management-container .modal .modal-actions .btn-cancel {
+    display: block !important;       /* <- key: beats inline-flex width behavior */
+    width: 100% !important;          /* fill the row */
+    min-width: 0 !important;         /* ignore global 80px */
+    margin-right: 0 !important;      /* remove global right gap */
+    box-sizing: border-box !important;
+    text-align: center !important;   /* keep text centered */
+    white-space: nowrap !important;  /* keep your text on one line */
+  }
+}
