@@ -15,7 +15,8 @@ import {
   Download,
   Upload,
   Check,
-  X
+  X,
+  AlertCircle
 } from "lucide-react";
 import Sidebar from "../Admin/Sidebar";
 import { supabase } from "../supabasebaseClient";
@@ -35,7 +36,7 @@ const ManageDance = () => {
   const [selectedDance, setSelectedDance] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [danceToDelete, setDanceToDelete] = useState(null);
-  const [deleteInput, setDeleteInput] = useState(""); // <-- Add this state
+  const [deleteInput, setDeleteInput] = useState("");
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -48,6 +49,9 @@ const ManageDance = () => {
     music: '',
     costumes: ''
   });
+
+  // Validation errors state
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Load dances from localStorage
   useEffect(() => {
@@ -225,6 +229,21 @@ const ManageDance = () => {
   const currentDances = sortedDances.slice(indexOfFirstDance, indexOfLastDance);
   const totalPages = Math.ceil(sortedDances.length / dancesPerPage);
 
+  // --- VALIDATION FUNCTION ---
+  const validateForm = () => {
+    const errors = {};
+    const requiredFields = ['title', 'region', 'history', 'references'];
+
+    requiredFields.forEach(field => {
+      if (!editForm[field] || editForm[field].trim() === '') {
+        errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+      }
+    });
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   // --- DELETE FUNCTION ---
   const handleDeleteDance = async (danceId) => {
     if (!danceId) return;
@@ -305,6 +324,7 @@ const ManageDance = () => {
       music: dance.music || '',
       costumes: dance.costumes || ''
     });
+    setValidationErrors({}); // Clear any previous validation errors
     setShowEditModal(true);
   };
 
@@ -313,11 +333,25 @@ const ManageDance = () => {
       ...prev,
       [field]: value
     }));
+
+    // Clear validation error for this field when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
   };
 
   // --- EDIT FUNCTION ---
   const handleSaveEdit = async () => {
     if (!selectedDance) return;
+
+    // Validate form before saving
+    if (!validateForm()) {
+      return; // Don't proceed if validation fails
+    }
+
     setLoading(true);
 
     // 1. Update in Supabase
@@ -391,6 +425,7 @@ const ManageDance = () => {
       music: '',
       costumes: ''
     });
+    setValidationErrors({});
     setLoading(false);
   };
 
@@ -407,6 +442,7 @@ const ManageDance = () => {
       music: '',
       costumes: ''
     });
+    setValidationErrors({});
   };
 
   const openDeleteModal = (dance) => {
@@ -487,6 +523,11 @@ const ManageDance = () => {
   useEffect(() => {
     if (!showDeleteModal) setDeleteInput("");
   }, [showDeleteModal]);
+
+  // Helper function to normalize strings for comparison
+  const normalizeString = (str) => {
+    return str.trim().toLowerCase().replace(/\s+/g, ' ');
+  };
 
   return (
     <div className="manage-dance-container">
@@ -619,7 +660,7 @@ const ManageDance = () => {
                     </td>
                     <td style={{ color: '#000000' }}>{dance.category}</td>
                     <td style={{ color: '#000000' }}>{new Date(dance.dateAdded).toLocaleDateString()}</td>
-                    <td style={{ color: '#000000' }}>{dance.username || "Unknown"}</td> {/* Uploaded By */}
+                    <td style={{ color: '#000000' }}>{dance.username || "Unknown"}</td>
                     <td>
                       <div className="action-buttons">
                         <button 
@@ -681,44 +722,53 @@ const ManageDance = () => {
             >
               <div className="modal-body">
                 <div className="form-group">
-                  <label htmlFor="edit-title">Dance Title</label>
+                  <label htmlFor="edit-title">Dance Title *</label>
                   <input
                     id="edit-title"
                     type="text"
                     value={editForm.title}
                     onChange={(e) => handleEditFormChange('title', e.target.value)}
-                    className="form-input"
+                    className={`form-input ${validationErrors.title ? 'error' : ''}`}
                     placeholder="Enter dance title"
-                    required
                   />
+                  {validationErrors.title && (
+                    <div className="error-message">
+                      <AlertCircle size={16} />
+                      {validationErrors.title}
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-region">Island/Region</label>
+                  <label htmlFor="edit-region">Island/Region *</label>
                   <select
                     id="edit-region"
                     value={editForm.region}
                     onChange={(e) => handleEditFormChange('region', e.target.value)}
-                    className="form-select"
-                    required
+                    className={`form-select ${validationErrors.region ? 'error' : ''}`}
                   >
                     <option value="">Select Island/Region</option>
                     <option value="Luzon">Luzon</option>
                     <option value="Visayas">Visayas</option>
                     <option value="Mindanao">Mindanao</option>
                   </select>
+                  {validationErrors.region && (
+                    <div className="error-message">
+                      <AlertCircle size={16} />
+                      {validationErrors.region}
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-history">History</label>
+                  <label htmlFor="edit-history">History *</label>
                   <textarea
                     id="edit-history"
                     value={editForm.history}
                     onChange={(e) => handleEditFormChange('history', e.target.value)}
-                    className="form-textarea"
+                    className={`form-textarea ${validationErrors.history ? 'error' : ''}`}
                     placeholder="Enter dance history..."
                     rows="4"
-                    required
                     style={{
                       minHeight: '120px',
                       maxHeight: '240px',
@@ -726,18 +776,23 @@ const ManageDance = () => {
                       resize: 'vertical'
                     }}
                   />
+                  {validationErrors.history && (
+                    <div className="error-message">
+                      <AlertCircle size={16} />
+                      {validationErrors.history}
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-references">References</label>
+                  <label htmlFor="edit-references">References *</label>
                   <textarea
                     id="edit-references"
                     value={editForm.references}
                     onChange={(e) => handleEditFormChange('references', e.target.value)}
-                    className="form-textarea"
+                    className={`form-textarea ${validationErrors.references ? 'error' : ''}`}
                     placeholder="Enter dance references..."
                     rows="4"
-                    required
                     style={{
                       minHeight: '120px',
                       maxHeight: '240px',
@@ -745,9 +800,15 @@ const ManageDance = () => {
                       resize: 'vertical'
                     }}
                   />
+                  {validationErrors.references && (
+                    <div className="error-message">
+                      <AlertCircle size={16} />
+                      {validationErrors.references}
+                    </div>
+                  )}
                 </div>
 
-                {/* NEW FIELDS */}
+                {/* Optional Fields */}
                 <div className="form-group">
                   <label htmlFor="edit-duration">Duration</label>
                   <input
@@ -815,19 +876,12 @@ const ManageDance = () => {
                     </div>
                   )}
                 </div>
-                {/* END NEW FIELDS */}
               </div>
               <div className="modal-actions">
                 <button
                   className="btn btn-primary"
                   onClick={handleSaveEdit}
-                  disabled={
-                    !editForm.title.trim() ||
-                    !editForm.region.trim() ||
-                    !editForm.history.trim() ||
-                    !editForm.references.trim() ||
-                    !isEditChanged()
-                  }
+                  disabled={!isEditChanged()}
                 >
                   <Check size={16} />
                   Save Changes
@@ -865,13 +919,13 @@ const ManageDance = () => {
                   borderColor:
                     deleteInput.length === 0
                       ? "#ccc"
-                      : deleteInput !== danceToDelete.title
+                      : normalizeString(deleteInput) !== normalizeString(danceToDelete.title)
                         ? "red"
                         : "#28a745",
                   outline:
                     deleteInput.length === 0
                       ? ""
-                      : deleteInput !== danceToDelete.title
+                      : normalizeString(deleteInput) !== normalizeString(danceToDelete.title)
                         ? "2px solid red"
                         : "2px solid #28a745"
                 }}
@@ -880,8 +934,8 @@ const ManageDance = () => {
                 <button 
                   className="btn btn-danger"
                   onClick={() => handleDeleteDance(danceToDelete.id)}
-                  disabled={deleteInput.trim() !== danceToDelete.title}
-                  title={deleteInput.trim() !== danceToDelete.title ? "Type the exact title to enable" : ""}
+                  disabled={normalizeString(deleteInput) !== normalizeString(danceToDelete.title)}
+                  title={normalizeString(deleteInput) !== normalizeString(danceToDelete.title) ? "Type the exact title to enable" : ""}
                 >
                   Delete
                 </button>

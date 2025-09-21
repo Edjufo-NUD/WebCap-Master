@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Play, MapPin } from 'lucide-react';
+import { Search, Filter, Play, MapPin, ChevronUp, ArrowUp } from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import './Dances.css';
 import { supabase } from '../supabasebaseClient';
@@ -263,11 +263,26 @@ const Dances = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [dances, setDances] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // For modal
   const [figures, setFigures] = useState([]);
   const [mainVideoUrl, setMainVideoUrl] = useState('');
   const [images, setImages] = useState([]);
+
+  // Show button when scrolled down
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 200);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to top handler
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     const fetchDances = async () => {
@@ -468,6 +483,22 @@ const Dances = () => {
         </div>
       </section>
 
+      {/* --- News Ticker / Announcement Bar --- */}
+<div className="news-ticker-bar">
+  <div className="news-ticker-content">
+    <span role="img" aria-label="megaphone" style={{ marginRight: 8 }}>📢</span>
+    <span>
+      🎉 Exciting news! <strong>FLIPino</strong> is now live on the Play Store and App Store.  
+      <span style={{ marginLeft: 4 }}>
+        Explore Filipino cultural dances like never before — watch, learn, and even <strong>simulate our featured dances</strong> right from your phone.  
+        Search for <strong>FLIPino</strong> today and start dancing with us! 💃🕺
+      </span>
+    </span>
+  </div>
+</div>
+
+      {/* --- End News Ticker --- */}
+
       {/* Dances Grid */}
       <section className="dances-grid-section">
         <div className="container">
@@ -553,6 +584,34 @@ const Dances = () => {
           </div>
         </div>
       </section>
+
+      {/* Scroll to Top Button - always on right, responsive */}
+      {showScrollTop && (
+        <button
+          className="scroll-to-top-btn"
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            background: '#fff',
+            bborder: '1.5px solid #a0855b',
+            borderRadius: '50%',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'opacity 0.2s, width 0.2s, height 0.2s',
+          }}
+          aria-label="Scroll to top"
+        >
+          <ArrowUp size={window.innerWidth < 480 ? 20 : window.innerWidth < 900 ? 24 : 32} color="#ffffffff" />
+        </button>
+      )}
 
       {/* Preview Modal */}
       {showPreview && selectedDance && (

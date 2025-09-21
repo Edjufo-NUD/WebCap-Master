@@ -16,6 +16,7 @@
   align-items: center;
   justify-content: space-between;
   height: 70px;
+  position: relative; /* Add this for centering */
 }
 
 /* Logo */
@@ -25,6 +26,7 @@
   gap: 0.75rem;
   cursor: pointer;
   transition: transform 0.2s ease;
+  flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
 .navbar-logo:hover {
@@ -44,11 +46,15 @@
   font-family: 'Poppins', sans-serif;
 }
 
-/* Desktop Navigation */
+/* Desktop Navigation - CENTERED */
 .navbar-menu {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center the nav items */
   gap: 0.5rem;
+  position: absolute; /* Position absolutely to center */
+  left: 50%; /* Move to center */
+  transform: translateX(-50%); /* Center perfectly */
 }
 
 .navbar-item {
@@ -58,10 +64,11 @@
   padding: 0.75rem 1.25rem;
   border-radius: 50px;
   cursor: pointer;
-  font-weight: 500, 12px;
+  font-weight: 500;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .navbar-item:before {
@@ -96,6 +103,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0; /* Prevent actions from shrinking */
 }
 
 .profile-dropdown {
@@ -124,13 +132,15 @@
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  background: white;
+  background: #c4a678;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   padding: 0.5rem;
   min-width: 150px;
   z-index: 1001;
   animation: fadeInDown 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 @keyframes fadeInDown {
@@ -152,23 +162,30 @@
   padding: 0.75rem;
   background: none;
   border: none;
-  color: #374151;
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   border-radius: 8px;
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.profile-dropdown-item:last-child {
+  margin-bottom: 0;
 }
 
 .profile-dropdown-item:hover {
-  background: #F3F4F6;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .profile-dropdown-item.logout {
-  color: #EF4444;
+  color: #FCA5A5;
 }
 
 .profile-dropdown-item.logout:hover {
-  background: #FEF2F2;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ff9999;
 }
 
 /* Mobile Menu Button */
@@ -453,5 +470,48 @@
   .logout-modal-cancel,
   .logout-modal-confirm {
     width: 100%;
+  }
+}
+
+/* Add these classes to your existing Navbar.css file */
+
+/* Desktop only - hide on mobile */
+.desktop-only {
+  display: block;
+}
+
+/* Mobile only - hide on desktop */
+.mobile-only {
+  display: none;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  /* Hide desktop-only elements on mobile */
+  .desktop-only {
+    display: none;
+  }
+  
+  /* Show mobile-only elements on mobile */
+  .mobile-only {
+    display: block;
+  }
+  
+  /* Hide desktop navigation menu on mobile */
+  .navbar-menu {
+    display: none;
+  }
+}
+
+/* Media query for desktop */
+@media (min-width: 769px) {
+  /* Show desktop navigation menu */
+  .navbar-menu {
+    display: flex;
+  }
+  
+  /* Hide mobile menu on desktop */
+  .mobile-menu {
+    display: none !important;
   }
 }

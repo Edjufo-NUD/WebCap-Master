@@ -85,10 +85,10 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Profile and Mobile Menu */}
+          {/* Desktop Profile and Mobile Menu */}
           <div className="navbar-actions">
-            {/* Profile Dropdown */}
-            <div className="profile-dropdown">
+            {/* Profile Dropdown - Desktop Only */}
+            <div className="profile-dropdown desktop-only">
               <button 
                 className="profile-button"
                 onClick={toggleProfileDropdown}
@@ -118,9 +118,9 @@ const Navbar = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Mobile Only */}
             <button 
-              className="mobile-menu-button"
+              className="mobile-menu-button mobile-only"
               onClick={toggleMobileMenu}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -148,12 +148,14 @@ const Navbar = () => {
                 setIsMobileMenuOpen(false);
               }}
             >
+              <User size={16} />
               Profile
             </button>
             <button
               className="mobile-menu-item logout"
               onClick={handleLogoutClick}
             >
+              <LogOut size={16} />
               Logout
             </button>
           </div>
