@@ -852,3 +852,17 @@ body, html {
     padding-left: 0.5rem;
   }
 }
+/* Add this to your existing CSS */
+.figures-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Mobile responsive - single column on phones */
+@media (max-width: 768px) {
+  .figures-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}

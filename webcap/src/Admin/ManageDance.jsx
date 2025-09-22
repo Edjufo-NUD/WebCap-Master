@@ -37,7 +37,6 @@ const ManageDance = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [danceToDelete, setDanceToDelete] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
-  const [deleteConfirmInput, setDeleteConfirmInput] = useState(""); // Add a state for the confirmation input
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -900,34 +899,49 @@ const ManageDance = () => {
         )}
 
         {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
+        {showDeleteModal && danceToDelete && (
           <div className="modal-overlay">
-            <div className="modal" style={modalStyle}>
+            <div className="modal">
               <h3>Confirm Delete</h3>
               <p>
-                To delete <strong>{danceToDelete?.title}</strong>, type the title exactly below:
+                To confirm deletion, type <b>{`"${danceToDelete.title}"`}</b> below.<br />
+                This action cannot be undone.
               </p>
               <input
                 type="text"
-                value={deleteConfirmInput}
-                onChange={e => setDeleteConfirmInput(e.target.value)}
-                placeholder="Type the exact title here"
-                style={{ width: "100%", marginBottom: 16 }}
+                className="form-input"
+                placeholder={`Type "${danceToDelete.title}" to confirm`}
+                value={deleteInput}
+                onChange={e => setDeleteInput(e.target.value)}
+                autoFocus
+                style={{
+                  marginBottom: 16,
+                  borderColor:
+                    deleteInput.length === 0
+                      ? "#ccc"
+                      : normalizeString(deleteInput) !== normalizeString(danceToDelete.title)
+                        ? "red"
+                        : "#28a745",
+                  outline:
+                    deleteInput.length === 0
+                      ? ""
+                      : normalizeString(deleteInput) !== normalizeString(danceToDelete.title)
+                        ? "2px solid red"
+                        : "2px solid #28a745"
+                }}
               />
-              <div className="modal-actions" style={modalActionsStyle}>
-                <button
-                  className="btn btn-delete"
-                  onClick={confirmDelete}
-                  disabled={deleteConfirmInput !== (danceToDelete?.title || "")}
+              <div className="modal-actions">
+                <button 
+                  className="btn btn-danger"
+                  onClick={() => handleDeleteDance(danceToDelete.id)}
+                  disabled={normalizeString(deleteInput) !== normalizeString(danceToDelete.title)}
+                  title={normalizeString(deleteInput) !== normalizeString(danceToDelete.title) ? "Type the exact title to enable" : ""}
                 >
                   Delete
                 </button>
-                <button
+                <button 
                   className="btn btn-cancel"
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setDeleteConfirmInput("");
-                  }}
+                  onClick={() => setShowDeleteModal(false)}
                 >
                   Cancel
                 </button>
