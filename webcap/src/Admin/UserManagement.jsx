@@ -147,25 +147,6 @@ const UserManagement = () => {
   const modalBtnStyle = isMobile
     ? { width: "100%", minWidth: 0, marginRight: 0, boxSizing: "border-box" }
     : undefined;
-  const modalBtnSameSizeStyle = isMobile
-    ? {
-        width: "100%",
-        minWidth: 0,
-        maxWidth: "100%",
-        marginRight: 0,
-        boxSizing: "border-box",
-        display: "block",
-        textAlign: "center",
-      }
-    : {
-        width: 212,
-        minWidth: 212,
-        maxWidth: 212,
-        marginRight: 0,
-        boxSizing: "border-box",
-        display: "inline-block",
-        textAlign: "center",
-      };
 
   return (
     <div className="user-management-container">
@@ -243,36 +224,6 @@ const UserManagement = () => {
                 )}
               </tbody>
             </table>
-
-            {totalAdminPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
-                <span style={{ minWidth: 180 }}>
-                  Showing {(currentPage - 1) * usersPerPage + 1}{" - "}
-                  {Math.min(currentPage * usersPerPage, totalAdmins)} of {totalAdmins} admins
-                </span>
-                <div>
-                  {currentPage > 1 && (
-                    <button className="btn" onClick={handlePrevPage} style={{ marginRight: 8, padding: "8px 12px" }} title="Previous">
-                      <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13.7 15.3a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 1 1 1.4 1.4L9.42 10l4.3 4.3a1 1 0 0 1 0 1.4z"/>
-                      </svg>
-                    </button>
-                  )}
-                  {currentPage < totalAdminPages && (
-                    <button
-                      className="btn"
-                      onClick={() => handleNextPage(totalAdminPages)}  // fixed here
-                      style={{ padding: "8px 12px" }}
-                      title="Next"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 4.7a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 1 1-1.4-1.4L10.58 10l-4.3-4.3a1 1 0 0 1 0-1.4z"/>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Users */}
@@ -334,45 +285,74 @@ const UserManagement = () => {
                 )}
               </tbody>
             </table>
-
-            {totalUserPages > 1 && (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16 }}>
-                <span style={{ minWidth: 180 }}>
-                  Showing {(currentPage - 1) * usersPerPage + 1}{" - "}
-                  {Math.min(currentPage * usersPerPage, totalUsers)} of {totalUsers} users
-                </span>
-                <div>
-                  {currentPage > 1 && (
-                    <button className="btn" onClick={handlePrevPage} style={{ marginRight: 8, padding: "8px 12px" }} title="Previous">
-                      <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M13.7 15.3a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 1 1 1.4 1.4L9.42 10l4.3 4.3a1 1 0 0 1 0 1.4z"/>
-                      </svg>
-                    </button>
-                  )}
-                  {currentPage < totalUserPages && (
-                    <button
-                      className="btn"
-                      onClick={() => handleNextPage(totalUserPages)}
-                      style={{ padding: "8px 12px" }}
-                      title="Next"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M6.3 4.7a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 1 1-1.4-1.4L10.58 10l-4.3-4.3a1 1 0 0 1 0-1.4z"/>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* EXTERNAL PAGINATION CARDS - Outside of main card */}
+        {totalAdminPages > 1 && (
+          <div className="pagination-card">
+            <div className="pagination-content">
+              <div className="pagination-left">
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+              </div>
+              <span className="pagination-info">
+                Showing {(currentPage - 1) * usersPerPage + 1}{" - "}
+                {Math.min(currentPage * usersPerPage, totalAdmins)} of {totalAdmins} admins
+              </span>
+              <div className="pagination-right">
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => handleNextPage(totalAdminPages)}
+                  disabled={currentPage === totalAdminPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {totalUserPages > 1 && (
+          <div className="pagination-card">
+            <div className="pagination-content">
+              <div className="pagination-left">
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+              </div>
+              <span className="pagination-info">
+                Showing {(currentPage - 1) * usersPerPage + 1}{" - "}
+                {Math.min(currentPage * usersPerPage, totalUsers)} of {totalUsers} users
+              </span>
+              <div className="pagination-right">
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => handleNextPage(totalUserPages)}
+                  disabled={currentPage === totalUserPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Edit Modal */}
       {showEditModal && (
         <div className="modal-overlay">
           <div className="modal" style={modalStyle}>
-            <h3>Edit User</h3>
+            <h3>Edit User Role</h3>
             <div className="user-info">
               <p>
                 <strong>Name:</strong> {editingUser.name}
@@ -402,18 +382,10 @@ const UserManagement = () => {
               </select>
             </div>
             <div className="modal-actions" style={modalActionsStyle}>
-              <button
-                className="btn btn-save modal-btn-same-size-unique"
-                onClick={saveUserChanges}
-                style={modalBtnSameSizeStyle}
-              >
+              <button className="btn btn-save" onClick={saveUserChanges} style={modalBtnStyle}>
                 Save Changes
               </button>
-              <button
-                className="btn btn-cancel modal-btn-same-size-unique"
-                onClick={() => setShowEditModal(false)}
-                style={modalBtnSameSizeStyle}
-              >
+              <button className="btn btn-cancel" onClick={() => setShowEditModal(false)} style={modalBtnStyle}>
                 Cancel
               </button>
             </div>

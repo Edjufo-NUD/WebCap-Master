@@ -779,13 +779,8 @@ const Dances = () => {
               {/* Figures - Show for both featured and database dances */}
               <div className="modal-section">
                 <h3>Figures</h3>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 24,
-                  }}
-                >
+                // Updated code
+<div className="figures-grid">
                   {figures.length === 0 && <span style={{ gridColumn: '1 / -1' }}>No figures uploaded.</span>}
                   {figures.map((fig, idx) => (
                     <div key={fig.id} className="figure-box">

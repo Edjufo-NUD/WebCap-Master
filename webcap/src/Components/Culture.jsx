@@ -699,62 +699,7 @@ const Culture = () => {
     }
   ];
 
-  const danceCultureConnections = [
-    {
-      culturalTheme: 'Respect and Courtship (Galang at Panliligaw)',
-      representativeDances: ['Cariñosa', 'Pandanggo sa Ilaw', 'La Jota'],
-      culturalValues: [
-        'Men must show patience and persistence in courtship',
-        'Women demonstrate grace while maintaining modesty',
-        'Community oversight ensures proper moral behavior',
-        'Physical contact is minimal and respectful'
-      ],
-      danceElements: [
-        'Use of fans and handkerchiefs as symbolic barriers and invitations',
-        'Circular movements that bring couples together and apart',
-        'Eye contact patterns that show interest while maintaining propriety',
-        'Group formations that provide community supervision'
-      ],
-      modernRelevance:
-        'These dances teach traditional Filipino values about romantic relationships and gender interactions that influence contemporary Filipino courtship culture.'
-    },
-    {
-      culturalTheme: 'Resilience and Adaptability (Lakas ng Loob)',
-      representativeDances: ['Tinikling', 'Maglalatik', 'Banga'],
-      culturalValues: [
-        'Ability to navigate challenges with grace and skill',
-        'Quick thinking and adaptability in difficult situations',
-        'Persistence in the face of obstacles',
-        'Community support during individual challenges'
-      ],
-      danceElements: [
-        'Precise timing required to avoid bamboo poles or coconut shells',
-        'Increasing speed that tests dancer endurance and focus',
-        'Balance and coordination skills that mirror life skills',
-        'Group encouragement and support for individual performers'
-      ],
-      modernRelevance:
-        'These dances prepare participants for life challenges while building confidence and community support systems.'
-    },
-    {
-      culturalTheme: 'Spiritual Connection (Pananampalataya)',
-      representativeDances: ['Singkil', 'Dugso', 'Bendian'],
-      culturalValues: [
-        'Recognition of divine presence in daily life',
-        'Respect for ancestral wisdom and spiritual guidance',
-        'Community participation in religious observance',
-        'Integration of prayer and celebration'
-      ],
-      danceElements: [
-        'Sacred costumes and props that represent spiritual elements',
-        'Ritualistic movements that mirror prayer gestures',
-        'Seasonal timing that connects to agricultural and religious cycles',
-        'Elder leadership in ceremonial aspects'
-      ],
-      modernRelevance:
-        'These dances maintain Filipino spiritual traditions while adapting to contemporary religious practices.'
-    }
-  ];
+  
 
   const timeline = [
     {
@@ -1144,52 +1089,7 @@ const Culture = () => {
         </div>
       </section>
 
-      {/* Culture-Dance Connections */}
-      <section className="culture-dance-connections">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">How Folk Dances Preserve Culture</h2>
-            <p className="section-subtitle">
-              Each dance movement, costume, and rhythm carries deep cultural meaning that connects us to Filipino values and traditions
-            </p>
-          </div>
-
-          <div className="connections-grid">
-            {danceCultureConnections.map((connection, index) => (
-              <div key={index} className="connection-card">
-                <div className="connection-header">
-                  <div className="connection-icon">
-                    <Heart size={24} />
-                  </div>
-                  <h3 className="connection-theme">{connection.culturalTheme}</h3>
-                </div>
-
-                <div className="connection-dances">
-                  <h4>Representative Dances:</h4>
-                  <div className="dance-pills">
-                    {connection.representativeDances.map((dance, danceIndex) => (
-                      <span key={danceIndex} className="dance-pill">{dance}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="connection-values">
-                  <h4>Cultural Values Expressed:</h4>
-                  <ul className="values-list">
-                    {connection.culturalValues.slice(0, 3).map((value, valueIndex) => (
-                      <li key={valueIndex}>{value}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="connection-relevance">
-                  <p className="relevance-text">{connection.modernRelevance}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* Folk Dance Classifications */}
       <section className="folk-dance-classifications">

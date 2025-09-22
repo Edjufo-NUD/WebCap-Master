@@ -388,3 +388,120 @@
     white-space: nowrap !important;  /* keep your text on one line */
   }
 }
+/* Add this CSS to your UserManagement.css file */
+
+/* External Pagination Cards */
+.pagination-card {
+  background: white;
+  margin-top: 20px;
+  padding: 20px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  position: relative;
+}
+
+.pagination-left {
+  flex: 0 0 auto;
+  min-width: 100px;
+}
+
+.pagination-info {
+  color: #6c757d;
+  font-weight: 500;
+  font-size: 0.95rem;
+  flex: 1;
+  text-align: center;
+  min-width: 200px;
+}
+
+.pagination-right {
+  flex: 0 0 auto;
+  min-width: 100px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.btn-secondary:disabled {
+  background: #adb5bd !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+/* Mobile responsiveness for pagination cards */
+@media (max-width: 768px) {
+  .pagination-card {
+    padding: 15px 20px;
+    margin-top: 15px;
+  }
+  
+  .pagination-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .pagination-info {
+    min-width: auto;
+    font-size: 0.9rem;
+  }
+  
+  .pagination-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-card {
+    padding: 12px 15px;
+    margin-top: 12px;
+  }
+  
+  .pagination-info {
+    font-size: 0.85rem;
+  }
+  
+  .pagination-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
