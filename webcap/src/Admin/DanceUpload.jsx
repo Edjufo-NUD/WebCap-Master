@@ -21,7 +21,7 @@ const DanceUpload = () => {
   const [figureVideos, setFigureVideos] = useState([]);
   const [danceImage, setDanceImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', type: '' });
+  const [notification, setNotification] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -130,7 +130,7 @@ const DanceUpload = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    showSnackbar('Uploading Video', 'loading');
+    showNotification('Uploading dance...', 'warning');
 
     try {
       // Validate required fields
@@ -164,7 +164,7 @@ const DanceUpload = () => {
 
       if (titleCheckError) throw titleCheckError;
       if (existingDance) {
-        showSnackbar('A dance with this title already exists.', 'error');
+        showNotification('A dance with this title already exists.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -219,7 +219,8 @@ const DanceUpload = () => {
           duration: formData.duration,
           performers: formData.performers,
           music: formData.music,
-          costumes: formData.costumes
+          costumes: formData.costumes,
+          status: 'pending'
         }])
         .select()
         .single();
@@ -241,14 +242,13 @@ const DanceUpload = () => {
         position: 0,
       }]);
 
-      showSnackbar('Upload successful. The dance has been uploaded.', 'success');
-      navigate('/manage-dance');
+      showNotification('Upload successful. The dance has been submitted for approval.', 'success');
+      navigate('/dance-request');
     } catch (error) {
       console.error('Upload error:', error);
-      showSnackbar('Upload failed. Please try again.', 'error');
+      showNotification('Upload failed. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
-      if (snackbar.type === 'loading') setSnackbar({ open: false, message: '', type: '' });
     }
   };
 
@@ -259,11 +259,9 @@ const DanceUpload = () => {
     return name.slice(0, maxLength - 3 - ext.length) + '...' + ext;
   };
 
-  const showSnackbar = (message, type = 'info', duration = 3000) => {
-    setSnackbar({ open: true, message, type });
-    if (type !== 'loading') {
-      setTimeout(() => setSnackbar({ open: false, message: '', type: '' }), duration);
-    }
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
   };
 
   const handleKeyDown = (e) => {
@@ -278,29 +276,11 @@ const DanceUpload = () => {
 
   return (
     <div className="dance-upload-container">
-      {snackbar.open && (
-        <div
-          className={`snackbar ${snackbar.type}`}
-          style={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            maxWidth: 360,
-            minWidth: 220,
-            zIndex: 9999,
-            padding: '18px 28px',
-            textAlign: 'left',
-            fontWeight: 600,
-            fontSize: '1.1rem',
-            background: snackbar.type === 'loading' ? '#fffbe6' : snackbar.type === 'success' ? '#e6ffed' : '#f0f0f0',
-            color: snackbar.type === 'loading' ? '#8a6d3b' : snackbar.type === 'success' ? '#155724' : '#333',
-            borderRadius: 10,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.13)',
-            border: '1px solid #eee',
-            transition: 'opacity 0.3s'
-          }}
-        >
-          {snackbar.message}
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          <div className="notification-content">
+            {notification.message}
+          </div>
         </div>
       )}
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />

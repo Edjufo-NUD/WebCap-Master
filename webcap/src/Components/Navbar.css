@@ -2,11 +2,8 @@
   background: #a0855b;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(160, 133, 91, 0.3);
 }
@@ -19,34 +16,36 @@
   align-items: center;
   justify-content: space-between;
   height: 70px;
-  position: relative;
+  position: relative; /* Add this for centering */
 }
 
-/* Logo */
+/* Logo - MOVED TO UTMOST LEFT */
 .navbar-logo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
   transition: transform 0.2s ease;
-  flex-shrink: 0;
-  position: fixed;
-  left: 1rem;
-  z-index: 1001;
+  flex-shrink: 0; /* Prevent logo from shrinking */
+  position: fixed; /* Fixed positioning for zoom stability */
+  left: 1rem; /* Fixed distance from left edge */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Perfect vertical centering */
+  z-index: 1001; /* Ensure logo stays above other elements */
 }
 
 .navbar-logo:hover {
-  transform: scale(1.05);
+  transform: translateY(-50%) scale(1.05); /* Maintain vertical centering while scaling */
 }
 
 .navbar-logo-image {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 8px;
 }
 
 .navbar-logo-text {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: white;
   font-family: 'Poppins', sans-serif;
@@ -56,17 +55,17 @@
 .navbar-menu {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Center the nav items */
   gap: 0.5rem;
-  flex: 1;
-  margin-left: 200px; /* Add space for fixed logo */
-  margin-right: 100px; /* Add space for profile actions */
+  position: absolute; /* Position absolutely to center */
+  left: 50%; /* Move to center */
+  transform: translateX(-50%); /* Center perfectly */
 }
 
-.navbar-item {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.8);
+.navbar-menu .navbar-item {
+  background: none !important;
+  border: none !important;
+  color: white !important;
   padding: 0.75rem 1.25rem;
   border-radius: 50px;
   cursor: pointer;
@@ -77,7 +76,11 @@
   white-space: nowrap; /* Prevent text wrapping */
 }
 
-.navbar-item:before {
+.navbar-menu .navbar-item * {
+  color: white !important;
+}
+
+.navbar-menu .navbar-item:before {
   content: '';
   position: absolute;
   top: 0;
@@ -88,28 +91,41 @@
   transition: left 0.5s;
 }
 
-.navbar-item:hover:before {
+.navbar-menu .navbar-item:hover:before {
   left: 100%;
 }
 
-.navbar-item:hover {
-  color: white;
+.navbar-menu .navbar-item:hover {
+  color: white !important;
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 
-.navbar-item.active {
-  color: white;
+.navbar-menu .navbar-item:hover * {
+  color: white !important;
+}
+
+.navbar-menu .navbar-item.active {
+  color: white !important;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px);
 }
 
-/* Profile and Actions */
+.navbar-menu .navbar-item.active * {
+  color: white !important;
+}
+
+/* Profile and Actions - MOVED TO UTMOST RIGHT */
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
   flex-shrink: 0; /* Prevent actions from shrinking */
+  position: fixed; /* Fixed positioning for zoom stability */
+  right: 2rem; /* Moved a bit more to the left from edge */
+  top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Perfect vertical centering */
+  z-index: 1001; /* Ensure actions stay above other elements */
 }
 
 .profile-dropdown {
@@ -186,28 +202,49 @@
 }
 
 .profile-dropdown-item.logout {
-  color: #FCA5A5;
+  color: white;
 }
 
 .profile-dropdown-item.logout:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #ff9999;
+  color: white;
 }
 
 /* Mobile Menu Button */
 .mobile-menu-button {
   display: none;
-  background: none;
-  border: none;
-  color: white;
+  background: none !important;
+  border: none !important;
+  color: white !important;
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 8px;
   transition: background-color 0.2s ease;
 }
 
+.mobile-menu-button * {
+  color: white !important;
+}
+
+.mobile-menu-button svg {
+  color: white !important;
+  fill: white !important;
+  stroke: white !important;
+}
+
 .mobile-menu-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.mobile-menu-button:hover * {
+  color: white !important;
+}
+
+.mobile-menu-button:hover svg {
+  color: white !important;
+  fill: white !important;
+  stroke: white !important;
 }
 
 /* Mobile Menu */
@@ -235,12 +272,12 @@
   }
 }
 
-.mobile-menu-item {
+.mobile-menu .mobile-menu-item {
   display: block;
   width: 100%;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.8);
+  background: none !important;
+  border: none !important;
+  color: white !important;
   padding: 1rem;
   text-align: left;
   cursor: pointer;
@@ -250,18 +287,30 @@
   transition: all 0.2s ease;
 }
 
-.mobile-menu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+.mobile-menu .mobile-menu-item * {
+  color: white !important;
 }
 
-.mobile-menu-item.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+.mobile-menu .mobile-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.mobile-menu .mobile-menu-item:hover * {
+  color: white !important;
+}
+
+.mobile-menu .mobile-menu-item.active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.mobile-menu .mobile-menu-item.active * {
+  color: white !important;
 }
 
 .mobile-menu-item.logout {
-  color: #FCA5A5;
+  color: white;
 }
 
 .mobile-menu-divider {
@@ -285,11 +334,30 @@
   }
   
   .navbar-logo-text {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   
   .navbar-container {
     padding: 0 1rem;
+  }
+  
+  /* Adjust logo position for mobile */
+  .navbar-logo {
+    left: 0.5rem; /* Maintain left positioning on mobile */
+    top: 35px; /* Fixed position from top for mobile navbar height */
+    transform: translateY(-50%); /* Keep vertical centering */
+  }
+  
+  .navbar-logo-image {
+    width: 42px;
+    height: 42px;
+  }
+  
+  /* Adjust navbar-actions position for mobile */
+  .navbar-actions {
+    right: 1rem; /* Maintain some spacing on mobile */
+    top: 35px; /* Fixed position from top for mobile navbar height */
+    transform: translateY(-50%); /* Keep vertical centering */
   }
 }
 
@@ -299,12 +367,26 @@
   }
   
   .navbar-logo-image {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
   }
   
   .navbar-logo-text {
-    font-size: 1.125rem;
+    font-size: 1.375rem;
+  }
+  
+  /* Further adjust logo position for small mobile */
+  .navbar-logo {
+    left: 0.25rem; /* Maintain left positioning on small mobile */
+    top: 30px; /* Fixed position from top for smaller mobile navbar height */
+    transform: translateY(-50%); /* Keep vertical centering */
+  }
+  
+  /* Further adjust navbar-actions position for small mobile */
+  .navbar-actions {
+    right: 0.75rem; /* Maintain some spacing on small mobile */
+    top: 30px; /* Fixed position from top for smaller mobile navbar height */
+    transform: translateY(-50%); /* Keep vertical centering */
   }
 }
 
@@ -493,18 +575,6 @@
 
 /* Media query for mobile devices */
 @media (max-width: 768px) {
-  /* Reset logo positioning for mobile */
-  .navbar-logo {
-    position: static;
-    left: auto;
-  }
-  
-  /* Reset navigation menu margins for mobile */
-  .navbar-menu {
-    margin-left: 0;
-    margin-right: 0;
-  }
-  
   /* Hide desktop-only elements on mobile */
   .desktop-only {
     display: none;

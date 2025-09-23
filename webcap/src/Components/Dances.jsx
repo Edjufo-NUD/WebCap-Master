@@ -5,7 +5,6 @@ import './Dances.css';
 import { supabase } from '../supabasebaseClient';
 import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
-import suakusuaImage from '../assets/Sua.png';
 import pahidImage from '../assets/Pahid.png';
 
 const regions = ['All', 'Luzon', 'Visayas', 'Mindanao'];
@@ -94,7 +93,7 @@ const featuredDances = [
     image_url: pahidImage,
     history: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage. This dance demonstrates the refined artistry and storytelling tradition of Filipino culture through expressive choreography.',
     references: 'Traditional Filipino folk music with indigenous instruments. Traditional Filipino attire with cultural significance.',
-    main_video_url: '', // No main video provided, will use first figure video
+    main_video_url: 'https://youtube.com/shorts/9McsqHeMnmc', // No main video provided, will use first figure video
     difficulty: 'Intermediate',
     duration: '4-6 minutes',
     performers: '4-8 dancers',
@@ -140,12 +139,16 @@ const featuredDances = [
   {
     id: 'featured-2',
     title: 'Sua Ku Sua',
+    name: 'Sua Ku Sua',
     island: 'Mindanao',
+    region: 'Jolo, Sulu',
     province: 'Jolo, Sulu',
-    image_url: suakusuaImage,
+    image: null, // No image available
+    image_url: null, // No image available
+    description: 'A courtship dance from the Tausug people of Sulu.',
     history: 'A courtship dance from the Tausug people of Sulu. A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
     references: 'Traditional Tausug kulintang ensemble. Elaborate Muslim royal attire with intricate embroidery.',
-    main_video_url: '', // No main video provided, will use first figure video
+    main_video_url: '', // No main video provided
     difficulty: 'Advanced',
     duration: '5-7 minutes',
     performers: '2-4 dancers',
@@ -290,6 +293,7 @@ const Dances = () => {
       const { data: dancesData, error: dancesError } = await supabase
         .from('dances')
         .select('id, title, island, references, history, main_video_url, duration, performers, music, costumes')
+        .eq('status', 'approved')
         .order('created_at', { ascending: false });
 
       const { data: imagesData, error: imagesError } = await supabase
@@ -346,7 +350,7 @@ const Dances = () => {
       // For featured dances, use the figureVideos array
       if (selectedDance.isFeatured) {
         setFigures(selectedDance.figureVideos || []);
-        setMainVideoUrl(selectedDance.main_video_url || (selectedDance.figureVideos?.[0]?.video_url || ''));
+        setMainVideoUrl(selectedDance.main_video_url || '');
         setImages([]);
         return;
       }
@@ -523,8 +527,17 @@ const Dances = () => {
                     {dance.image_url ? (
                       <img src={dance.image_url} alt={dance.title} />
                     ) : (
-                      <div className="letter-circle">
-                        {dance.title ? dance.title.charAt(0).toUpperCase() : "?"}
+                      <div className="letter-circle" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#f5f5f5',
+                        border: '2px dashed #ddd',
+                        color: '#666',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}>
+                        {dance.title === 'Sua Ku Sua' ? 'No Preview Available' : (dance.title ? dance.title.charAt(0).toUpperCase() : "?")}
                       </div>
                     )}
                     <div className="dance-overlay">
@@ -625,54 +638,47 @@ const Dances = () => {
               maxHeight: '90vh', // limit modal height
             }}
           >
-            {/* Thumbnail image at the very top, fills the modal width and height */}
-            {selectedDance.image_url && (
-              <div style={{
-                width: '100%',
-                height: 220,
-                overflow: 'hidden',
-                borderTopLeftRadius: 12,
-                borderTopRightRadius: 12,
-                position: 'relative'
-              }}>
+            {/* Thumbnail image or No Preview Available placeholder */}
+            <div className="modal-header">
+              {selectedDance.image_url ? (
                 <img
                   src={selectedDance.image_url}
                   alt={selectedDance.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block'
-                  }}
+                  className="modal-image"
                 />
-                {/* Optional: Overlay title on image */}
+              ) : (
                 <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
                   width: '100%',
-                  background: 'rgba(0,0,0,0.45)',
-                  color: '#fff',
-                  padding: '16px 20px 10px 20px',
-                  borderBottomLeftRadius: 12,
-                  borderBottomRightRadius: 12
+                  height: '100%',
+                  background: '#f5f5f5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '2px dashed #ddd',
+                  color: '#666',
+                  fontSize: '18px',
+                  fontWeight: '500'
                 }}>
-                  <h2 className="modal-title" style={{ margin: 0 }}>{selectedDance.title}</h2>
-                  <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance</p>
-                  <div className="modal-meta-badges">
-                    <span className="region-badge">{capitalize(selectedDance.island)}</span>
-                    {selectedDance.difficulty && (
-                      <span className={`difficulty ${selectedDance.difficulty.toLowerCase()}`}>
-                        {selectedDance.difficulty}
-                      </span>
-                    )}
-                    {selectedDance.isFeatured && (
-                      <span className="featured-badge-modal">Featured</span>
-                    )}
-                  </div>
+                  No Preview Available
+                </div>
+              )}
+              {/* Overlay title on image/placeholder */}
+              <div className="modal-header-content">
+                <h2 className="modal-title" style={{ margin: 0 }}>{selectedDance.title}</h2>
+                <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance</p>
+                <div className="modal-meta-badges">
+                  <span className="region-badge">{capitalize(selectedDance.island)}</span>
+                  {selectedDance.difficulty && (
+                    <span className={`difficulty ${selectedDance.difficulty.toLowerCase()}`}>
+                      {selectedDance.difficulty}
+                    </span>
+                  )}
+                  {selectedDance.isFeatured && (
+                    <span className="featured-badge-modal">Featured</span>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
             <div className="modal-body" style={{ padding: 24 }}>
               {/* History */}
               <div className="modal-section">
@@ -736,11 +742,11 @@ const Dances = () => {
               )}
 
               {/* Main Video - Handle both featured (YouTube) and database (video) dances */}
-              {mainVideoUrl && (
+              {selectedDance.isFeatured && (
                 <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
                   <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
-                  {selectedDance.isFeatured ? (
-                    // Featured dances use YouTube embed
+                  {mainVideoUrl ? (
+                    // Show YouTube embed if video URL exists
                     <iframe
                       src={getYouTubeEmbedUrl(mainVideoUrl)}
                       title={`${selectedDance.title} - Main Video`}
@@ -756,31 +762,61 @@ const Dances = () => {
                       allowFullScreen
                     />
                   ) : (
-                    // Database dances use video element
-                    <video
-                      src={mainVideoUrl}
-                      controls
+                    // Show "No Preview Available" if no main video
+                    <div
                       style={{
                         width: '100%',
                         maxWidth: 520,
                         height: 320,
                         borderRadius: 12,
-                        background: '#000',
-                        objectFit: 'cover',
-                        boxShadow: '0 4px 24px #0002'
+                        background: '#f5f5f5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px dashed #ddd',
+                        color: '#666',
+                        fontSize: '18px',
+                        fontWeight: '500',
+                        boxShadow: '0 4px 24px #0002',
+                        margin: '0 auto'
                       }}
                     >
-                      Your browser does not support the video tag.
-                    </video>
+                      No Preview Available
+                    </div>
                   )}
+                </div>
+              )}
+              {/* Database dances main video section */}
+              {!selectedDance.isFeatured && mainVideoUrl && (
+                <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
+                  <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
+                  <video
+                    src={mainVideoUrl}
+                    controls
+                    style={{
+                      width: '100%',
+                      maxWidth: 520,
+                      height: 320,
+                      borderRadius: 12,
+                      background: '#000',
+                      objectFit: 'cover',
+                      boxShadow: '0 4px 24px #0002'
+                    }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
               )}
 
               {/* Figures - Show for both featured and database dances */}
               <div className="modal-section">
                 <h3>Figures</h3>
-                // Updated code
-<div className="figures-grid">
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: '24px',
+                  margin: '1rem 0'
+                }}>
                   {figures.length === 0 && <span style={{ gridColumn: '1 / -1' }}>No figures uploaded.</span>}
                   {figures.map((fig, idx) => (
                     <div key={fig.id} className="figure-box">
@@ -794,9 +830,11 @@ const Dances = () => {
                           title={`${selectedDance.title} - Figure ${fig.figure_number ?? idx + 1}`}
                           width="100%"
                           height="200"
+                          frameBorder="0"
                           style={{
                             borderRadius: 6,
-                            border: 'none'
+                            border: 'none',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                           }}
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen

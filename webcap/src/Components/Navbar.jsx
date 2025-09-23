@@ -51,8 +51,14 @@ const Navbar = () => {
   // Close dropdowns when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close profile dropdown if clicking outside
       if (!event.target.closest('.profile-dropdown')) {
         setIsProfileDropdownOpen(false);
+      }
+      
+      // Close mobile menu if clicking outside
+      if (!event.target.closest('.mobile-menu') && !event.target.closest('.mobile-menu-button')) {
+        setIsMobileMenuOpen(false);
       }
     };
 
@@ -181,17 +187,17 @@ const Navbar = () => {
             
             <div className="logout-modal-actions">
               <button 
-                className="logout-modal-cancel"
-                onClick={handleLogoutCancel}
-              >
-                Cancel
-              </button>
-              <button 
                 className="logout-modal-confirm"
                 onClick={handleLogoutConfirm}
               >
                 <LogOut size={16} />
                 Logout
+              </button>
+              <button 
+                className="logout-modal-cancel"
+                onClick={handleLogoutCancel}
+              >
+                Cancel
               </button>
             </div>
           </div>
