@@ -37,6 +37,7 @@ const ManageDance = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [danceToDelete, setDanceToDelete] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
+  const [notification, setNotification] = useState(null);
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -52,6 +53,12 @@ const ManageDance = () => {
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Show notification function
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   // Load dances from localStorage
   useEffect(() => {
@@ -101,10 +108,12 @@ const ManageDance = () => {
     const fetchData = async () => {
       if (!accessToken) return; // No session, do not fetch
 
-      // Example: fetch all dances
+      // Example: fetch approved dances only
       const { data: dances, error } = await supabase
         .from("dances")
-        .select("*");
+        .select("*")
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error("Error fetching data:", error.message);
@@ -120,10 +129,12 @@ const ManageDance = () => {
   // Fetch dances and related data from Supabase
   const fetchDancesAndRelated = async () => {
     setLoading(true); // <-- Add this line
-    // 1. Fetch dances
+    // 1. Fetch dances (only approved ones)
     const { data: dancesData, error: dancesError } = await supabase
       .from("dances")
-      .select("id, title, island, user_id, created_at, history, references, duration, performers, music, costumes");
+      .select("id, title, island, user_id, created_at, history, references, duration, performers, music, costumes, status")
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false });
 
     // 2. Fetch users (for uploader info)
     const { data: usersData, error: usersError } = await supabase
@@ -305,8 +316,10 @@ const ManageDance = () => {
       setShowDeleteModal(false);
       setDanceToDelete(null);
       setDeleteInput("");
+      showNotification("Dance deleted successfully", 'success');
     } catch (err) {
       alert("Failed to delete dance: " + (err.message || err));
+      showNotification("Failed to delete dance: " + (err.message || err), 'error');
     } finally {
       setLoading(false);
     }
@@ -354,20 +367,23 @@ const ManageDance = () => {
 
     setLoading(true);
 
-    // 1. Update in Supabase
-    const { error: updateError } = await supabase
-      .from("dances")
-      .update({
-        title: editForm.title,
-        island: editForm.region,
-        history: editForm.history,
-        references: editForm.references,
-        duration: editForm.duration,
-        performers: editForm.performers,
-        music: editForm.music,
-        costumes: editForm.costumes
-      })
-      .eq("id", selectedDance.id);
+    try {
+      // 1. Update in Supabase
+      const { error: updateError } = await supabase
+        .from("dances")
+        .update({
+          title: editForm.title,
+          island: editForm.region,
+          history: editForm.history,
+          references: editForm.references,
+          duration: editForm.duration,
+          performers: editForm.performers,
+          music: editForm.music,
+          costumes: editForm.costumes
+        })
+        .eq("id", selectedDance.id);
+
+      if (updateError) throw updateError;
 
     // 2. Update in localStorage
     const storedDances = localStorage.getItem('uploadedDances');
@@ -426,7 +442,13 @@ const ManageDance = () => {
       costumes: ''
     });
     setValidationErrors({});
+    showNotification("Dance updated successfully", 'success');
     setLoading(false);
+    } catch (error) {
+      console.error('Error updating dance:', error);
+      showNotification("Failed to update dance: " + (error.message || error), 'error');
+      setLoading(false);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -531,6 +553,14 @@ const ManageDance = () => {
 
   return (
     <div className="manage-dance-container">
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          <div className="notification-content">
+            {notification.message}
+          </div>
+        </div>
+      )}
+      
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
       
       <div className="main-content">

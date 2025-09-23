@@ -10,6 +10,7 @@ import {
   Menu,
   FileText,
   CheckSquare,
+  AlertTriangle,
 } from "lucide-react";
 import { supabase } from "../supabasebaseClient";
 import FLIPinoLogo from "../assets/FLIPinoNLogo.png";
@@ -19,6 +20,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
   const navigate = useNavigate();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [pendingDancesCount, setPendingDancesCount] = useState(0);
   const [username, setUsername] = useState(
     // read cached username right away
     localStorage.getItem("username")
@@ -52,6 +54,39 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
 
     getUsername();
   }, [email, username]);
+
+  // Fetch pending dances count
+  useEffect(() => {
+    const fetchPendingCount = async () => {
+      if (role !== 'superadmin') return; // Only fetch for superadmin
+
+      const { count, error } = await supabase
+        .from('dances')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      if (!error) {
+        setPendingDancesCount(count || 0);
+      }
+    };
+
+    fetchPendingCount();
+    
+    // Refresh count every 30 seconds for real-time updates
+    const interval = setInterval(fetchPendingCount, 30000);
+    
+    // Listen for custom events from DanceApproval component
+    const handlePendingCountChanged = () => {
+      fetchPendingCount();
+    };
+    
+    window.addEventListener('pendingCountChanged', handlePendingCountChanged);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('pendingCountChanged', handlePendingCountChanged);
+    };
+  }, [role]);
 
   // Filter menu items based on role
   const menuItems = [
@@ -91,6 +126,21 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
 
   const cancelLogout = () => setShowLogoutModal(false);
 
+  // Close mobile menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Close mobile menu if clicking outside
+      if (!event.target.closest('.sidebar-mobile-menu') && !event.target.closest('.sidebar-hamburger')) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <>
       <div className={`sidebar${mobileMenuOpen ? " open-mobile" : ""}`}>
@@ -118,14 +168,25 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
         <nav className="sidebar-nav">
           {menuItems.map((item) => {
             const IconComponent = item.icon;
+            const showBadge = item.id === "dance-approval" && role === "superadmin" && pendingDancesCount > 0;
+            
             return (
               <div
                 key={item.id}
                 className={`sidebar-item ${activeItem === item.id ? "active" : ""}`}
                 onClick={() => handleItemClick(item)}
+                style={{ justifyContent: 'space-between' }}
               >
-                <IconComponent className="sidebar-icon" size={20} />
-                <span className="sidebar-label">{item.label}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <IconComponent className="sidebar-icon" size={20} />
+                  <span className="sidebar-label">{item.label}</span>
+                </div>
+                {showBadge && (
+                  <span className="pending-badge" style={{ 
+                    position: 'static',
+                    marginLeft: '0'
+                  }}>{pendingDancesCount}</span>
+                )}
               </div>
             );
           })}
@@ -144,14 +205,25 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
           <nav>
             {menuItems.map((item) => {
               const IconComponent = item.icon;
+              const showBadge = item.id === "dance-approval" && role === "superadmin" && pendingDancesCount > 0;
+              
               return (
                 <div
                   key={item.id}
                   className={`sidebar-item ${activeItem === item.id ? "active" : ""}`}
                   onClick={() => handleItemClick(item)}
+                  style={{ justifyContent: 'space-between' }}
                 >
-                  <IconComponent className="sidebar-icon" size={20} />
-                  <span className="sidebar-label">{item.label}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <IconComponent className="sidebar-icon" size={20} />
+                    <span className="sidebar-label">{item.label}</span>
+                  </div>
+                  {showBadge && (
+                    <span className="pending-badge" style={{ 
+                      position: 'static',
+                      marginLeft: '0'
+                    }}>{pendingDancesCount}</span>
+                  )}
                 </div>
               );
             })}
@@ -164,15 +236,33 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
       )}
 
       {showLogoutModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3>Confirm Logout</h3>
-            <p>Are you sure you want to logout?</p>
-            <div className="modal-actions">
-              <button className="btn btn-logout" onClick={confirmLogout}>
+        <div className="logout-modal-overlay" onClick={cancelLogout}>
+          <div className="logout-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="logout-modal-header">
+              <div className="logout-modal-icon">
+                <AlertTriangle size={24} />
+              </div>
+              <h3 className="logout-modal-title">Confirm Logout</h3>
+            </div>
+            
+            <div className="logout-modal-body">
+              <p className="logout-modal-message">
+                Are you sure you want to log out? You will need to sign in again to access your account.
+              </p>
+            </div>
+            
+            <div className="logout-modal-actions">
+              <button 
+                className="logout-modal-confirm"
+                onClick={confirmLogout}
+              >
+                <LogOut size={16} />
                 Logout
               </button>
-              <button className="btn btn-cancel" onClick={cancelLogout}>
+              <button 
+                className="logout-modal-cancel"
+                onClick={cancelLogout}
+              >
                 Cancel
               </button>
             </div>

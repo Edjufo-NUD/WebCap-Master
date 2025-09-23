@@ -25,6 +25,7 @@ ALTER TABLE dances ADD COLUMN duration VARCHAR;
 ALTER TABLE dances ADD COLUMN performers VARCHAR;
 ALTER TABLE dances ADD COLUMN music VARCHAR;
 ALTER TABLE dances ADD COLUMN costumes VARCHAR;
+ALTER TABLE dances ADD COLUMN status VARCHAR DEFAULT 'pending'; -- pending, approved, declined
 
 -- DANCE_IMAGES table
 CREATE TABLE dance_images (

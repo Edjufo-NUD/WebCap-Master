@@ -12,7 +12,14 @@ const UserManagement = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [notification, setNotification] = useState(null);
   const usersPerPage = 10;
+
+  // Show notification function
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -57,8 +64,9 @@ const UserManagement = () => {
       setShowDeleteModal(false);
       setUserToDelete(null);
       fetchUsers();
+      showNotification("User deleted successfully", 'success');
     } else {
-      alert("Failed to delete user.");
+      showNotification("Failed to delete user", 'error');
     }
   };
 
@@ -75,8 +83,9 @@ const UserManagement = () => {
       setShowEditModal(false);
       setEditingUser(null);
       fetchUsers();
+      showNotification("User updated successfully", 'success');
     } else {
-      alert("Failed to update user.");
+      showNotification("Failed to update user", 'error');
     }
   };
 
@@ -126,6 +135,14 @@ const UserManagement = () => {
 
   return (
     <div className="user-management-container">
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          <div className="notification-content">
+            {notification.message}
+          </div>
+        </div>
+      )}
+      
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
 
       <div className="user-management-content">

@@ -8,7 +8,14 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Email validation function
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,18 +23,56 @@ const ForgotPassword = () => {
     setMessage("");
 
     if (!email) {
-      setError("Please enter your email.");
+      setError("Please enter your email address.");
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/reset-password",
-    });
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
 
-    if (error) {
-      setError("Failed to send reset email. Please check your email address.");
-    } else {
-      setMessage("Password reset email sent! Please check your inbox.");
+    setIsLoading(true);
+
+    try {
+      // Get the current domain for redirect URL
+      const currentDomain = window.location.origin;
+      
+      console.log("Attempting to send reset email to:", email);
+      console.log("Redirect URL:", `${currentDomain}/reset-password`);
+      
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${currentDomain}/reset-password`,
+      });
+
+      console.log("Supabase response:", { data, error });
+
+      if (error) {
+        console.error("Reset password error:", error);
+        
+        // Handle specific error cases
+        if (error.message.includes("rate limit")) {
+          setError("Too many reset attempts. Please wait before trying again.");
+        } else if (error.message.includes("user not found")) {
+          // For security reasons, we still show success message even if user doesn't exist
+          setMessage("If an account with that email exists, we've sent you a password reset link. Please check your inbox and spam folder.");
+        } else {
+          setError("Failed to send reset email. Please try again later.");
+        }
+      } else {
+        console.log("Reset email request successful");
+        setMessage("Password reset email sent! Please check your inbox and spam folder. It may take 1-5 minutes to arrive.");
+        
+        // Clear the email field after successful submission
+        setTimeout(() => {
+          setEmail("");
+        }, 2000);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -62,8 +107,8 @@ const ForgotPassword = () => {
                   {message}
                 </div>
               )}
-              <button type="submit" className="login-button">
-                Send Reset Email
+              <button type="submit" className="login-button" disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send Reset Email"}
               </button>
               <div style={{ textAlign: "right", marginTop: "8px" }}>
                 <span

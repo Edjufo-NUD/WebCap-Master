@@ -1,901 +1,1060 @@
+:root {
+  --sidebar-width: 260px; /* set to your Sidebar’s actual width */
+}
+
 /* Reset styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Dance Approval Page Styles */
+.dance-approval-page {
+  min-height: 100vh;
+  width: calc(100vw - var(--sidebar-width));
+  max-width: 100%;
+  margin-left: var(--sidebar-width);
+  background: #fafafa;
+  overflow-x: hidden;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Notification Styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease-out;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.notification.success {
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+.notification.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.notification.warning {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
   }
-  
-  body, html {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
-  
-  /* Dance Approval Page Styles */
-  .dance-approval-page {
-    min-height: 100vh;
-    width: 100vw;
-    background: #fafafa;
-    padding-top: 80px; /* Account for navbar */
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
+}
+
+
+.container {
+  max-width: none;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+/* Header Section - Full Width */
+.approval-header {
+  background: linear-gradient(135deg, #a0855b, #8b7355);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+  width: 100vw;
+  margin: 0;
+  position: relative;
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
-  
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  /* Header Section - Full Width */
-  .approval-header {
-    background: linear-gradient(135deg, #a0855b, #8b7355);
-    color: white;
-    padding: 4rem 0;
-    text-align: center;
-    width: 100vw;
-    margin: 0;
-    position: relative;
-  }
-  
-  .page-title {
-    font-size: 3rem;
-    font-weight: 800;
-    margin-bottom: 1rem;
-    animation: fadeInUp 0.8s ease-out;
-  }
-  
-  .page-subtitle {
-    font-size: 1.2rem;
-    opacity: 0.9;
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fadeInUp 0.8s ease-out 0.2s both;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Search and Filter Section - Full Width */
-  .search-filter {
-    background: white;
-    padding: 2rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 80px;
-    z-index: 100;
-    width: 100vw;
-    margin: 0;
-  }
-  
+}
+
+/* Search and Filter Section - Full Width */
+.search-filter {
+  background: #fff;
+  padding: 2rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.search-filter .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* centers them together */
+  gap: 1rem;                /* less gap */
+  flex-wrap: wrap;
+}
+
+
+.search-bar {
+  position: relative;
+  flex: 1;
+  max-width: 380px;
+  min-width: 220px;
+  margin-left: 1rem;   /* move search bar right */
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+.search-input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 50px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+  color: #1f2937;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #a0855b;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+  color: #1f2937;
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-right: 1rem;  /* move filter buttons left */
+}
+
+.filter-icon {
+  color: #6b7280;
+}
+
+.region-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.region-tab {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #374151;
+  min-width: 120px;
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.region-tab:hover {
+  border-color: #a0855b;
+  background: #f3f4f6;
+}
+
+.region-tab.active {
+  background: #a0855b;
+  color: white;
+  border-color: #a0855b;
+}
+
+/* Updated Responsive Design */
+@media (max-width: 768px) {
   .search-filter .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
   }
   
   .search-bar {
-    position: relative;
-    flex: 1;
-    max-width: 400px;
-    min-width: 250px;
-  }
-  
-  .search-icon {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6b7280;
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 50px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f9fafb;
-    color: #1f2937;
-  }
-  
-  .search-input:focus {
-    outline: none;
-    border-color: #a0855b;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
-    color: #1f2937;
-  }
-  
-  .search-input::placeholder {
-    color: #9ca3af;
+    max-width: none;
+    min-width: auto;
   }
   
   .filter-tabs {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-shrink: 0;
-  }
-  
-  .filter-icon {
-    color: #6b7280;
+    justify-content: center;
   }
   
   .region-tabs {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .region-tab {
-    padding: 0.75rem 1.5rem;
-    border: 2px solid #e5e7eb;
-    background: #f9fafb;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #374151;
-    min-width: 120px;
-    text-align: center;
-    flex: 0 0 auto;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    min-width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .region-tab {
+    min-width: 80px;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
   }
   
-  .region-tab:hover {
-    border-color: #a0855b;
-    background: #f3f4f6;
+  .region-tabs {
+    gap: 0.25rem;
+  }
+}
+
+/* Dances Grid Section - Full Width */
+.dances-grid-section {
+  background: #fafafa;
+  padding: 3rem 0;
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.results-info {
+  margin-bottom: 2rem;
+  color: #6b7280;
+  font-weight: 500;
+  text-align: center;
+}
+
+.dances-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.dance-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  animation: slideInUp 0.6s ease-out;
+  position: relative;
+  border: 2px solid #fef3c7; /* Add pending border */
+}
+
+.dance-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Pending Dance Styling */
+.pending-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.5px;
+}
+
+.pending-badge-modal {
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dance-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.dance-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.letter-circle {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #a0855b, #8b7355);
+  color: white;
+  font-size: 4rem;
+  font-weight: bold;
+}
+
+.dance-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dance-card:hover .dance-overlay {
+  opacity: 1;
+}
+
+.dance-card:hover .dance-image img {
+  transform: scale(1.1);
+}
+
+.play-button {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #a0855b;
+}
+
+.play-button:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.dance-region-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #a0855b;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
+.dance-content {
+  padding: 1.5rem;
+}
+
+.dance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.dance-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.dance-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.star-icon {
+  fill: currentColor;
+}
+
+.dance-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.dance-description {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.dance-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.difficulty {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.difficulty.beginner {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.difficulty.intermediate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.difficulty.advanced {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.review-button {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.review-button:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  background: #a0855b;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(160, 133, 91, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.scroll-to-top:hover {
+  background: #8b7355;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(160, 133, 91, 0.4);
+}
+
+.scroll-to-top:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive for scroll button */
+@media (max-width: 768px) {
+  .scroll-to-top {
+    width: 48px;
+    height: 48px;
+    bottom: 1.5rem;
+    left: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-to-top {
+    width: 44px;
+    height: 44px;
+    bottom: 1rem;
+    left: 1rem;
+  }
+}
+
+/* Preview Modal */
+.preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Enhanced modal backdrop for better click-to-close experience */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+}
+
+.modal-content {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+  z-index: 1001;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Modal Header - Full Width Image with Overlay */
+.modal-header {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.modal-image:not([src]), .modal-image[src=""] {
+  opacity: 0;
+}
+
+.modal-header-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: white;
+  padding: 3rem 2rem 2rem 2rem;
+}
+
+.modal-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.modal-subtitle {
+  color: #d1d5db;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1rem;
+}
+
+.modal-meta-badges {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.region-badge {
+  background: #a0855b;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-section {
+  margin-bottom: 2rem;
+}
+
+.modal-section h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.8rem;
+}
+
+.modal-section p {
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.modal-section div {
+  color: #6b7280;
+}
+
+.steps-list {
+  list-style: none;
+  padding: 0;
+}
+
+.steps-list li {
+  background: #f3f4f6;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  border-left: 4px solid #a0855b;
+  color: #374151;
+  font-weight: 500;
+}
+
+.figure-box {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+/* Approval Actions */
+.approval-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 2rem 0;
+  border-top: 2px solid #f3f4f6;
+}
+
+.accept-button {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  min-width: 140px;
+  justify-content: center;
+}
+
+.accept-button:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.decline-button {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  min-width: 140px;
+  justify-content: center;
+}
+
+.decline-button:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.accept-button:active,
+.decline-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 768px) {
+  .modal-header {
+    height: 250px;
   }
   
-  .region-tab.active {
-    background: #a0855b;
-    color: white;
-    border-color: #a0855b;
+  .modal-header-content {
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
   }
   
-  /* Updated Responsive Design */
-  @media (max-width: 768px) {
-    .search-filter .container {
-      flex-direction: column;
-      gap: 1.5rem;
-      align-items: stretch;
-    }
-    
-    .search-bar {
-      max-width: none;
-      min-width: auto;
-    }
-    
-    .filter-tabs {
-      justify-content: center;
-    }
-    
-    .region-tabs {
-      justify-content: center;
-    }
-    
-    .region-tab {
-      padding: 0.6rem 1.2rem;
-      font-size: 0.9rem;
-      min-width: 90px;
-    }
+  .modal-title {
+    font-size: 1.5rem;
   }
   
-  @media (max-width: 480px) {
-    .region-tab {
-      min-width: 80px;
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-    }
-    
-    .region-tabs {
-      gap: 0.25rem;
-    }
+  .approval-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
   
-  /* Dances Grid Section - Full Width */
-  .dances-grid-section {
-    padding: 3rem 0 6rem;
+  .accept-button,
+  .decline-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header {
+    height: 200px;
+  }
+  
+  .modal-header-content {
+    padding: 1.5rem 1rem 1rem 1rem;
+  }
+  
+  .modal-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .dance-approval-page {
     width: 100vw;
-    margin: 0;
-    background: #fafafa;
+    margin-left: 0;
   }
   
-  .results-info {
-    margin-bottom: 2rem;
-    color: #6b7280;
-    font-weight: 500;
-    text-align: center;
+  .search-filter {
+    width: 100%;
   }
-  
+}
+
+@media (max-width: 1200px) {
   .dances-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .dances-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dances-grid {
+    grid-template-columns: 1fr;
     padding: 0 1rem;
   }
   
   .dance-card {
-    background: white;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    animation: slideInUp 0.6s ease-out;
-    position: relative;
-    border: 2px solid #fef3c7; /* Add pending border */
-  }
-  
-  .dance-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-  }
-  
-  /* Pending Dance Styling */
-  .pending-badge {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    background: linear-gradient(45deg, #f59e0b, #d97706);
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    z-index: 10;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    letter-spacing: 0.5px;
-  }
-  
-  .pending-badge-modal {
-    background: linear-gradient(45deg, #f59e0b, #d97706);
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  @keyframes slideInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .dance-image {
-    position: relative;
-    height: 250px;
-    overflow: hidden;
-  }
-  
-  .dance-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-  
-  .letter-circle {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #a0855b, #8b7355);
-    color: white;
-    font-size: 4rem;
-    font-weight: bold;
-  }
-  
-  .dance-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .dance-card:hover .dance-overlay {
-    opacity: 1;
-  }
-  
-  .dance-card:hover .dance-image img {
-    transform: scale(1.1);
-  }
-  
-  .play-button {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #a0855b;
-  }
-  
-  .play-button:hover {
-    background: white;
-    transform: scale(1.1);
-  }
-  
-  .dance-region-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(255, 255, 255, 0.9);
-    color: #a0855b;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    backdrop-filter: blur(10px);
-  }
-  
-  .dance-content {
-    padding: 1.5rem;
-  }
-  
-  .dance-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 1rem;
   }
   
-  .dance-name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin: 0;
+  .search-filter {
+    padding: 1.5rem 0;
   }
   
-  .dance-rating {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    color: #fbbf24;
-    font-weight: 600;
-  }
-  
-  .star-icon {
-    fill: currentColor;
-  }
-  
-  .dance-meta {
-    display: flex;
+  .filter-tabs {
+    flex-direction: column;
     gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
   }
   
-  .meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    color: #6b7280;
-    font-size: 0.85rem;
+  .region-tabs {
+    justify-content: center;
   }
   
-  .dance-description {
-    color: #6b7280;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+  .region-tab {
+    padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
   }
   
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+  }
+  
+  .dance-meta {
+    gap: 0.5rem;
+  }
+  
+  .meta-item {
+    font-size: 0.8rem;
+  }
+  
   .dance-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .difficulty {
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .difficulty.beginner {
-    background: #dcfce7;
-    color: #166534;
-  }
-  
-  .difficulty.intermediate {
-    background: #fef3c7;
-    color: #92400e;
-  }
-  
-  .difficulty.advanced {
-    background: #fee2e2;
-    color: #991b1b;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
   }
   
   .review-button {
-    background: #f59e0b;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 25px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    text-align: center;
   }
   
-  .review-button:hover {
-    background: #d97706;
-    transform: translateY(-2px);
-  }
-  
-  /* Scroll to Top Button */
-  .scroll-to-top {
-    position: fixed;
-    bottom: 2rem;
-    left: 2rem;
-    background: #a0855b;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(160, 133, 91, 0.3);
-    transition: all 0.3s ease;
-    z-index: 1000;
-    animation: slideInUp 0.3s ease-out;
-  }
-  
-  .scroll-to-top:hover {
-    background: #8b7355;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(160, 133, 91, 0.4);
-  }
-  
-  .scroll-to-top:active {
-    transform: translateY(0);
-  }
-  
-  /* Mobile responsive for scroll button */
-  @media (max-width: 768px) {
-    .scroll-to-top {
-      width: 48px;
-      height: 48px;
-      bottom: 1.5rem;
-      left: 1.5rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .scroll-to-top {
-      width: 44px;
-      height: 44px;
-      bottom: 1rem;
-      left: 1rem;
-    }
-  }
-  
-  /* Preview Modal */
+  /* Modal responsive */
   .preview-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
-  
-  /* Enhanced modal backdrop for better click-to-close experience */
-  .modal-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    cursor: pointer;
+    padding: 1rem;
   }
   
   .modal-content {
-    position: relative;
-    background: white;
-    border-radius: 20px;
-    max-width: 900px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    animation: modalSlideIn 0.3s ease-out;
-    z-index: 1001;
-  }
-  
-  @keyframes modalSlideIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9) translateY(50px);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-  
-  /* Modal Header - Full Width Image with Overlay */
-  .modal-header {
-    position: relative;
-    height: 300px;
-    overflow: hidden;
-    border-radius: 20px 20px 0 0;
-    background: #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .modal-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    transition: opacity 0.3s ease;
-  }
-  
-  .modal-image:not([src]), .modal-image[src=""] {
-    opacity: 0;
-  }
-  
-  .modal-header-content {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-    color: white;
-    padding: 3rem 2rem 2rem 2rem;
-  }
-  
-  .modal-title {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    color: white;
-  }
-  
-  .modal-subtitle {
-    color: #d1d5db;
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    margin-bottom: 1rem;
-  }
-  
-  .modal-meta-badges {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  
-  .region-badge {
-    background: #a0855b;
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-  
-  .rating {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    color: #fbbf24;
-    font-weight: 600;
+    max-height: 95vh;
   }
   
   .modal-body {
-    padding: 2rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.5rem;
   }
   
-  .modal-section {
-    margin-bottom: 2rem;
-  }
-  
-  .modal-section h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.8rem;
-  }
-  
-  .modal-section p {
-    color: #6b7280;
-    line-height: 1.6;
-    font-size: 1rem;
-  }
-  
-  .modal-section div {
-    color: #6b7280;
-  }
-  
-  .steps-list {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .steps-list li {
-    background: #f3f4f6;
-    padding: 0.8rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 10px;
-    border-left: 4px solid #a0855b;
-    color: #374151;
-    font-weight: 500;
-  }
-  
-  .figure-box {
-    background: #f8f9fa;
-    padding: 1rem;
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
-  }
-  
-  /* Approval Actions */
-  .approval-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 2rem;
+  .approval-header {
     padding: 2rem 0;
-    border-top: 2px solid #f3f4f6;
   }
   
-  .accept-button {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    min-width: 140px;
-    justify-content: center;
+  .page-title {
+    font-size: 1.5rem;
   }
   
-  .accept-button:hover {
-    background: linear-gradient(135deg, #059669, #047857);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  .dance-content {
+    padding: 1rem;
   }
   
-  .decline-button {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    min-width: 140px;
-    justify-content: center;
+  .dance-name {
+    font-size: 1.2rem;
   }
   
-  .decline-button:hover {
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  .search-input {
+    font-size: 0.9rem;
   }
   
-  .accept-button:active,
-  .decline-button:active {
-    transform: translateY(0);
+  .region-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
   }
-  
-  /* Responsive Design for Modal */
-  @media (max-width: 768px) {
-    .modal-header {
-      height: 250px;
-    }
-    
-    .modal-header-content {
-      padding: 2rem 1.5rem 1.5rem 1.5rem;
-    }
-    
-    .modal-title {
-      font-size: 1.5rem;
-    }
-    
-    .approval-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .accept-button,
-    .decline-button {
-      width: 100%;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .modal-header {
-      height: 200px;
-    }
-    
-    .modal-header-content {
-      padding: 1.5rem 1rem 1rem 1rem;
-    }
-    
-    .modal-title {
-      font-size: 1.25rem;
-    }
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .dances-grid {
-      grid-template-columns: 1fr;
-      padding: 0 1rem;
-    }
-    
-    .dance-card {
-      margin-bottom: 1rem;
-    }
-    
-    .search-filter {
-      padding: 1.5rem 0;
-    }
-    
-    .filter-tabs {
-      flex-direction: column;
-      gap: 1rem;
-    }
-    
-    .region-tabs {
-      justify-content: center;
-    }
-    
-    .region-tab {
-      padding: 0.6rem 1.2rem;
-      font-size: 0.9rem;
-    }
-    
-    .page-title {
-      font-size: 2rem;
-    }
-    
-    .page-subtitle {
-      font-size: 1rem;
-    }
-    
-    .dance-meta {
-      gap: 0.5rem;
-    }
-    
-    .meta-item {
-      font-size: 0.8rem;
-    }
-    
-    .dance-footer {
-      flex-direction: column;
-      gap: 1rem;
-      align-items: stretch;
-    }
-    
-    .review-button {
-      text-align: center;
-    }
-    
-    /* Modal responsive */
-    .preview-modal {
-      padding: 1rem;
-    }
-    
-    .modal-content {
-      max-height: 95vh;
-    }
-    
-    .modal-body {
-      padding: 1.5rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .container {
-      padding: 0 0.5rem;
-    }
-    
-    .approval-header {
-      padding: 2rem 0;
-    }
-    
-    .page-title {
-      font-size: 1.5rem;
-    }
-    
-    .dance-content {
-      padding: 1rem;
-    }
-    
-    .dance-name {
-      font-size: 1.2rem;
-    }
-    
-    .search-input {
-      font-size: 0.9rem;
-    }
-    
-    .region-tab {
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-    }
-  }
-  
-  /* Add to DanceApproval.css */
+}
+
+/* Add to DanceApproval.css */
+.figures-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Mobile responsive - single column on phones */
+@media (max-width: 768px) {
   .figures-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
-  /* Mobile responsive - single column on phones */
-  @media (max-width: 768px) {
-    .figures-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
+}
+@media (max-width: 1024px) {
+  .dance-approval-page {
+    width: 100vw;
+    margin-left: 0;
   }
+}
+/* === Mobile fixes: keep search bar visible and non-overlapping === */
+:root {
+  --navbar-height-mobile: 72px; /* ← set to your mobile header height */
+}
+
+@media (max-width: 768px) {
+  /* Push whole page down so sticky bar never hides under the header */
+  .dance-approval-page {
+    padding-top: var(--navbar-height-mobile);
+  }
+
+  /* Keep sticky at top of the viewport (the page padding creates the gap) */
+  .search-filter {
+    top: 0;                 /* stays pinned to top of viewport */
+    padding: 1.25rem 0;     /* a bit tighter on mobile */
+    z-index: 200;           /* above content */
+  }
+
+  /* Make search bar full-width and prevent squish */
+  .search-filter .container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;              /* remove left offset on mobile */
+  }
+
+  .search-input {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.85rem 1rem 0.85rem 2.5rem;
+  }
+
+  .filter-tabs {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-right: 0;
+  }
+
+  .region-tabs {
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  /* Prevent the "X pending dances found" text from overlapping */
+  .results-info {
+    margin-top: 0.5rem;
+  }
+
+  /* Optional: add a little extra top space to the whole grid section */
+  .dances-grid-section {
+    padding-top: 2rem;
+  }
+}

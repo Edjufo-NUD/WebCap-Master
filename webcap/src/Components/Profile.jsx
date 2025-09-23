@@ -80,6 +80,17 @@ const Profile = () => {
     setTimeout(() => setSnackbar({ message: '', type: '' }), 3000);
   };
 
+  // Password validation function
+  const validatePassword = (password) => {
+    if (password.length < 8) return "Password must be at least 8 characters long.";
+    if (password.length > 24) return "Password must be no more than 24 characters long.";
+    if (!/(?=.*[a-z])/.test(password)) return "Password must contain at least one lowercase letter.";
+    if (!/(?=.*[A-Z])/.test(password)) return "Password must contain at least one uppercase letter.";
+    if (!/(?=.*\d)/.test(password)) return "Password must contain at least one number.";
+    if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) return "Password must contain at least one special character.";
+    return null;
+  };
+
   const handleEdit = () => {
     setIsEditing(true);
     setEditData({ ...profileData });
@@ -143,14 +154,20 @@ const Profile = () => {
       showSnackbar('Please fill in all password fields.', 'error');
       return;
     }
-    if (newPass.length < 6 || newPass.length > 24) {
-      showSnackbar('New password must be 6-24 characters.', 'error');
+    
+    // Validate current password length (basic validation)
+    if (current.length < 6) {
+      showSnackbar('Current password is too short.', 'error');
       return;
     }
-    if (current.length < 6 || current.length > 24) {
-      showSnackbar('Current password must be 6-24 characters.', 'error');
+    
+    // Validate new password with comprehensive requirements
+    const passwordError = validatePassword(newPass);
+    if (passwordError) {
+      showSnackbar(passwordError, 'error');
       return;
     }
+    
     if (newPass !== confirm) {
       showSnackbar('Confirm password must match new password.', 'error');
       return;
@@ -429,7 +446,7 @@ const Profile = () => {
                       placeholder="New Password"
                       value={passwordFields.new}
                       onChange={e => handlePasswordFieldChange('new', e.target.value)}
-                      minLength={6}
+                      minLength={8}
                       maxLength={24}
                     />
                     <button
@@ -453,7 +470,7 @@ const Profile = () => {
                       placeholder="Confirm New Password"
                       value={passwordFields.confirm}
                       onChange={e => handlePasswordFieldChange('confirm', e.target.value)}
-                      minLength={6}
+                      minLength={8}
                       maxLength={24}
                     />
                     <button

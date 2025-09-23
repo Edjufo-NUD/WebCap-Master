@@ -33,7 +33,15 @@ const Register = () => {
     setTimeout(() => setSnackbar({ message: "", type: "" }), 3000);
   };
 
-  const validatePassword = (password) => password.length >= 8 && password.length <= 24;
+  const validatePassword = (password) => {
+    if (password.length < 8) return "Password must be at least 8 characters long.";
+    if (password.length > 24) return "Password must be no more than 24 characters long.";
+    if (!/(?=.*[a-z])/.test(password)) return "Password must contain at least one lowercase letter.";
+    if (!/(?=.*[A-Z])/.test(password)) return "Password must contain at least one uppercase letter.";
+    if (!/(?=.*\d)/.test(password)) return "Password must contain at least one number.";
+    if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) return "Password must contain at least one special character.";
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,9 +54,10 @@ const Register = () => {
       return;
     }
 
-    // Password validation: min 8, max 24
-    if (!validatePassword(password)) {
-      showSnackbar("Password must be between 8 and 24 characters.", "error");
+    // Password validation: min 8, max 24, with complexity requirements
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      showSnackbar(passwordError, "error");
       setLoading(false);
       return;
     }
@@ -163,6 +172,8 @@ const Register = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    minLength={8}
+                    maxLength={24}
                     style={{ paddingRight: "40px" }}
                   />
                   <span
@@ -192,6 +203,8 @@ const Register = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
+                    minLength={8}
+                    maxLength={24}
                     style={{ paddingRight: "40px" }}
                   />
                   <span
