@@ -1650,7 +1650,7 @@ const Culture = () => {
       )}
 
       {/* Scroll to Top Button - always on right, responsive */}
-      {showScrollTop && (
+      {showScrollTop && !selectedRegion && !selectedElement && (
         <button
           className="scroll-to-top-btn"
           onClick={scrollToTop}
@@ -1659,7 +1659,7 @@ const Culture = () => {
             bottom: 24,
             right: 24,
             zIndex: 9999,
-            background: '#fff',
+            background: '#a0855b',
             border: '1.5px solid #a0855b',
             borderRadius: '50%',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
@@ -1673,7 +1673,7 @@ const Culture = () => {
           }}
           aria-label="Scroll to top"
         >
-          <ArrowUp size={window.innerWidth < 480 ? 20 : window.innerWidth < 900 ? 24 : 32} color="#ffffffff" />
+          <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
         </button>
       )}
     </div>

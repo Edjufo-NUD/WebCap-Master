@@ -638,7 +638,7 @@ const ManageDance = () => {
                   <th>Dance</th>
                   <th>Island</th>
                   <th>Date Added</th>
-                  <th>Uploaded By</th> {/* Added column header */}
+                  <th>Uploaded By</th>
                   <th>Actions</th>
                 </tr>
               </thead>
