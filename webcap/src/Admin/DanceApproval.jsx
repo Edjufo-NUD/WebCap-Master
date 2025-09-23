@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Play, MapPin, ChevronUp, ArrowUp } from 'lucide-react';
-import Navbar from '../Components/Navbar';
-import './Dances.css';
+import { Search, Filter, Play, MapPin, ChevronUp, ArrowUp, Check, X } from 'lucide-react';
+import Navbar from '../Admin/Sidebar';
+import './DanceApproval.css';
 import { supabase } from '../supabasebaseClient';
 import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
@@ -47,6 +47,7 @@ const featuredDances = [
     music: 'Traditional Ilocano folk music with gongs and drums',
     costumes: 'Colorful traditional Ilocano attire with wide-brimmed hats',
     isFeatured: true,
+    status: 'pending',
     // Figure videos for Binungey
     figureVideos: [
       {
@@ -89,12 +90,12 @@ const featuredDances = [
   {
     id: 'featured-4',
     title: 'Pahid',
-    island: 'Luzon', // You can adjust this if needed
-    province: 'Northern Luzon', // You can adjust this if needed
+    island: 'Luzon',
+    province: 'Northern Luzon',
     image_url: pahidImage,
     history: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage. This dance demonstrates the refined artistry and storytelling tradition of Filipino culture through expressive choreography.',
     references: 'Traditional Filipino folk music with indigenous instruments. Traditional Filipino attire with cultural significance.',
-    main_video_url: '', // No main video provided, will use first figure video
+    main_video_url: '',
     difficulty: 'Intermediate',
     duration: '4-6 minutes',
     performers: '4-8 dancers',
@@ -103,7 +104,7 @@ const featuredDances = [
     music: 'Traditional Filipino folk music with indigenous instruments',
     costumes: 'Traditional Filipino attire with cultural significance',
     isFeatured: true,
-    // Figure videos for Pahid
+    status: 'pending',
     figureVideos: [
       {
         id: 'pahid-fig-1',
@@ -145,7 +146,7 @@ const featuredDances = [
     image_url: suakusuaImage,
     history: 'A courtship dance from the Tausug people of Sulu. A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
     references: 'Traditional Tausug kulintang ensemble. Elaborate Muslim royal attire with intricate embroidery.',
-    main_video_url: '', // No main video provided, will use first figure video
+    main_video_url: '',
     difficulty: 'Advanced',
     duration: '5-7 minutes',
     performers: '2-4 dancers',
@@ -154,7 +155,7 @@ const featuredDances = [
     music: 'Traditional Tausug kulintang ensemble',
     costumes: 'Elaborate Muslim royal attire with intricate embroidery',
     isFeatured: true,
-    // Figure videos for Sua Ku Sua
+    status: 'pending',
     figureVideos: [
       {
         id: 'suakusua-fig-1',
@@ -216,7 +217,7 @@ const featuredDances = [
     image_url: tiklosImage,
     history: 'A dance depicting the Bayanihan spirit of community cooperation. Represents the Filipino spirit of bayanihan (community cooperation) where neighbors help each other during planting and harvesting seasons.',
     references: 'Lively Visayan folk music with traditional instruments. Simple rural Filipino clothing reflecting farming attire.',
-    main_video_url: 'https://youtube.com/shorts/QnkC5NnK0L4?feature=share', // Tiklos Cultural Dance
+    main_video_url: 'https://youtube.com/shorts/QnkC5NnK0L4?feature=share',
     difficulty: 'Beginner',
     duration: '3-5 minutes',
     performers: '8-12 dancers',
@@ -225,7 +226,7 @@ const featuredDances = [
     music: 'Lively Visayan folk music with traditional instruments',
     costumes: 'Simple rural Filipino clothing reflecting farming attire',
     isFeatured: true,
-    // Figure videos for Tiklos
+    status: 'pending',
     figureVideos: [
       {
         id: 'tiklos-fig-1',
@@ -256,7 +257,8 @@ const capitalize = (str) => str && typeof str === 'string'
   ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
   : '';
 
-const Dances = () => {
+const DanceApproval = () => {
+  const [activeItem, setActiveItem] = useState("dance-approval");
   const [selectedRegion, setSelectedRegion] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDance, setSelectedDance] = useState(null);
@@ -287,9 +289,11 @@ const Dances = () => {
   useEffect(() => {
     const fetchDances = async () => {
       setLoading(true);
+      // Fetch only pending dances for approval
       const { data: dancesData, error: dancesError } = await supabase
         .from('dances')
-        .select('id, title, island, references, history, main_video_url, duration, performers, music, costumes')
+        .select('id, title, island, references, history, main_video_url, duration, performers, music, costumes, status')
+        .eq('status', 'pending')
         .order('created_at', { ascending: false });
 
       const { data: imagesData, error: imagesError } = await supabase
@@ -309,24 +313,22 @@ const Dances = () => {
           ...d,
           image_url: imageMap[d.id] || null,
           isFeatured: false,
-          // Ensure new fields are always present for modal display
           duration: d.duration || '',
           performers: d.performers || '',
           music: d.music || '',
           costumes: d.costumes || '',
-          // Capitalize island for display
           island: capitalize(d.island || ''),
-          // Add origin field for modal, same as island
           origin: capitalize(d.island || '')
         }));
 
-        // Combine featured dances with database dances
-        // Featured dances first, then database dances
-        const combinedDances = [...featuredDances, ...databaseDances];
+        // For demo purposes, include featured dances with pending status
+        const pendingFeaturedDances = featuredDances.filter(dance => dance.status === 'pending');
+        const combinedDances = [...pendingFeaturedDances, ...databaseDances];
         setDances(combinedDances);
       } else {
-        // If there's an error with database, just show featured dances
-        setDances(featuredDances);
+        // If there's an error with database, just show pending featured dances
+        const pendingFeaturedDances = featuredDances.filter(dance => dance.status === 'pending');
+        setDances(pendingFeaturedDances);
       }
       setLoading(false);
     };
@@ -352,7 +354,6 @@ const Dances = () => {
       }
 
       // For database dances, fetch from Supabase
-      // Fetch figures (order by figure_number)
       const { data: figuresData } = await supabase
         .from('dance_figures')
         .select('*')
@@ -361,7 +362,6 @@ const Dances = () => {
 
       setFigures(figuresData || []);
 
-      // Fetch images (order by position)
       const { data: imagesData } = await supabase
         .from('dance_images')
         .select('*')
@@ -370,7 +370,6 @@ const Dances = () => {
 
       setImages(imagesData || []);
 
-      // Main video: first video_url in dance_images with position 0, fallback to 1
       let mainVideo = imagesData?.find(img => img.position === 0 && img.video_url) ||
                       imagesData?.find(img => img.position === 1 && img.video_url);
       setMainVideoUrl(mainVideo?.video_url || selectedDance.main_video_url || '');
@@ -400,26 +399,79 @@ const Dances = () => {
     setImages([]);
   };
 
+  // Handle Accept dance
+  const handleAccept = async (danceId) => {
+    try {
+      if (selectedDance?.isFeatured) {
+        // For featured dances, just update local state for demo
+        console.log(`Accepted dance: ${selectedDance.title}`);
+        alert(`Dance "${selectedDance.title}" has been accepted!`);
+      } else {
+        // For database dances, update in Supabase
+        const { error } = await supabase
+          .from('dances')
+          .update({ status: 'approved' })
+          .eq('id', danceId);
+        
+        if (!error) {
+          alert(`Dance has been accepted!`);
+          // Remove from current list
+          setDances(prev => prev.filter(d => d.id !== danceId));
+        } else {
+          alert('Error accepting dance');
+        }
+      }
+      closePreview();
+    } catch (error) {
+      console.error('Error accepting dance:', error);
+      alert('Error accepting dance');
+    }
+  };
+
+  // Handle Decline dance
+  const handleDecline = async (danceId) => {
+    try {
+      if (selectedDance?.isFeatured) {
+        // For featured dances, just update local state for demo
+        console.log(`Declined dance: ${selectedDance.title}`);
+        alert(`Dance "${selectedDance.title}" has been declined.`);
+      } else {
+        // For database dances, update in Supabase
+        const { error } = await supabase
+          .from('dances')
+          .update({ status: 'rejected' })
+          .eq('id', danceId);
+        
+        if (!error) {
+          alert(`Dance has been declined.`);
+          // Remove from current list
+          setDances(prev => prev.filter(d => d.id !== danceId));
+        } else {
+          alert('Error declining dance');
+        }
+      }
+      closePreview();
+    } catch (error) {
+      console.error('Error declining dance:', error);
+      alert('Error declining dance');
+    }
+  };
+
   useEffect(() => {
     if (showPreview) {
-      // Prevent background scroll
       document.body.style.overflow = 'hidden';
     } else {
-      // Restore scroll
       document.body.style.overflow = '';
     }
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = '';
     };
   }, [showPreview]);
 
-  // Prevent scroll bubbling outside modal
   useEffect(() => {
     if (!showPreview) return;
 
     const preventScroll = (e) => {
-      // Only prevent if not inside modal-content
       const modalContent = document.querySelector('.modal-content');
       if (modalContent && !modalContent.contains(e.target)) {
         e.preventDefault();
@@ -439,15 +491,15 @@ const Dances = () => {
   const displayOrNA = (value) => value && value.trim() ? value : "N/A";
 
   return (
-    <div className="dances-page">
-      <Navbar />
+    <div className="dance-approval-page">
+      <Navbar activeItem={activeItem} setActiveItem={setActiveItem} />
       
       {/* Header Section */}
-      <section className="dances-header">
+      <section className="approval-header">
         <div className="container">
-          <h1 className="page-title">Filipino Folk Dances</h1>
+          <h1 className="page-title">Dance Approval Center</h1>
           <p className="page-subtitle">
-            Explore the rich cultural heritage of the Philippines through traditional folk dances
+            Review and approve pending dance submissions
           </p>
         </div>
       </section>
@@ -483,41 +535,23 @@ const Dances = () => {
         </div>
       </section>
 
-      {/* --- News Ticker / Announcement Bar --- */}
-<div className="news-ticker-bar">
-  <div className="news-ticker-content">
-    <span role="img" aria-label="megaphone" style={{ marginRight: 8 }}>📢</span>
-    <span>
-      🎉 Exciting news! <strong>FLIPino</strong> is now live on the Play Store and App Store.  
-      <span style={{ marginLeft: 4 }}>
-        Explore Filipino cultural dances like never before — watch, learn, and even <strong>simulate our featured dances</strong> right from your phone.  
-        Search for <strong>FLIPino</strong> today and start dancing with us! 💃🕺
-      </span>
-    </span>
-  </div>
-</div>
-
-      {/* --- End News Ticker --- */}
-
       {/* Dances Grid */}
       <section className="dances-grid-section">
         <div className="container">
           <div className="results-info">
-            <p>{filteredDances.length} dances found</p>
+            <p>{filteredDances.length} pending dances found</p>
           </div>
           
           <div className="dances-grid">
             {loading ? (
-              <div style={{ textAlign: 'center', width: '100%' }}>Loading dances...</div>
+              <div style={{ textAlign: 'center', width: '100%' }}>Loading pending dances...</div>
             ) : filteredDances.length === 0 ? (
-              <div style={{ textAlign: 'center', width: '100%' }}>No dances found.</div>
+              <div style={{ textAlign: 'center', width: '100%' }}>No pending dances found.</div>
             ) : (
               filteredDances.map(dance => (
                 <div key={dance.id} className="dance-card" onClick={() => openPreview(dance)}>
-                  {/* Featured badge for featured dances */}
-                  {dance.isFeatured && (
-                    <div className="featured-badge">Featured</div>
-                  )}
+                  {/* Pending badge */}
+                  <div className="pending-badge">Pending Approval</div>
                   
                   <div className="dance-image">
                     {dance.image_url ? (
@@ -537,7 +571,6 @@ const Dances = () => {
                   <div className="dance-content">
                     <div className="dance-header">
                       <h3 className="dance-name">{dance.title}</h3>
-                      {/* Show difficulty for featured dances */}
                       {dance.difficulty && (
                         <span className={`difficulty ${dance.difficulty.toLowerCase()}`}>
                           {dance.difficulty}
@@ -557,7 +590,6 @@ const Dances = () => {
                       )}
                     </div>
                     
-                    {/* Show only up to 2 lines of history, then "..." */}
                     <p
                       className="dance-description"
                       style={{
@@ -573,8 +605,8 @@ const Dances = () => {
                       {dance.history}
                     </p>
                     <div className="dance-footer">
-                      <button className="learn-button">
-                        View Details
+                      <button className="review-button">
+                        Review Dance
                       </button>
                     </div>
                   </div>
@@ -585,8 +617,8 @@ const Dances = () => {
         </div>
       </section>
 
-      {/* Scroll to Top Button - always on right, responsive */}
-      {showScrollTop && !showPreview && (
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
         <button
           className="scroll-to-top-btn"
           onClick={scrollToTop}
@@ -595,7 +627,7 @@ const Dances = () => {
             bottom: 24,
             right: 24,
             zIndex: 9999,
-            background: '#a0855b',
+            background: '#fff',
             border: '1.5px solid #a0855b',
             borderRadius: '50%',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
@@ -609,7 +641,7 @@ const Dances = () => {
           }}
           aria-label="Scroll to top"
         >
-          <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
+          <ArrowUp size={window.innerWidth < 480 ? 20 : window.innerWidth < 900 ? 24 : 32} color="#a0855b" />
         </button>
       )}
 
@@ -621,11 +653,10 @@ const Dances = () => {
             className="modal-content"
             style={{
               padding: 0,
-              overflow: 'auto', // allow scroll inside modal
-              maxHeight: '90vh', // limit modal height
+              overflow: 'auto',
+              maxHeight: '90vh',
             }}
           >
-            {/* Thumbnail image at the very top, fills the modal width and height */}
             {selectedDance.image_url && (
               <div style={{
                 width: '100%',
@@ -645,7 +676,6 @@ const Dances = () => {
                     display: 'block'
                   }}
                 />
-                {/* Optional: Overlay title on image */}
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
@@ -658,7 +688,7 @@ const Dances = () => {
                   borderBottomRightRadius: 12
                 }}>
                   <h2 className="modal-title" style={{ margin: 0 }}>{selectedDance.title}</h2>
-                  <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance</p>
+                  <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance - Pending Approval</p>
                   <div className="modal-meta-badges">
                     <span className="region-badge">{capitalize(selectedDance.island)}</span>
                     {selectedDance.difficulty && (
@@ -666,9 +696,7 @@ const Dances = () => {
                         {selectedDance.difficulty}
                       </span>
                     )}
-                    {selectedDance.isFeatured && (
-                      <span className="featured-badge-modal">Featured</span>
-                    )}
+                    <span className="pending-badge-modal">Pending</span>
                   </div>
                 </div>
               </div>
@@ -682,32 +710,6 @@ const Dances = () => {
 
               {/* Additional info for featured dances */}
               {selectedDance.isFeatured && (
-                <>
-                  <div className="modal-section">
-                    <h3>Performance Details</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1rem 0' }}>
-                      <div><strong>Duration:</strong> {displayOrNA(selectedDance.duration)}</div>
-                      <div><strong>Performers:</strong> {displayOrNA(selectedDance.performers)}</div>
-                      <div><strong>Origin:</strong> {displayOrNA(selectedDance.origin)}</div>
-                      <div><strong>Difficulty:</strong> {displayOrNA(selectedDance.difficulty)}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="modal-section">
-                    <h3>Cultural Significance</h3>
-                    <p>{selectedDance.significance}</p>
-                  </div>
-
-                  <div className="modal-section">
-                    <h3>Music & Costumes</h3>
-                    <p><strong>Music:</strong> {displayOrNA(selectedDance.music)}</p>
-                    <p><strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}</p>
-                  </div>
-                </>
-              )}
-
-              {/* For database dances: show new info (no difficulty) */}
-              {!selectedDance.isFeatured && (
                 <>
                   <div className="modal-section">
                     <h3>Performance Details</h3>
@@ -735,12 +737,11 @@ const Dances = () => {
                 </>
               )}
 
-              {/* Main Video - Handle both featured (YouTube) and database (video) dances */}
+              {/* Main Video */}
               {mainVideoUrl && (
                 <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
                   <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
                   {selectedDance.isFeatured ? (
-                    // Featured dances use YouTube embed
                     <iframe
                       src={getYouTubeEmbedUrl(mainVideoUrl)}
                       title={`${selectedDance.title} - Main Video`}
@@ -756,7 +757,6 @@ const Dances = () => {
                       allowFullScreen
                     />
                   ) : (
-                    // Database dances use video element
                     <video
                       src={mainVideoUrl}
                       controls
@@ -776,11 +776,10 @@ const Dances = () => {
                 </div>
               )}
 
-              {/* Figures - Show for both featured and database dances */}
+              {/* Figures */}
               <div className="modal-section">
                 <h3>Figures</h3>
-                // Updated code
-<div className="figures-grid">
+                <div className="figures-grid">
                   {figures.length === 0 && <span style={{ gridColumn: '1 / -1' }}>No figures uploaded.</span>}
                   {figures.map((fig, idx) => (
                     <div key={fig.id} className="figure-box">
@@ -788,7 +787,6 @@ const Dances = () => {
                         Figure {fig.figure_number ?? idx + 1}
                       </div>
                       {selectedDance.isFeatured ? (
-                        // For featured dances, use YouTube embed
                         <iframe
                           src={getYouTubeEmbedUrl(fig.video_url)}
                           title={`${selectedDance.title} - Figure ${fig.figure_number ?? idx + 1}`}
@@ -802,7 +800,6 @@ const Dances = () => {
                           allowFullScreen
                         />
                       ) : (
-                        // For database dances, use video element
                         <video
                           src={fig.video_url}
                           controls
@@ -819,6 +816,24 @@ const Dances = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Approval Actions */}
+              <div className="approval-actions">
+                <button
+                  className="decline-button"
+                  onClick={() => handleDecline(selectedDance.id)}
+                >
+                  <X size={20} />
+                  Decline Dance
+                </button>
+                <button
+                  className="accept-button"
+                  onClick={() => handleAccept(selectedDance.id)}
+                >
+                  <Check size={20} />
+                  Accept Dance
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -827,4 +842,4 @@ const Dances = () => {
   );
 };
 
-export default Dances;
+export default DanceApproval;

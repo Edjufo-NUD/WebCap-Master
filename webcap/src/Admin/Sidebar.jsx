@@ -8,6 +8,8 @@ import {
   LogOut,
   Settings,
   Menu,
+  FileText,
+  CheckSquare,
 } from "lucide-react";
 import { supabase } from "../supabasebaseClient";
 import FLIPinoLogo from "../assets/FLIPinoNLogo.png";
@@ -55,11 +57,15 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
   const menuItems = [
     { id: "manage-dance", label: "Manage Dance", icon: Settings, path: "/manage-dance" },
     { id: "dance-upload", label: "Dance Upload", icon: Upload, path: "/dance-upload" },
+    { id: "dance-request", label: "Dance Request", icon: FileText, path: "/dance-request" },
+    { id: "dance-approval", label: "Dance Approval", icon: CheckSquare, path: "/dance-approval" },
     { id: "analytics", label: "Analytics", icon: BarChart3, path: "/analytics" },
     { id: "user-ratings", label: "User Ratings", icon: Star, path: "/user-ratings" },
     { id: "user-management", label: "User Management", icon: Users, path: "/user-management" },
   ].filter(item => {
     if (item.id === "user-management") return role === "superadmin";
+    if (item.id === "dance-request") return role === "admin";
+    if (item.id === "dance-approval") return role === "superadmin";
     return role === "admin" || role === "superadmin";
   });
 

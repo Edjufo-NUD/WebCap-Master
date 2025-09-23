@@ -336,6 +336,7 @@
   background-color: #ffebee;
   color: #c62828; /* red */
 }
+
 /* === RESPONSIVE ADD-ONS (no visual changes) === */
 
 /* let the table area scroll horizontally on small screens */
@@ -375,20 +376,47 @@
     box-sizing: border-box !important;
   }
 
-  /* strongest override for your global .btn rules */
+  /* Target ALL buttons in modal actions - use button element selector */
+  .user-management-container .modal .modal-actions button {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    flex: none !important;
+    align-self: stretch !important;
+  }
+
+  /* Double-ensure with class selectors */
   .user-management-container .modal .modal-actions .btn,
   .user-management-container .modal .modal-actions .btn-save,
-  .user-management-container .modal .modal-actions .btn-cancel {
-    display: block !important;       /* <- key: beats inline-flex width behavior */
-    width: 100% !important;          /* fill the row */
-    min-width: 0 !important;         /* ignore global 80px */
-    margin-right: 0 !important;      /* remove global right gap */
+  .user-management-container .modal .modal-actions .btn-cancel,
+  .user-management-container .modal .modal-actions .btn-delete {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
     box-sizing: border-box !important;
-    text-align: center !important;   /* keep text centered */
-    white-space: nowrap !important;  /* keep your text on one line */
+    text-align: center !important;
+    flex: none !important;
+    align-self: stretch !important;
+  }
+
+  /* Nuclear option - target by button type */
+  .user-management-container .modal .modal-actions button[type="button"] {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    flex: none !important;
+    align-self: stretch !important;
   }
 }
-/* Add this CSS to your UserManagement.css file */
 
 /* External Pagination Cards */
 .pagination-card {
@@ -405,12 +433,6 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
-  position: relative;
-}
-
-.pagination-left {
-  flex: 0 0 auto;
-  min-width: 100px;
 }
 
 .pagination-info {
@@ -418,33 +440,13 @@
   font-weight: 500;
   font-size: 0.95rem;
   flex: 1;
-  text-align: center;
   min-width: 200px;
 }
 
-.pagination-right {
-  flex: 0 0 auto;
-  min-width: 100px;
+.pagination-controls {
   display: flex;
-  justify-content: flex-end;
-}
-
-.btn {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
+  gap: 15px;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-  min-height: 44px;
 }
 
 .btn-secondary {

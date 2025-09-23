@@ -14,19 +14,6 @@ const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10;
 
-  // ➜ Detect phone size (<=640px) to apply inline styles that beat all CSS
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.matchMedia("(max-width: 640px)").matches : false
-  );
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 640px)");
-    const onChange = (e) => setIsMobile(e.matches);
-    mq.addEventListener ? mq.addEventListener("change", onChange) : mq.addListener(onChange);
-    return () => {
-      mq.removeEventListener ? mq.removeEventListener("change", onChange) : mq.removeListener(onChange);
-    };
-  }, []);
-
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -47,7 +34,7 @@ const UserManagement = () => {
             id: u.id,
             name: u.username,
             email: u.email,
-            role: u.role || "user",
+            role: (u.role || "user").toLowerCase(),
             status: u.status || "Enabled",
           }))
       );
@@ -137,17 +124,6 @@ const UserManagement = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
 
-  // Inline styles for modal on phones (overrides any CSS conflicts)
-  const modalStyle = isMobile
-    ? { width: "100%", maxWidth: "none", boxSizing: "border-box", margin: "20px" }
-    : undefined;
-  const modalActionsStyle = isMobile
-    ? { display: "flex", flexDirection: "column", alignItems: "stretch", gap: 10 }
-    : undefined;
-  const modalBtnStyle = isMobile
-    ? { width: "100%", minWidth: 0, marginRight: 0, boxSizing: "border-box" }
-    : undefined;
-
   return (
     <div className="user-management-container">
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
@@ -204,14 +180,26 @@ const UserManagement = () => {
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <button
+                          type="button"
                           className="btn btn-edit"
                           onClick={() => handleEditUser(user)}
                           title="Edit"
-                          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "10px" }}
+                          style={{
+                            // keep inline-flex here for the small icon button in table only
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "10px",
+                          }}
                         >
-                          {/* Edit icon */}
-                          <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M14.846 2.854a2.25 2.25 0 0 1 3.182 3.182l-1.06 1.06-3.182-3.182 1.06-1.06ZM12.782 4.918l3.182 3.182-8.21 8.21a2.25 2.25 0 0 1-1.06.59l-3.182.796a.75.75 0 0 1-.91-.91l.796-3.182a2.25 2.25 0 0 1 .59-1.06l8.21-8.21Z"/>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="20"
+                            width="20"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M14.846 2.854a2.25 2.25 0 0 1 3.182 3.182l-1.06 1.06-3.182-3.182 1.06-1.06ZM12.782 4.918l3.182 3.182-8.21 8.21a2.25 2.25 0 0 1-1.06.59l-3.182.796a.75.75 0 0 1-.91-.91l.796-3.182a2.25 2.25 0 0 1 .59-1.06l8.21-8.21Z" />
                           </svg>
                         </button>
                       </td>
@@ -219,7 +207,9 @@ const UserManagement = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" style={{ textAlign: "center" }}>No admins found.</td>
+                    <td colSpan="5" style={{ textAlign: "center" }}>
+                      No admins found.
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -264,13 +254,25 @@ const UserManagement = () => {
                       </td>
                       <td style={{ textAlign: "center" }}>
                         <button
+                          type="button"
                           className="btn btn-edit"
                           onClick={() => handleEditUser(user)}
                           title="Edit"
-                          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "10px" }}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "10px",
+                          }}
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M14.846 2.854a2.25 2.25 0 0 1 3.182 3.182l-1.06 1.06-3.182-3.182 1.06-1.06ZM12.782 4.918l3.182 3.182-8.21 8.21a2.25 2.25 0 0 1-1.06.59l-3.182.796a.75.75 0 0 1-.91-.91l.796-3.182a2.25 2.25 0 0 1 .59-1.06l8.21-8.21Z"/>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            height="20"
+                            width="20"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M14.846 2.854a2.25 2.25 0 0 1 3.182 3.182l-1.06 1.06-3.182-3.182 1.06-1.06ZM12.782 4.918l3.182 3.182-8.21 8.21a2.25 2.25 0 0 1-1.06.59l-3.182.796a.75.75 0 0 1-.91-.91l.796-3.182a2.25 2.25 0 0 1 .59-1.06l8.21-8.21Z" />
                           </svg>
                         </button>
                       </td>
@@ -288,13 +290,14 @@ const UserManagement = () => {
           </div>
         </div>
 
-        {/* EXTERNAL PAGINATION CARDS - Outside of main card */}
+        {/* EXTERNAL PAGINATION CARDS */}
         {totalAdminPages > 1 && (
           <div className="pagination-card">
             <div className="pagination-content">
               <div className="pagination-left">
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
                 >
@@ -306,8 +309,9 @@ const UserManagement = () => {
                 {Math.min(currentPage * usersPerPage, totalAdmins)} of {totalAdmins} admins
               </span>
               <div className="pagination-right">
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={() => handleNextPage(totalAdminPages)}
                   disabled={currentPage === totalAdminPages}
                 >
@@ -322,8 +326,9 @@ const UserManagement = () => {
           <div className="pagination-card">
             <div className="pagination-content">
               <div className="pagination-left">
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
                 >
@@ -335,8 +340,9 @@ const UserManagement = () => {
                 {Math.min(currentPage * usersPerPage, totalUsers)} of {totalUsers} users
               </span>
               <div className="pagination-right">
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   onClick={() => handleNextPage(totalUserPages)}
                   disabled={currentPage === totalUserPages}
                 >
@@ -349,9 +355,9 @@ const UserManagement = () => {
       </div>
 
       {/* Edit Modal */}
-      {showEditModal && (
-        <div className="modal-overlay">
-          <div className="modal" style={modalStyle}>
+      {showEditModal && editingUser && (
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Edit user">
+          <div className="modal">
             <h3>Edit User Role</h3>
             <div className="user-info">
               <p>
@@ -381,11 +387,15 @@ const UserManagement = () => {
                 <option value="Disabled">Disabled</option>
               </select>
             </div>
-            <div className="modal-actions" style={modalActionsStyle}>
-              <button className="btn btn-save" onClick={saveUserChanges} style={modalBtnStyle}>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-save" onClick={saveUserChanges}>
                 Save Changes
               </button>
-              <button className="btn btn-cancel" onClick={() => setShowEditModal(false)} style={modalBtnStyle}>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                onClick={() => setShowEditModal(false)}
+              >
                 Cancel
               </button>
             </div>
@@ -395,15 +405,19 @@ const UserManagement = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="modal-overlay">
-          <div className="modal" style={modalStyle}>
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Confirm delete">
+          <div className="modal">
             <h3>Confirm Delete</h3>
             <p>Are you sure you want to delete user "{userToDelete?.name}"?</p>
-            <div className="modal-actions" style={modalActionsStyle}>
-              <button className="btn btn-delete" onClick={confirmDelete} style={modalBtnStyle}>
+            <div className="modal-actions">
+              <button type="button" className="btn btn-delete" onClick={confirmDelete}>
                 Delete
               </button>
-              <button className="btn btn-cancel" onClick={() => setShowDeleteModal(false)} style={modalBtnStyle}>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                onClick={() => setShowDeleteModal(false)}
+              >
                 Cancel
               </button>
             </div>

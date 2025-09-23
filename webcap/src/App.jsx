@@ -10,12 +10,15 @@ import About from "./Components/About";
 import Profile from "./Components/Profile";
 import UserManagement from "./Admin/UserManagement";
 import DanceUpload from "./Admin/DanceUpload";
+import DanceRequest from "./Admin/DanceRequest";
+import DanceApproval from "./Admin/DanceApproval";
 import Analytics from "./Admin/Analytics";
 import UserRatings from "./Admin/UserRatings";
 import ManageDance from "./Admin/ManageDance";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import ForgotPassword from "./Components/ForgotPassword";
 import ResetPassword from "./Components/ResetPassword";
+import ScrollToTop from "./Components/ScrollToTop";
 
 // Get session and role from localStorage
 const accessToken = localStorage.getItem("access_token");
@@ -25,6 +28,7 @@ const role = currentUser?.role;
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Root: redirect to proper dashboard */}
         <Route
@@ -132,6 +136,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
               <DanceUpload />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dance-request"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <DanceRequest />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dance-approval"
+          element={
+            <ProtectedRoute allowedRoles={["superadmin"]}>
+              <DanceApproval />
             </ProtectedRoute>
           }
         />

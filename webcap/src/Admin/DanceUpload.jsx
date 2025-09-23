@@ -68,12 +68,18 @@ const DanceUpload = () => {
 
   const removeFigureVideo = (id) => {
     setFigureVideos(prev => prev.filter(video => video.id !== id));
+    // Clear the file input to allow re-uploading the same file
+    const figuresInput = document.getElementById('figures-input');
+    if (figuresInput) figuresInput.value = '';
   };
 
   const removePreviewVideo = () => {
     if (previewVideo) {
       URL.revokeObjectURL(previewVideo.url);
       setPreviewVideo(null);
+      // Clear the file input to allow re-uploading the same file
+      const previewInput = document.getElementById('preview-video-input');
+      if (previewInput) previewInput.value = '';
     }
   };
 
@@ -81,6 +87,9 @@ const DanceUpload = () => {
     if (danceImage) {
       URL.revokeObjectURL(danceImage.url);
       setDanceImage(null);
+      // Clear the file input to allow re-uploading the same file
+      const imageInput = document.getElementById('image-input');
+      if (imageInput) imageInput.value = '';
     }
   };
 

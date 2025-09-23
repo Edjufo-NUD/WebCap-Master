@@ -2,8 +2,11 @@
   background: #a0855b;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(160, 133, 91, 0.3);
 }
@@ -16,7 +19,7 @@
   align-items: center;
   justify-content: space-between;
   height: 70px;
-  position: relative; /* Add this for centering */
+  position: relative;
 }
 
 /* Logo */
@@ -26,7 +29,10 @@
   gap: 0.75rem;
   cursor: pointer;
   transition: transform 0.2s ease;
-  flex-shrink: 0; /* Prevent logo from shrinking */
+  flex-shrink: 0;
+  position: fixed;
+  left: 1rem;
+  z-index: 1001;
 }
 
 .navbar-logo:hover {
@@ -50,11 +56,11 @@
 .navbar-menu {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center the nav items */
+  justify-content: center;
   gap: 0.5rem;
-  position: absolute; /* Position absolutely to center */
-  left: 50%; /* Move to center */
-  transform: translateX(-50%); /* Center perfectly */
+  flex: 1;
+  margin-left: 200px; /* Add space for fixed logo */
+  margin-right: 100px; /* Add space for profile actions */
 }
 
 .navbar-item {
@@ -487,6 +493,18 @@
 
 /* Media query for mobile devices */
 @media (max-width: 768px) {
+  /* Reset logo positioning for mobile */
+  .navbar-logo {
+    position: static;
+    left: auto;
+  }
+  
+  /* Reset navigation menu margins for mobile */
+  .navbar-menu {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
   /* Hide desktop-only elements on mobile */
   .desktop-only {
     display: none;
