@@ -631,9 +631,4 @@
   }
 }
 
-/* Dark Mode Support (if needed in future) */
-@media (prefers-color-scheme: dark) {
-  .dance-upload-container {
-    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-  }
-}
+/* Dark Mode Support removed to maintain white background */
