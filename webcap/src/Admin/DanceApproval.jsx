@@ -336,15 +336,13 @@ const DanceApproval = () => {
       {/* Dances Grid */}
       <section className="dances-grid-section">
         <div className="container">
-          <div className="results-info">
-            <p>{filteredDances.length} pending dances found</p>
-          </div>
-          
           <div className="dances-grid">
             {loading ? (
               <div style={{ textAlign: 'center', width: '100%' }}>Loading pending dances...</div>
             ) : filteredDances.length === 0 ? (
-              <div style={{ textAlign: 'center', width: '100%' }}>No pending dances found.</div>
+              <div style={{ textAlign: 'center', width: '100%' }}>
+                {/* Empty state - no message */}
+              </div>
             ) : (
               filteredDances.map(dance => (
                 <div key={dance.id} className="dance-card" onClick={() => openPreview(dance)}>

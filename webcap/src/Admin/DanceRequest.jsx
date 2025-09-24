@@ -266,12 +266,6 @@ const DanceRequest = () => {
       {/* Grid */}
       <section className="dances-grid-section">
         <div className="container">
-          <div className="results-info">
-            <p>
-              {filteredDances.length} {userRole === 'admin' ? 'your' : ''} pending dance requests found
-            </p>
-          </div>
-
           <div className="dances-grid">
             {loading ? (
               <div style={{ textAlign: 'center', width: '100%' }}>
@@ -279,7 +273,7 @@ const DanceRequest = () => {
               </div>
             ) : filteredDances.length === 0 ? (
               <div style={{ textAlign: 'center', width: '100%' }}>
-                No {userRole === 'admin' ? 'pending requests from you' : 'pending dance requests'} found.
+                {/* Empty state - no message */}
               </div>
             ) : (
               filteredDances.map(dance => (
