@@ -388,14 +388,7 @@ const Home = () => {
               Immerse yourself in the rich cultural heritage of the Philippines through 
               traditional folk dances. Learn, practice, and celebrate our vibrant traditions.
             </p>
-            <div className="hero-buttons">
-              <button 
-                className="btn-primary"
-                onClick={() => navigate('/dances')}
-              >
-                Explore Dances
-              </button>
-            </div>
+
           </div>
           <div className="hero-image">
             <img 
@@ -504,7 +497,7 @@ const Home = () => {
                 className="btn-primary"
                 onClick={() => navigate('/culture')}
               >
-                Explore Culture
+                Explore Dance Tradition
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -692,18 +685,7 @@ const Home = () => {
               )}
             </div>
 
-            <div className="modal-footer" style={{ padding: '16px 24px' }}>
-              <button 
-                className="btn-primary modal-btn"
-                onClick={() => {
-                  closeModal();
-                  navigate('/dances');
-                }}
-                style={{ width: '100%' }}
-              >
-                View All Dances
-              </button>
-            </div>
+
           </div>
         </div>
       )}
