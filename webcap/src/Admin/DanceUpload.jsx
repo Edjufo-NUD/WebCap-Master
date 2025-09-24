@@ -300,7 +300,9 @@ const DanceUpload = () => {
             </h2>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="title">Dance Title</label>
+              <label className="form-label" htmlFor="title">
+                Dance Title<span className="required-asterisk">*</span>
+              </label>
               <input
                 type="text"
                 id="title"
@@ -315,7 +317,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="region">Island</label>
+              <label className="form-label" htmlFor="region">
+                Island<span className="required-asterisk">*</span>
+              </label>
               <select
                 id="region"
                 name="region"
@@ -333,7 +337,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="duration">Duration</label>
+              <label className="form-label" htmlFor="duration">
+                Duration<span className="required-asterisk">*</span>
+              </label>
               <input
                 type="text"
                 id="duration"
@@ -348,7 +354,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="performers">Performers</label>
+              <label className="form-label" htmlFor="performers">
+                Performers<span className="required-asterisk">*</span>
+              </label>
               <input
                 type="text"
                 id="performers"
@@ -363,7 +371,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="music">Music & Instruments</label>
+              <label className="form-label" htmlFor="music">
+                Music & Instruments<span className="required-asterisk">*</span>
+              </label>
               <input
                 type="text"
                 id="music"
@@ -378,7 +388,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="costumes">Traditional Costumes</label>
+              <label className="form-label" htmlFor="costumes">
+                Traditional Costumes<span className="required-asterisk">*</span>
+              </label>
               <input
                 type="text"
                 id="costumes"
@@ -393,7 +405,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="history">History</label>
+              <label className="form-label" htmlFor="history">
+                History<span className="required-asterisk">*</span>
+              </label>
               <textarea
                 id="history"
                 name="history"
@@ -414,7 +428,9 @@ const DanceUpload = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="references">References</label>
+              <label className="form-label" htmlFor="references">
+                References<span className="required-asterisk">*</span>
+              </label>
               <textarea
                 id="references"
                 name="references"
@@ -438,7 +454,7 @@ const DanceUpload = () => {
           {/* Video Preview Section */}
           <div className="form-section">
             <h2 className="form-section-title">
-              Video Preview
+              Video Preview<span className="section-required-asterisk">*</span>
             </h2>
 
             <div
@@ -489,7 +505,7 @@ const DanceUpload = () => {
           {/* Upload Figures Section */}
           <div className="form-section">
             <h2 className="form-section-title">
-              Upload Figures
+              Upload Figures<span className="section-required-asterisk">*</span>
             </h2>
 
             <div
@@ -548,7 +564,7 @@ const DanceUpload = () => {
           {/* Upload Image Section */}
           <div className="form-section">
             <h2 className="form-section-title">
-              Upload Image
+              Upload Image<span className="section-required-asterisk">*</span>
             </h2>
 
             <div

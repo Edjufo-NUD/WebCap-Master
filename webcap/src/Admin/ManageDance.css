@@ -521,6 +521,13 @@
   font-size: 0.9rem;
 }
 
+.required-asterisk {
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
 .form-input,
 .form-select,
 .form-textarea {
