@@ -752,7 +752,9 @@ const ManageDance = () => {
             >
               <div className="modal-body">
                 <div className="form-group">
-                  <label htmlFor="edit-title">Dance Title *</label>
+                  <label htmlFor="edit-title">
+                    Dance Title<span className="required-asterisk">*</span>
+                  </label>
                   <input
                     id="edit-title"
                     type="text"
@@ -770,7 +772,9 @@ const ManageDance = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-region">Island/Region *</label>
+                  <label htmlFor="edit-region">
+                    Island/Region<span className="required-asterisk">*</span>
+                  </label>
                   <select
                     id="edit-region"
                     value={editForm.region}
@@ -791,7 +795,9 @@ const ManageDance = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-history">History *</label>
+                  <label htmlFor="edit-history">
+                    History<span className="required-asterisk">*</span>
+                  </label>
                   <textarea
                     id="edit-history"
                     value={editForm.history}
@@ -815,7 +821,9 @@ const ManageDance = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-references">References *</label>
+                  <label htmlFor="edit-references">
+                    References<span className="required-asterisk">*</span>
+                  </label>
                   <textarea
                     id="edit-references"
                     value={editForm.references}
@@ -840,7 +848,9 @@ const ManageDance = () => {
 
                 {/* Optional Fields */}
                 <div className="form-group">
-                  <label htmlFor="edit-duration">Duration</label>
+                  <label htmlFor="edit-duration">
+                    Duration<span className="required-asterisk">*</span>
+                  </label>
                   <input
                     id="edit-duration"
                     type="text"
@@ -857,7 +867,9 @@ const ManageDance = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-performers">Performers</label>
+                  <label htmlFor="edit-performers">
+                    Performers<span className="required-asterisk">*</span>
+                  </label>
                   <input
                     id="edit-performers"
                     type="text"
@@ -874,7 +886,9 @@ const ManageDance = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-music">Music & Instruments</label>
+                  <label htmlFor="edit-music">
+                    Music & Instruments<span className="required-asterisk">*</span>
+                  </label>
                   <input
                     id="edit-music"
                     type="text"
@@ -891,7 +905,9 @@ const ManageDance = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="edit-costumes">Traditional Costumes</label>
+                  <label htmlFor="edit-costumes">
+                    Traditional Costumes<span className="required-asterisk">*</span>
+                  </label>
                   <input
                     id="edit-costumes"
                     type="text"
