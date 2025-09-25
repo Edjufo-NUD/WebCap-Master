@@ -1171,3 +1171,756 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
     opacity: 0.8;
   }
 }
+
+/* Login Invitation Modal Styles */
+.login-invitation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  backdrop-filter: blur(12px);
+  animation: fadeInBackdrop 0.4s ease-out;
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(12px);
+  }
+}
+
+.login-invitation-modal {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 24px;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(160, 133, 91, 0.3), 0 0 0 1px rgba(160, 133, 91, 0.1);
+  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center bottom;
+  overflow: hidden;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+
+.login-invitation-header {
+  text-align: center;
+  padding: 1.5rem 2rem 0.5rem 2rem;
+  position: relative;
+}
+
+.login-invitation-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #a0855b, #8b7355);
+  color: white;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+  animation: bounceIn 0.8s ease-out 0.2s both;
+  box-shadow: 0 8px 32px rgba(160, 133, 91, 0.3);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.login-invitation-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0;
+  animation: fadeInUp 0.6s ease-out 0.4s both;
+}
+
+.login-invitation-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.5;
+  animation: fadeInUp 0.6s ease-out 0.6s both;
+}
+
+.login-invitation-body {
+  padding: 0 2rem 1.5rem 2rem;
+}
+
+.login-invitation-features {
+  list-style: none;
+  margin: 1.5rem 0 2rem 0;
+  padding: 0;
+}
+
+.login-invitation-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  color: #374151;
+  font-weight: 500;
+  animation: slideInLeft 0.5s ease-out both;
+}
+
+.login-invitation-features li:nth-child(1) { animation-delay: 0.8s; }
+.login-invitation-features li:nth-child(2) { animation-delay: 1s; }
+.login-invitation-features li:nth-child(3) { animation-delay: 1.2s; }
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.login-invitation-features .feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(160, 133, 91, 0.1);
+  color: #a0855b;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.login-invitation-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  animation: fadeInUp 0.6s ease-out 1.4s both;
+}
+
+.login-invitation-btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+  min-height: 48px;
+}
+
+.login-invitation-btn.primary {
+  background: linear-gradient(45deg, #a0855b, #8b7355);
+  color: white;
+  box-shadow: 0 4px 15px rgba(160, 133, 91, 0.4);
+}
+
+.login-invitation-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(160, 133, 91, 0.6);
+  background: linear-gradient(45deg, #8b7355, #a0855b);
+}
+
+.login-invitation-btn.secondary {
+  background: rgba(160, 133, 91, 0.1);
+  color: #a0855b;
+  border: 2px solid rgba(160, 133, 91, 0.2);
+}
+
+.login-invitation-btn.secondary:hover {
+  background: rgba(160, 133, 91, 0.2);
+  border-color: rgba(160, 133, 91, 0.4);
+  transform: translateY(-1px);
+}
+
+.login-invitation-footer {
+  text-align: center;
+  padding: 1rem 2rem 2rem 2rem;
+  border-top: 1px solid rgba(160, 133, 91, 0.1);
+  animation: fadeIn 0.6s ease-out 1.6s both;
+}
+
+.login-invitation-footer-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* Progress preview styles */
+.progress-preview {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(160, 133, 91, 0.06), rgba(205, 133, 63, 0.03));
+  border-radius: 16px;
+  border: 1px solid rgba(160, 133, 91, 0.12);
+  box-shadow: 0 4px 20px rgba(160, 133, 91, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #a0855b, #8b7355, #a0855b);
+  animation: shimmerTop 2s ease-in-out infinite;
+}
+
+@keyframes shimmerTop {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(160, 133, 91, 0.1);
+}
+
+.chart-icon {
+  font-size: 1.25rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-3px); }
+  60% { transform: translateY(-1px); }
+}
+
+.preview-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.025em;
+}
+
+.progress-cards {
+  margin-bottom: 1rem;
+}
+
+.progress-card {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  border: 1px solid rgba(160, 133, 91, 0.08);
+  animation: fadeInUp 0.6s ease-out both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.progress-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(160, 133, 91, 0.15);
+}
+
+.progress-card:nth-child(1) { animation-delay: 1.2s; }
+.progress-card:nth-child(2) { animation-delay: 1.4s; }
+.progress-card:nth-child(3) { animation-delay: 1.6s; }
+
+.progress-card:last-child {
+  margin-bottom: 0;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.dance-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.progress-score {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(45deg, #a0855b, #8b7355);
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(160, 133, 91, 0.3);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(160, 133, 91, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease-out;
+  animation: progressFill 1s ease-out 1.8s both;
+  position: relative;
+}
+
+.progress-fill.excellent {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.progress-fill.high {
+  background: linear-gradient(90deg, #a0855b, #8b7355);
+}
+
+.progress-fill.medium {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: progressShine 2s ease-in-out infinite;
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  50%, 100% { transform: translateX(100%); }
+}
+
+@keyframes progressFill {
+  from { width: 0% !important; }
+}
+
+.progress-stats {
+  text-align: right;
+}
+
+.stat {
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+}
+
+.preview-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(160, 133, 91, 0.1);
+}
+
+.total-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-dances, .avg-score {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.avg-score {
+  color: #a0855b;
+}
+
+.benefit-text {
+  margin-top: 1rem;
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(160, 133, 91, 0.03);
+  border-radius: 12px;
+  border: 1px dashed rgba(160, 133, 91, 0.15);
+}
+
+.benefit-text p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
+}
+
+.login-invitation-skip {
+  background: none;
+  border: none;
+  color: #a0855b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.login-invitation-skip:hover {
+  background: rgba(160, 133, 91, 0.1);
+  transform: scale(1.05);
+}
+
+/* Decorative elements for modal */
+.login-invitation-modal::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgba(160, 133, 91, 0.2), rgba(205, 133, 63, 0.1), rgba(160, 133, 91, 0.2));
+  border-radius: 26px;
+  z-index: -1;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Floating particles animation inside modal */
+.login-invitation-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(160, 133, 91, 0.3);
+  border-radius: 50%;
+  animation: floatParticle 4s linear infinite;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.particle:nth-child(2) { left: 20%; animation-delay: 0.8s; }
+.particle:nth-child(3) { left: 30%; animation-delay: 1.6s; }
+.particle:nth-child(4) { left: 40%; animation-delay: 2.4s; }
+.particle:nth-child(5) { left: 50%; animation-delay: 3.2s; }
+.particle:nth-child(6) { left: 60%; animation-delay: 0.4s; }
+.particle:nth-child(7) { left: 70%; animation-delay: 1.2s; }
+.particle:nth-child(8) { left: 80%; animation-delay: 2s; }
+.particle:nth-child(9) { left: 90%; animation-delay: 2.8s; }
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(90vh) scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(-10vh) scale(1);
+  }
+  100% {
+    transform: translateY(-20vh) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Mobile responsiveness for login invitation modal */
+@media (max-width: 768px) {
+  .login-invitation-overlay {
+    padding: 1rem 0.75rem;
+    align-items: center;
+  }
+  
+  .login-invitation-modal {
+    margin: 0;
+    border-radius: 16px;
+    max-width: 90%;
+    width: 90%;
+    overflow: hidden;
+    animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  @keyframes slideInFromBottom {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .login-invitation-modal::before {
+    border-radius: 18px;
+  }
+  
+  .login-invitation-header {
+    padding: 0.75rem 1.25rem 0.25rem 1.25rem;
+  }
+  
+  .login-invitation-body {
+    padding: 0 1.25rem 0.75rem 1.25rem;
+  }
+  
+  .login-invitation-footer {
+    padding: 0.25rem 1.25rem 1rem 1.25rem;
+  }
+  
+  .login-invitation-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .login-invitation-title {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+  }
+  
+  .login-invitation-subtitle {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .login-invitation-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-invitation-features {
+    margin: 1rem 0 0 0;
+  }
+  
+  .login-invitation-features li {
+    padding: 0.35rem 0;
+    font-size: 0.85rem;
+  }
+  
+  .login-invitation-footer-text {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .progress-preview {
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+  
+  .preview-header {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .chart-icon {
+    font-size: 1rem;
+  }
+  
+  .preview-title {
+    font-size: 0.8rem;
+  }
+  
+  .progress-card {
+    margin-bottom: 0.5rem;
+    padding: 0.6rem;
+  }
+  
+  .dance-name {
+    font-size: 0.75rem;
+  }
+  
+  .progress-score {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+  }
+  
+  .progress-bar {
+    height: 6px;
+    margin-bottom: 0.3rem;
+  }
+  
+  .stat {
+    font-size: 0.65rem;
+    padding: 0.08rem 0.3rem;
+  }
+  
+  .total-dances, .avg-score {
+    font-size: 0.7rem;
+  }
+  
+  .benefit-text {
+    margin-top: 1rem;
+    padding: 0.75rem;
+  }
+  
+  .benefit-text p {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-invitation-overlay {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .login-invitation-modal {
+    max-width: 95%;
+    width: 95%;
+    overflow: hidden;
+  }
+  
+  .login-invitation-header {
+    padding: 0.5rem 1rem 0.25rem 1rem;
+  }
+  
+  .login-invitation-body {
+    padding: 0 1rem 0.75rem 1rem;
+  }
+  
+  .login-invitation-footer {
+    padding: 0.25rem 1rem 0.75rem 1rem;
+  }
+  
+  .login-invitation-title {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+  
+  .login-invitation-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .login-invitation-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .login-invitation-features li {
+    padding: 0.25rem 0;
+    font-size: 0.8rem;
+  }
+  
+  .login-invitation-footer-text {
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .login-invitation-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+  
+  .progress-preview {
+    margin: 0.75rem 0;
+    padding: 0.5rem;
+  }
+  
+  .preview-header {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
+  }
+  
+  .chart-icon {
+    font-size: 0.9rem;
+  }
+  
+  .preview-title {
+    font-size: 0.75rem;
+  }
+  
+  .progress-card {
+    margin-bottom: 0.4rem;
+    padding: 0.5rem;
+  }
+  
+  .dance-name {
+    font-size: 0.7rem;
+  }
+  
+  .progress-score {
+    font-size: 0.6rem;
+    padding: 0.12rem 0.35rem;
+  }
+  
+  .progress-bar {
+    height: 5px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat {
+    font-size: 0.6rem;
+    padding: 0.06rem 0.25rem;
+  }
+  
+  .total-dances, .avg-score {
+    font-size: 0.65rem;
+  }
+  
+  .benefit-text {
+    margin-top: 0.75rem;
+    padding: 0.6rem;
+  }
+  
+  .benefit-text p {
+    font-size: 0.75rem;
+  }
+}

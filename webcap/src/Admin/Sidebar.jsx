@@ -117,11 +117,14 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
 
   const confirmLogout = () => {
     setShowLogoutModal(false);
-    // clear both caches
-    localStorage.removeItem("username");
-    localStorage.removeItem("currentUser");
+    // Clear all authentication data
+    localStorage.clear(); // Clear everything including access_token
+    
+    // Trigger custom event to update auth state in App.jsx
+    window.dispatchEvent(new Event('authChange'));
+    
+    // Redirect admin users to login page
     navigate("/login");
-    window.location.reload();
   };
 
   const cancelLogout = () => setShowLogoutModal(false);

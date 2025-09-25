@@ -220,6 +220,86 @@ body, html {
   align-items: center;
 }
 
+/* Password Requirements Styles for Profile (White Theme) */
+.password-requirements-profile {
+  background: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(160, 133, 91, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  animation: fadeInProfile 0.3s ease;
+}
+
+.requirements-title-profile {
+  color: #374151;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-family: 'Arial', sans-serif;
+}
+
+.requirement-item-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-family: 'Arial', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.requirement-item-profile:last-child {
+  margin-bottom: 0;
+}
+
+.requirement-icon-profile {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.requirement-item-profile.valid .requirement-icon-profile {
+  color: #10b981;
+}
+
+.requirement-item-profile.invalid .requirement-icon-profile {
+  color: #ef4444;
+}
+
+.requirement-text-profile {
+  transition: all 0.2s ease;
+}
+
+.requirement-item-profile.valid .requirement-text-profile {
+  color: #10b981;
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.requirement-item-profile.invalid .requirement-text-profile {
+  color: #6b7280;
+}
+
+/* Animation for the requirements */
+@keyframes fadeInProfile {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+    transform: translateY(0);
+  }
+}
+
 .password-input {
   padding-right: 3rem !important; /* Make room for the eye icon */
   flex: 1;
@@ -471,4 +551,436 @@ body, html {
   background: linear-gradient(45deg, #ef4444, #dc2626);
   color: white;
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Dance Progress Chart Responsive Styles */
+.dance-progress-container {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.dance-progress-chart {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.dance-progress-chart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.dance-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dance-progress-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dance-progress-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.progress-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.progress-bar-container {
+  background: #f3f4f6;
+  border-radius: 8px;
+  height: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 8px;
+}
+
+.figure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.figure-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.figure-item:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dance-progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .dance-progress-badges {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .figure-grid {
+    grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+    gap: 0.4rem;
+  }
+  
+  .figure-item {
+    width: 35px;
+    height: 35px;
+    font-size: 0.65rem;
+  }
+  
+  .dance-progress-chart {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dance-progress-title {
+    font-size: 1rem;
+  }
+  
+  .progress-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+  
+  .figure-grid {
+    grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+    gap: 0.3rem;
+  }
+  
+  .figure-item {
+    width: 30px;
+    height: 30px;
+    font-size: 0.6rem;
+  }
+  
+  .dance-progress-chart {
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+}
+
+/* Scrollbar styling for progress container */
+.dance-progress-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dance-progress-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dance-progress-container::-webkit-scrollbar-thumb {
+  background: #a0855b;
+  border-radius: 3px;
+}
+
+.dance-progress-container::-webkit-scrollbar-thumb:hover {
+  background: #8b7355;
+}
+
+/* Dance Progress Table Responsive Styles */
+.dance-progress-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.dance-progress-table {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.dance-progress-table:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.dance-progress-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.dance-progress-table-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dance-table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin: 1rem 0;
+}
+
+.dance-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 400px;
+}
+
+.dance-table thead th {
+  background: #f9fafb;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.dance-table tbody td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+.dance-table tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.dance-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+.table-score-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 50px;
+}
+
+.table-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 70px;
+  justify-content: center;
+}
+
+.dance-summary {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-formula {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 600;
+  flex: 1;
+  min-width: 200px;
+}
+
+.summary-score {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Mobile responsive adjustments for tables */
+@media (max-width: 768px) {
+  .dance-progress-table {
+    padding: 1rem;
+  }
+  
+  .dance-progress-table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .dance-table-wrapper {
+    margin: 0.5rem 0;
+  }
+  
+  .dance-table {
+    min-width: 350px;
+    font-size: 0.8rem;
+  }
+  
+  .dance-table thead th {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .dance-table tbody td {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .table-score-badge {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
+    min-width: 45px;
+  }
+  
+  .table-status-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    min-width: 65px;
+  }
+  
+  .dance-summary {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .summary-formula {
+    font-size: 0.8rem;
+    min-width: auto;
+    text-align: center;
+  }
+  
+  .summary-score {
+    font-size: 1.1rem;
+    width: 100%;
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dance-progress-table {
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+  
+  .dance-progress-table-title {
+    font-size: 1rem;
+  }
+  
+  .dance-table {
+    min-width: 320px;
+    font-size: 0.75rem;
+  }
+  
+  .dance-table thead th {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .dance-table tbody td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+  }
+  
+  .table-score-badge {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.3rem;
+    min-width: 40px;
+  }
+  
+  .table-status-badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.3rem;
+    min-width: 60px;
+  }
+  
+  .summary-formula {
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+  
+  .summary-score {
+    font-size: 1rem;
+  }
+}
+
+/* Table scrollbar styling */
+.dance-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.dance-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.dance-table-wrapper::-webkit-scrollbar-thumb {
+  background: #a0855b;
+  border-radius: 3px;
+}
+
+.dance-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #8b7355;
 }
