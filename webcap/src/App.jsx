@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Components/Login";
 import Register from "./Components/Register";
@@ -20,105 +20,159 @@ import ForgotPassword from "./Components/ForgotPassword";
 import ResetPassword from "./Components/ResetPassword";
 import ScrollToTop from "./Components/ScrollToTop";
 
-// Get session and role from localStorage
-const accessToken = localStorage.getItem("access_token");
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-const role = currentUser?.role;
+// Component to handle auth-protected routes
+const AuthProtectedRoute = ({ children }) => {
+  // Check authentication state dynamically
+  const accessToken = localStorage.getItem("access_token");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const role = currentUser?.role;
+
+  if (accessToken) {
+    if (role === "user") {
+      return <Navigate to="/home" replace />;
+    } else if (role === "admin" || role === "superadmin") {
+      return <Navigate to="/manage-dance" replace />;
+    } else {
+      return <Navigate to="/home" replace />;
+    }
+  }
+
+  return children;
+};
+
+// Component to restrict admin/superadmin access to only their designated pages
+const AdminRestrictedRoute = ({ children, allowedRoles }) => {
+  const accessToken = localStorage.getItem("access_token");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const role = currentUser?.role;
+
+  // If logged in as admin or superadmin, check if they have access to this route
+  if (accessToken && (role === "admin" || role === "superadmin")) {
+    // Define allowed pages for each role
+    const adminPages = ["/manage-dance", "/dance-upload", "/dance-request", "/analytics", "/user-ratings"];
+    const superadminPages = ["/manage-dance", "/dance-upload", "/dance-approval", "/analytics", "/user-ratings", "/user-management"];
+    
+    const currentPath = window.location.pathname;
+    
+    // Check if current user role has access to this page
+    const hasAccess = (role === "admin" && adminPages.includes(currentPath)) ||
+                     (role === "superadmin" && superadminPages.includes(currentPath));
+    
+    if (!hasAccess) {
+      // Redirect to manage-dance if they don't have access
+      return <Navigate to="/manage-dance" replace />;
+    }
+  }
+
+  return children;
+};
 
 function App() {
+  const [authState, setAuthState] = useState({
+    accessToken: localStorage.getItem("access_token"),
+    user: JSON.parse(localStorage.getItem("currentUser"))
+  });
+
+  // Listen for storage changes to update auth state
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setAuthState({
+        accessToken: localStorage.getItem("access_token"),
+        user: JSON.parse(localStorage.getItem("currentUser"))
+      });
+    };
+
+    // Listen for manual localStorage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Custom event for when we manually update localStorage
+    window.addEventListener('authChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('authChange', handleStorageChange);
+    };
+  }, []);
+  
   return (
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Root: redirect to proper dashboard */}
-        <Route
-          path="/"
-          element={
-            accessToken && role === "user" ? (
-              <Navigate to="/home" />
-            ) : accessToken && (role === "admin" || role === "superadmin") ? (
-              <Navigate to="/manage-dance" />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
+        {/* Root: Restricted for admin/superadmin */}
+        <Route path="/" element={
+          <AdminRestrictedRoute>
+            <Home />
+          </AdminRestrictedRoute>
+        } />
 
-        {/* Login route */}
+        {/* Auth routes - prevent access if logged in */}
         <Route
           path="/login"
           element={
-            accessToken && role === "user" ? (
-              <Navigate to="/home" />
-            ) : accessToken && (role === "admin" || role === "superadmin") ? (
-              <Navigate to="/manage-dance" />
-            ) : (
+            <AuthProtectedRoute key={authState.accessToken || 'no-auth'}>
               <Login />
-            )
+            </AuthProtectedRoute>
           }
         />
 
-        {/* Register route */}
         <Route
           path="/register"
           element={
-            accessToken && role === "user" ? (
-              <Navigate to="/home" />
-            ) : accessToken && (role === "admin" || role === "superadmin") ? (
-              <Navigate to="/manage-dance" />
-            ) : (
+            <AuthProtectedRoute key={authState.accessToken || 'no-auth'}>
               <Register />
-            )
+            </AuthProtectedRoute>
           }
         />
 
-        {/* User routes */}
         <Route
-          path="/navbar"
+          path="/forgot-password"
           element={
-            <ProtectedRoute allowedRoles={["user"]}>
-              <Navbar />
-            </ProtectedRoute>
+            <AuthProtectedRoute key={authState.accessToken || 'no-auth'}>
+              <ForgotPassword />
+            </AuthProtectedRoute>
           }
         />
+
         <Route
-          path="/home"
+          path="/reset-password"
           element={
-            <ProtectedRoute allowedRoles={["user"]}>
-              <Home />
-            </ProtectedRoute>
+            <AuthProtectedRoute key={authState.accessToken || 'no-auth'}>
+              <ResetPassword />
+            </AuthProtectedRoute>
           }
         />
-        <Route
-          path="/dances"
-          element={
-            <ProtectedRoute allowedRoles={["user"]}>
-              <Dances />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/culture"
-          element={
-            <ProtectedRoute allowedRoles={["user"]}>
-              <Culture />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <ProtectedRoute allowedRoles={["user"]}>
-              <About />
-            </ProtectedRoute>
-          }
-        />
+
+        {/* Public routes - restricted for admin/superadmin */}
+        <Route path="/home" element={
+          <AdminRestrictedRoute>
+            <Home />
+          </AdminRestrictedRoute>
+        } />
+        <Route path="/dances" element={
+          <AdminRestrictedRoute>
+            <Dances />
+          </AdminRestrictedRoute>
+        } />
+        <Route path="/culture" element={
+          <AdminRestrictedRoute>
+            <Culture />
+          </AdminRestrictedRoute>
+        } />
+        <Route path="/about" element={
+          <AdminRestrictedRoute>
+            <About />
+          </AdminRestrictedRoute>
+        } />
+
+        {/* Protected user-only routes */}
         <Route
           path="/profile"
           element={
-            <ProtectedRoute allowedRoles={["user"]}>
-              <Profile />
-            </ProtectedRoute>
+            <AdminRestrictedRoute>
+              <ProtectedRoute allowedRoles={["user"]}>
+                <Profile />
+              </ProtectedRoute>
+            </AdminRestrictedRoute>
           }
         />
 
@@ -180,9 +234,7 @@ function App() {
           }
         />
 
-        {/* Forgot Password route */}
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+
 
         {/* Catch all unknown routes */}
         <Route path="*" element={<Navigate to="/" />} />

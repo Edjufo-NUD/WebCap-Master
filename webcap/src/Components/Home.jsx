@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Calendar, BookOpen, ChevronRight, Star, X, MapPin, Clock, ArrowUp } from 'lucide-react';
+import { Users, Calendar, BookOpen, ChevronRight, Star, X, MapPin, Clock, ArrowUp, UserPlus, LogIn, Check } from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import './Home.css';
 import home1Image from '../assets/home1.jpg';
@@ -35,6 +35,8 @@ const Home = () => {
   const [imageError, setImageError] = useState({});
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showLoginInvitation, setShowLoginInvitation] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const carouselImages = [home1Image, home2Image, home3Image];
 
@@ -293,6 +295,36 @@ const Home = () => {
     })));
   }, []);
 
+  // Check authentication status
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const accessToken = localStorage.getItem("access_token");
+      const newAuthState = !!accessToken;
+      setIsAuthenticated(newAuthState);
+      
+      // Show login invitation for guest users only once per session
+      if (!newAuthState && !sessionStorage.getItem('loginInvitationShown')) {
+        // Show modal after a short delay to let the page load
+        setTimeout(() => {
+          setShowLoginInvitation(true);
+        }, 2000);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for auth changes
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('authChange', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('authChange', handleAuthChange);
+    };
+  }, []);
+
   // Auto-slide carousel
   useEffect(() => {
     const interval = setInterval(() => {
@@ -310,6 +342,20 @@ const Home = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Control body scroll for login invitation modal
+  useEffect(() => {
+    if (showLoginInvitation) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showLoginInvitation]);
 
   // Scroll to top handler
   const scrollToTop = () => {
@@ -339,6 +385,24 @@ const Home = () => {
     setSelectedDance(null);
     setIsModalOpen(false);
     document.body.style.overflow = 'unset';
+  };
+
+  // Login invitation modal handlers
+  const closeLoginInvitation = () => {
+    setShowLoginInvitation(false);
+    // Mark as shown for this session
+    sessionStorage.setItem('loginInvitationShown', 'true');
+    document.body.style.overflow = 'unset';
+  };
+
+  const handleLoginClick = () => {
+    closeLoginInvitation();     
+    navigate('/login');
+  };
+
+  const handleSignUpClick = () => {
+    closeLoginInvitation();
+    navigate('/register');
   };
 
   return (
@@ -690,8 +754,117 @@ const Home = () => {
         </div>
       )}
 
+      {/* Login Invitation Modal */}
+      {showLoginInvitation && (
+        <div className="login-invitation-overlay" onClick={closeLoginInvitation}>
+          <div className="login-invitation-modal" onClick={(e) => e.stopPropagation()}>
+            {/* Animated particles */}
+            <div className="login-invitation-particles">
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+            </div>
+
+            {/* Header */}
+            <div className="login-invitation-header">
+              <h2 className="login-invitation-title">Create Your Account</h2>
+            </div>
+
+            {/* Body */}
+            <div className="login-invitation-body">
+              {/* Progress visualization */}
+              <div className="progress-preview">
+                <div className="preview-header">
+                  <div className="chart-icon">📊</div>
+                  <span className="preview-title">Your Progress Dashboard</span>
+                </div>
+                
+                <div className="progress-cards">
+                  <div className="progress-card">
+                    <div className="progress-header">
+                      <span className="dance-name">🎭 Binungey</span>
+                      <span className="progress-score">85%</span>
+                    </div>
+                    <div className="progress-bar">
+                      <div className="progress-fill high" style={{ width: '85%' }}></div>
+                    </div>
+                    <div className="progress-stats">
+                      <span className="stat">+12% this week</span>
+                    </div>
+                  </div>
+                  
+                  <div className="progress-card">
+                    <div className="progress-header">
+                      <span className="dance-name">🌾 Tiklos</span>
+                      <span className="progress-score">72%</span>
+                    </div>
+                    <div className="progress-bar">
+                      <div className="progress-fill medium" style={{ width: '72%' }}></div>
+                    </div>
+                    <div className="progress-stats">
+                      <span className="stat">+8% this week</span>
+                    </div>
+                  </div>
+                  
+                  <div className="progress-card">
+                    <div className="progress-header">
+                      <span className="dance-name">👑 Sua Ku Sua</span>
+                      <span className="progress-score">93%</span>
+                    </div>
+                    <div className="progress-bar">
+                      <div className="progress-fill excellent" style={{ width: '93%' }}></div>
+                    </div>
+                    <div className="progress-stats">
+                      <span className="stat">+5% this week</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="preview-footer">
+                  <div className="total-stats">
+                    <span class="total-dances">3 Dances Tracked</span>
+                    <span class="avg-score">Average: 83%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="benefit-text">
+                <p>Monitor your dance performance with detailed analytics and track your improvement over time.</p>
+              </div>
+
+              <div className="login-invitation-actions">
+                <button className="login-invitation-btn primary" onClick={handleSignUpClick}>
+                  <UserPlus size={18} />
+                  Sign Up Free
+                </button>
+                <button className="login-invitation-btn secondary" onClick={handleLoginClick}>
+                  <LogIn size={18} />
+                  Login
+                </button>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="login-invitation-footer">
+              <p className="login-invitation-footer-text">
+                You can always create an account later
+              </p>
+              <button className="login-invitation-skip" onClick={closeLoginInvitation}>
+                Continue as Guest
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Scroll to Top Button */}
-      {showScrollTop && !isModalOpen && (
+      {showScrollTop && !isModalOpen && !showLoginInvitation && (
         <button
           className="scroll-to-top-btn"
           onClick={scrollToTop}

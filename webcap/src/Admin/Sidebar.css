@@ -94,17 +94,21 @@
 }
 
 .sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-left-color: #3498db;
+  background: rgba(241, 196, 15, 0.15);
+  border-left-color: #f1c40f;
+}
+
+.sidebar-item:hover .sidebar-label {
+  color: #f1c40f;
 }
 
 .sidebar-item.active {
-  background: rgba(52, 152, 219, 0.2);
-  border-left-color: #3498db;
+  background: rgba(241, 196, 15, 0.25);
+  border-left-color: #f1c40f;
 }
 
 .sidebar-item.active .sidebar-label {
-  color: #3498db;
+  color: #f1c40f;
   font-weight: 600;
 }
 
@@ -116,7 +120,7 @@
 
 .sidebar-item:hover .sidebar-icon,
 .sidebar-item.active .sidebar-icon {
-  color: #3498db;
+  color: #f1c40f;
 }
 
 .sidebar-label {

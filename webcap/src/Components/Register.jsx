@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaCheck, FaTimes } from "react-icons/fa";
 import IndakHamakaLogo from "../assets/FLIPinoNLogo.png";
 import "./Register.css";
 import { supabase } from "../supabasebaseClient"; // Make sure this path is correct
@@ -17,6 +17,33 @@ const Snackbar = ({ message, type, onClose }) => (
   </div>
 );
 
+// Password Requirements component
+const PasswordRequirements = ({ password, isVisible }) => {
+  const requirements = [
+    { key: 'length', text: '8-24 characters', check: password.length >= 8 && password.length <= 24 },
+    { key: 'lowercase', text: 'One lowercase letter', check: /(?=.*[a-z])/.test(password) },
+    { key: 'uppercase', text: 'One uppercase letter', check: /(?=.*[A-Z])/.test(password) },
+    { key: 'number', text: 'One number', check: /(?=.*\d)/.test(password) },
+    { key: 'special', text: 'One special character', check: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])/.test(password) }
+  ];
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="password-requirements">
+      <div className="requirements-title">Password Requirements:</div>
+      {requirements.map(req => (
+        <div key={req.key} className={`requirement-item ${req.check ? 'valid' : 'invalid'}`}>
+          <span className="requirement-icon">
+            {req.check ? <FaCheck /> : <FaTimes />}
+          </span>
+          <span className="requirement-text">{req.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -24,22 +51,32 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
   const [snackbar, setSnackbar] = useState({ message: "", type: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const showSnackbar = (message, type) => {
     setSnackbar({ message, type });
-    setTimeout(() => setSnackbar({ message: "", type: "" }), 3000);
+    // Show error messages longer than success messages
+    const timeout = type === "error" ? 5000 : 3000;
+    setTimeout(() => setSnackbar({ message: "", type: "" }), timeout);
   };
 
   const validatePassword = (password) => {
-    if (password.length < 8) return "Password must be at least 8 characters long.";
-    if (password.length > 24) return "Password must be no more than 24 characters long.";
-    if (!/(?=.*[a-z])/.test(password)) return "Password must contain at least one lowercase letter.";
-    if (!/(?=.*[A-Z])/.test(password)) return "Password must contain at least one uppercase letter.";
-    if (!/(?=.*\d)/.test(password)) return "Password must contain at least one number.";
-    if (!/(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])/.test(password)) return "Password must contain at least one special character.";
+    const requirements = [
+      { check: password.length >= 8 && password.length <= 24, message: "Password must be between 8-24 characters long." },
+      { check: /(?=.*[a-z])/.test(password), message: "Password must contain at least one lowercase letter." },
+      { check: /(?=.*[A-Z])/.test(password), message: "Password must contain at least one uppercase letter." },
+      { check: /(?=.*\d)/.test(password), message: "Password must contain at least one number." },
+      { check: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])/.test(password), message: "Password must contain at least one special character." }
+    ];
+    
+    const failedRequirements = requirements.filter(req => !req.check);
+    if (failedRequirements.length > 0) {
+      return failedRequirements[0].message;
+    }
+    
     return null;
   };
 
@@ -69,7 +106,27 @@ const Register = () => {
     }
 
     try {
-      // Step 1: Sign up in Supabase Auth and set display_name
+      // Step 1: Check if username already exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found (which is good)
+        console.error("Error checking username:", checkError);
+        showSnackbar("Error checking username availability. Please try again.", "error");
+        setLoading(false);
+        return;
+      }
+
+      if (existingUser) {
+        showSnackbar("This username is already taken. Please choose a different username.", "error");
+        setLoading(false);
+        return;
+      }
+
+      // Step 2: Sign up in Supabase Auth and set display_name
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -82,15 +139,31 @@ const Register = () => {
 
       if (signUpError) {
         console.error("Supabase signUp error:", signUpError);
-        showSnackbar(
-          `Auth error: ${signUpError.message || JSON.stringify(signUpError)}`,
-          "error"
-        );
+        
+        // Handle specific error cases with user-friendly messages
+        let errorMessage = "Registration failed. Please try again.";
+        
+        if (signUpError.message?.toLowerCase().includes("email")) {
+          if (signUpError.message.toLowerCase().includes("already") || 
+              signUpError.message.toLowerCase().includes("registered") ||
+              signUpError.message.toLowerCase().includes("exists")) {
+            errorMessage = "An account with this email already exists. Please use a different email or try logging in.";
+          } else if (signUpError.message.toLowerCase().includes("invalid")) {
+            errorMessage = "Please enter a valid email address.";
+          }
+        } else if (signUpError.message?.toLowerCase().includes("password")) {
+          errorMessage = "Password does not meet requirements. Please check and try again.";
+        } else if (signUpError.message?.toLowerCase().includes("network") || 
+                   signUpError.message?.toLowerCase().includes("connection")) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+        
+        showSnackbar(errorMessage, "error");
         setLoading(false);
         return;
       }
 
-      // Step 2: Insert into your custom users table (mirror username from Auth)
+      // Step 3: Insert into your custom users table (mirror username from Auth)
       if (signUpData?.user?.id) {
         const { error: dbError } = await supabase.from("users").insert([
           {
@@ -104,7 +177,25 @@ const Register = () => {
 
         if (dbError) {
           console.error("Insert into users failed:", dbError.message);
-          showSnackbar(`User profile creation failed: ${dbError.message}`, "error");
+          
+          // Handle specific database errors with user-friendly messages
+          let errorMessage = "Failed to create user profile. Please try again.";
+          
+          if (dbError.message?.toLowerCase().includes("duplicate key") || 
+              dbError.message?.toLowerCase().includes("unique constraint")) {
+            if (dbError.message.toLowerCase().includes("email")) {
+              errorMessage = "An account with this email already exists. Please use a different email or try logging in.";
+            } else if (dbError.message.toLowerCase().includes("username")) {
+              errorMessage = "This username is already taken. Please choose a different username.";
+            } else {
+              errorMessage = "An account with these details already exists. Please try different information.";
+            }
+          } else if (dbError.message?.toLowerCase().includes("network") || 
+                     dbError.message?.toLowerCase().includes("connection")) {
+            errorMessage = "Network error. Please check your connection and try again.";
+          }
+          
+          showSnackbar(errorMessage, "error");
           setLoading(false);
           return;
         }
@@ -171,6 +262,8 @@ const Register = () => {
                     className="register-input password-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setShowPasswordRequirements(true)}
+                    onBlur={() => setTimeout(() => setShowPasswordRequirements(false), 150)}
                     required
                     minLength={8}
                     maxLength={24}
@@ -191,6 +284,10 @@ const Register = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
+                <PasswordRequirements 
+                  password={password} 
+                  isVisible={showPasswordRequirements} 
+                />
               </div>
 
               <div className="input-group">

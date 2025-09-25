@@ -1,15 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, AlertTriangle } from 'lucide-react';
+import { Menu, X, User, LogOut, LogIn, AlertTriangle } from 'lucide-react';
 import logo from '../assets/FLIPinoNLogo.png';
 import './Navbar.css';
+import { supabase } from '../supabasebaseClient';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState(
+    // read cached username right away
+    localStorage.getItem("username")
+  );
   const navigate = useNavigate();
   const location = useLocation();
+
+  // read stored user object
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const userId = currentUser?.id;
+  const email = currentUser?.email;
+
+  // Check authentication status and get username
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      const accessToken = localStorage.getItem("access_token");
+      
+      setIsAuthenticated(!!accessToken);
+      
+      // only fetch if we have email and no cached username
+      if (accessToken && email && !username) {
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('username')
+          .eq('email', email)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching username:', error);
+          setUsername('User');
+          return;
+        }
+
+        // store to state + cache in localStorage
+        setUsername(userData.username);
+        localStorage.setItem("username", userData.username);
+      } else if (!accessToken) {
+        setUsername('');
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for auth changes
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('authChange', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('authChange', handleAuthChange);
+    };
+  }, [location.pathname, email, username]); // Re-check when route changes
 
   const navItems = [
     { path: '/home', label: 'Home' },
@@ -30,10 +84,14 @@ const Navbar = () => {
   };
 
   const handleLogoutConfirm = () => {
-    localStorage.clear();
     setShowLogoutModal(false);
-    navigate('/login');
-    window.location.reload(); // Force reload to reset app state
+    // Clear all authentication data
+    localStorage.clear(); // Clear everything including access_token
+    
+    // Trigger custom event to update auth state in App.jsx
+    window.dispatchEvent(new Event('authChange'));
+    
+    navigate('/home'); // Go to home instead of login
   };
 
   const handleLogoutCancel = () => {
@@ -93,6 +151,11 @@ const Navbar = () => {
 
           {/* Desktop Profile and Mobile Menu */}
           <div className="navbar-actions">
+            {/* User Greeting - Desktop Only */}
+            <div className="user-greeting desktop-only">
+              {isAuthenticated ? `Hi, ${username || "User"}!` : 'Guest'}
+            </div>
+            
             {/* Profile Dropdown - Desktop Only */}
             <div className="profile-dropdown desktop-only">
               <button 
@@ -103,23 +166,50 @@ const Navbar = () => {
               </button>
               {isProfileDropdownOpen && (
                 <div className="profile-dropdown-menu">
-                  <button 
-                    className="profile-dropdown-item"
-                    onClick={() => {
-                      handleNavigation('/profile');
-                      setIsProfileDropdownOpen(false);
-                    }}
-                  >
-                    <User size={16} />
-                    Profile
-                  </button>
-                  <button 
-                    className="profile-dropdown-item logout"
-                    onClick={handleLogoutClick}
-                  >
-                    <LogOut size={16} />
-                    Logout
-                  </button>
+                  {isAuthenticated ? (
+                    <>
+                      <button 
+                        className="profile-dropdown-item"
+                        onClick={() => {
+                          handleNavigation('/profile');
+                          setIsProfileDropdownOpen(false);
+                        }}
+                      >
+                        <User size={16} />
+                        Profile
+                      </button>
+                      <button 
+                        className="profile-dropdown-item logout"
+                        onClick={handleLogoutClick}
+                      >
+                        <LogOut size={16} />
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        className="profile-dropdown-item"
+                        onClick={() => {
+                          handleNavigation('/login');
+                          setIsProfileDropdownOpen(false);
+                        }}
+                      >
+                        <LogIn size={16} />
+                        Login
+                      </button>
+                      <button 
+                        className="profile-dropdown-item"
+                        onClick={() => {
+                          handleNavigation('/register');
+                          setIsProfileDropdownOpen(false);
+                        }}
+                      >
+                        <User size={16} />
+                        Sign Up
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -147,23 +237,50 @@ const Navbar = () => {
               </button>
             ))}
             <div className="mobile-menu-divider"></div>
-            <button
-              className="mobile-menu-item"
-              onClick={() => {
-                handleNavigation('/profile');
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              <User size={16} />
-              Profile
-            </button>
-            <button
-              className="mobile-menu-item logout"
-              onClick={handleLogoutClick}
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
+            {isAuthenticated ? (
+              <>
+                <button
+                  className="mobile-menu-item"
+                  onClick={() => {
+                    handleNavigation('/profile');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <User size={16} />
+                  Profile
+                </button>
+                <button
+                  className="mobile-menu-item logout"
+                  onClick={handleLogoutClick}
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="mobile-menu-item"
+                  onClick={() => {
+                    handleNavigation('/login');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <LogIn size={16} />
+                  Login
+                </button>
+                <button
+                  className="mobile-menu-item"
+                  onClick={() => {
+                    handleNavigation('/register');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <User size={16} />
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
         )}
       </nav>

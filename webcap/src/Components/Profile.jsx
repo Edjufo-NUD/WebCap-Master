@@ -1,19 +1,348 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Calendar, Edit3, Save, X, Lock, BarChart3 } from 'lucide-react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { User, Mail, Calendar, Edit3, Save, X, Lock, BarChart3, TrendingUp, Target, Activity } from 'lucide-react';
+import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
 import Navbar from '../Components/Navbar';
 import './Profile.css';
 import { supabase } from '../supabasebaseClient';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import logo from '../assets/FLIPinoNLogo.png';
 
-// Dances (alphabetical)
-const DANCE_NAMES = [
-  "Binungey",
-  "Pahid",
-  "Sua Ku Sua",
-  "Tiklos",
-  "Tiklos: Step-by-Step"
-];
+// Dance data with figure counts and structure
+const DANCE_DATA = {
+  "Binungey": {
+    displayName: "Binungey Summary",
+    totalFigures: 7,
+    figures: Array.from({length: 7}, (_, i) => ({ id: i + 1, name: `Figure ${i + 1}` }))
+  },
+  "Pahid": {
+    displayName: "Pahid", 
+    totalFigures: 6,
+    figures: Array.from({length: 6}, (_, i) => ({ id: i + 1, name: `Figure ${i + 1}` }))
+  },
+  "Sua Ku Sua": {
+    displayName: "Sua Ku Sua",
+    totalFigures: 10, 
+    figures: Array.from({length: 10}, (_, i) => ({ id: i + 1, name: `Figure ${i + 1}` }))
+  },
+  "Tiklos": {
+    displayName: "Tiklos",
+    totalFigures: 4,
+    figures: Array.from({length: 4}, (_, i) => ({ id: i + 1, name: `Figure ${i + 1}` }))
+  },
+  "Tiklos: Step-by-Step": {
+    displayName: "Tiklos: Step-by-Step",
+    totalFigures: 16,
+    figures: [
+      { id: 1, name: "Figure 1 (Step 1)" }, { id: 2, name: "Figure 1 (Step 2)" },
+      { id: 3, name: "Figure 1 (Step 3)" }, { id: 4, name: "Figure 1 (Step 4)" },
+      { id: 5, name: "Figure 2 (Step 1)" }, { id: 6, name: "Figure 2 (Step 2)" },
+      { id: 7, name: "Figure 2 (Step 3)" }, { id: 8, name: "Figure 2 (Step 4)" },
+      { id: 9, name: "Figure 3 (Step 1)" }, { id: 10, name: "Figure 3 (Step 2)" },
+      { id: 11, name: "Figure 3 (Step 3)" }, { id: 12, name: "Figure 3 (Step 4)" },
+      { id: 13, name: "Figure 4 (Step 1)" }, { id: 14, name: "Figure 4 (Step 2)" },
+      { id: 15, name: "Figure 4 (Step 3)" }, { id: 16, name: "Figure 4 (Step 4)" }
+    ]
+  }
+};
+
+// Dances (alphabetical) - for backward compatibility
+const DANCE_NAMES = Object.keys(DANCE_DATA);
+
+// Password Requirements component for Profile (white theme)
+const PasswordRequirements = ({ password, isVisible }) => {
+  const requirements = [
+    { key: 'length', text: '8-24 characters', check: password.length >= 8 && password.length <= 24 },
+    { key: 'lowercase', text: 'One lowercase letter', check: /(?=.*[a-z])/.test(password) },
+    { key: 'uppercase', text: 'One uppercase letter', check: /(?=.*[A-Z])/.test(password) },
+    { key: 'number', text: 'One number', check: /(?=.*\d)/.test(password) },
+    { key: 'special', text: 'One special character', check: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])/.test(password) }
+  ];
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="password-requirements-profile">
+      <div className="requirements-title-profile">Password Requirements:</div>
+      {requirements.map(req => (
+        <div key={req.key} className={`requirement-item-profile ${req.check ? 'valid' : 'invalid'}`}>
+          <span className="requirement-icon-profile">
+            {req.check ? <FaCheck /> : <FaTimes />}
+          </span>
+          <span className="requirement-text-profile">{req.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Dance Progress Table Component
+const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
+  const totalFigures = danceData.totalFigures;
+  const completedFigures = figureScores.filter(score => score > 0).length;
+  const completionRate = totalFigures > 0 ? Math.round((completedFigures / totalFigures) * 100) : 0;
+  
+  // Calculate final dance score (average of all figures)
+  const finalScore = figureScores.length > 0 ? 
+    Math.round(figureScores.reduce((sum, score) => sum + score, 0) / totalFigures) : 0;
+
+  // Prepare data for the table
+  const figureData = danceData.figures.map((figure, index) => ({
+    id: figure.id,
+    name: figure.name,
+    score: figureScores[index] || 0,
+    completed: (figureScores[index] || 0) > 0
+  }));
+
+  const getScoreColor = (score) => {
+    if (score >= 80) return '#10b981';
+    if (score >= 60) return '#f59e0b';
+    if (score > 0) return '#ef4444';
+    return '#9ca3af';
+  };
+
+  const getScoreBackground = (score) => {
+    if (score >= 80) return '#ecfdf5';
+    if (score >= 60) return '#fffbeb';
+    if (score > 0) return '#fef2f2';
+    return '#f9fafb';
+  };
+
+  return (
+    <div style={{
+      background: 'white',
+      borderRadius: '16px',
+      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
+      padding: '1.5rem',
+      marginBottom: '1.5rem',
+      border: `2px solid ${completionRate === 100 ? '#10b981' : '#e5e7eb'}`
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '1rem',
+        flexWrap: 'wrap',
+        gap: '0.5rem'
+      }}>
+        <h4 style={{
+          fontSize: '1.1rem',
+          fontWeight: '700',
+          color: '#1f2937',
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <Target size={18} style={{ color: '#a0855b' }} />
+          {danceName}
+        </h4>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          flexWrap: 'wrap'
+        }}>
+          <span style={{
+            background: completionRate === 100 ? '#10b981' : completionRate > 0 ? '#f59e0b' : '#ef4444',
+            color: 'white',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '12px',
+            fontSize: '0.8rem',
+            fontWeight: '600'
+          }}>
+            {completedFigures}/{totalFigures} Figures
+          </span>
+          <span style={{
+            background: '#a0855b',
+            color: 'white',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '12px',
+            fontSize: '0.8rem',
+            fontWeight: '600'
+          }}>
+            {finalScore}% Final
+          </span>
+        </div>
+      </div>
+
+      {/* Progress Bar */}
+      <div style={{
+        background: '#f3f4f6',
+        borderRadius: '8px',
+        height: '8px',
+        marginBottom: '1rem',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          background: `linear-gradient(90deg, ${completionRate === 100 ? '#10b981' : completionRate > 50 ? '#f59e0b' : '#ef4444'}, ${completionRate === 100 ? '#059669' : completionRate > 50 ? '#d97706' : '#dc2626'})`,
+          height: '100%',
+          width: `${completionRate}%`,
+          transition: 'width 0.3s ease',
+          borderRadius: '8px'
+        }} />
+      </div>
+
+      {/* Table Container */}
+      <div style={{
+        overflowX: 'auto',
+        borderRadius: '8px',
+        border: '1px solid #e5e7eb'
+      }}>
+        <table style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          minWidth: '300px'
+        }}>
+          <thead>
+            <tr style={{ background: '#f9fafb' }}>
+              <th style={{
+                padding: '0.75rem 1rem',
+                textAlign: 'left',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#374151',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                Figure #
+              </th>
+              <th style={{
+                padding: '0.75rem 1rem',
+                textAlign: 'left',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#374151',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                Figure Name
+              </th>
+              <th style={{
+                padding: '0.75rem 1rem',
+                textAlign: 'center',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#374151',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                Score
+              </th>
+              <th style={{
+                padding: '0.75rem 1rem',
+                textAlign: 'center',
+                fontSize: '0.875rem',
+                fontWeight: '600',
+                color: '#374151',
+                borderBottom: '1px solid #e5e7eb'
+              }}>
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {figureData.map((figure, index) => (
+              <tr 
+                key={index}
+                style={{
+                  background: index % 2 === 0 ? 'white' : '#fafafa',
+                  transition: 'background-color 0.2s ease'
+                }}
+              >
+                <td style={{
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                  color: '#374151',
+                  borderBottom: '1px solid #f3f4f6',
+                  fontWeight: '600'
+                }}>
+                  {figure.id}
+                </td>
+                <td style={{
+                  padding: '0.75rem 1rem',
+                  fontSize: '0.875rem',
+                  color: '#374151',
+                  borderBottom: '1px solid #f3f4f6'
+                }}>
+                  {figure.name}
+                </td>
+                <td style={{
+                  padding: '0.75rem 1rem',
+                  textAlign: 'center',
+                  borderBottom: '1px solid #f3f4f6'
+                }}>
+                  <span style={{
+                    display: 'inline-block',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px',
+                    fontSize: '0.875rem',
+                    fontWeight: '600',
+                    color: getScoreColor(figure.score),
+                    background: getScoreBackground(figure.score),
+                    border: `1px solid ${getScoreColor(figure.score)}20`
+                  }}>
+                    {figure.score > 0 ? `${figure.score}%` : '—'}
+                  </span>
+                </td>
+                <td style={{
+                  padding: '0.75rem 1rem',
+                  textAlign: 'center',
+                  borderBottom: '1px solid #f3f4f6'
+                }}>
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    padding: '0.25rem 0.5rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    color: figure.completed ? '#10b981' : '#9ca3af',
+                    background: figure.completed ? '#ecfdf5' : '#f9fafb',
+                    border: `1px solid ${figure.completed ? '#10b981' : '#9ca3af'}20`
+                  }}>
+                    {figure.completed ? '✓ Done' : '⏸ Pending'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Summary Row */}
+      <div style={{
+        marginTop: '1rem',
+        padding: '1rem',
+        background: '#f9fafb',
+        borderRadius: '8px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '0.5rem',
+        border: '1px solid #e5e7eb'
+      }}>
+        <div style={{
+          fontSize: '0.875rem',
+          color: '#374151',
+          fontWeight: '600'
+        }}>
+          Final Score = (Sum of all figure scores) ÷ {totalFigures} figures
+        </div>
+        <div style={{
+          fontSize: '1.2rem',
+          fontWeight: '700',
+          color: getScoreColor(finalScore),
+          padding: '0.5rem 1rem',
+          background: getScoreBackground(finalScore),
+          borderRadius: '8px',
+          border: `2px solid ${getScoreColor(finalScore)}`
+        }}>
+          {finalScore}%
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Snackbar component
 const Snackbar = ({ message, type, onClose }) => (
@@ -66,10 +395,16 @@ const Profile = () => {
     confirm: false
   });
 
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState({
+    new: false,
+    confirm: false
+  });
+
   const [userId, setUserId] = useState(null);
   const [performanceData, setPerformanceData] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [averageScore, setAverageScore] = useState(null);
+  const [danceProgressData, setDanceProgressData] = useState({});
 
   const togglePasswordVisibility = (field) => {
     setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
@@ -205,6 +540,7 @@ const Profile = () => {
     setShowPasswordEdit(false);
     setPasswordFields({ current: '', new: '', confirm: '' });
     setShowPasswords({ current: false, new: false, confirm: false });
+    setShowPasswordRequirements({ new: false, confirm: false });
     showSnackbar('Password updated successfully!', 'success');
   };
 
@@ -232,21 +568,43 @@ const Profile = () => {
         });
       }
 
-      // Fetch user history for performance chart and recent activity
-      const { data: historyData } = await supabase
+      // Fetch user history for performance chart, recent activity, and dance progress
+      const { data: historyData, error: historyError } = await supabase
         .from('user_history')
-        .select('dance_name, score, attempted_at')
+        .select('dance_name, figure_name, score, attempted_at')
         .eq('user_id', user.id);
+
+      if (historyError) {
+        console.error('Error fetching user history:', historyError);
+        // Continue with empty data if there's an error
+        setPerformanceData(DANCE_NAMES.map(name => ({ name, score: 0 })));
+        setDanceProgressData(Object.keys(DANCE_DATA).reduce((acc, danceName) => {
+          acc[danceName] = new Array(DANCE_DATA[danceName].totalFigures).fill(0);
+          return acc;
+        }, {}));
+        setAverageScore(null);
+        setRecentActivities([]);
+        return;
+      }
 
       // Prepare performance data for all dances, even if no attempts
       let perfData = DANCE_NAMES.map(name => ({ name, score: 0 }));
       let totalScore = 0;
       let totalAttempts = 0;
 
+      // Initialize dance progress data structure
+      const progressData = {};
+      Object.keys(DANCE_DATA).forEach(danceName => {
+        progressData[danceName] = new Array(DANCE_DATA[danceName].totalFigures).fill(0);
+      });
+
       if (historyData && historyData.length > 0) {
-        // Group by dance_name and average the scores
+        // Group by dance_name and calculate averages
         const danceScores = {};
+        const figureScores = {}; // For tracking individual figure scores
+
         historyData.forEach(item => {
+          // Overall dance score calculation
           if (!danceScores[item.dance_name]) {
             danceScores[item.dance_name] = { total: 0, count: 0 };
           }
@@ -254,6 +612,50 @@ const Profile = () => {
           danceScores[item.dance_name].count += 1;
           totalScore += item.score;
           totalAttempts += 1;
+
+          // Figure-specific score tracking
+          if (item.figure_name && DANCE_DATA[item.dance_name]) {
+            // Extract figure number from figure_name (e.g., "Figure 1", "BinungeyBoyFig1", etc.)
+            let figureNumber = null;
+            
+            // Try different patterns to extract figure number
+            const patterns = [
+              /Figure\s*(\d+)/i,           // "Figure 1", "Figure 2", etc.
+              /Fig(\d+)/i,                 // "Fig1", "Fig2", etc.
+              /Step\s*(\d+)/i,             // "Step 1", "Step 2", etc.
+              /(\d+)$/                     // Number at the end
+            ];
+            
+            for (const pattern of patterns) {
+              const match = item.figure_name.match(pattern);
+              if (match) {
+                figureNumber = parseInt(match[1]);
+                break;
+              }
+            }
+            
+            if (figureNumber) {
+              const figureIndex = figureNumber - 1; // Convert to 0-based index
+              if (figureIndex >= 0 && figureIndex < DANCE_DATA[item.dance_name].totalFigures) {
+                if (!figureScores[item.dance_name]) {
+                  figureScores[item.dance_name] = {};
+                }
+                if (!figureScores[item.dance_name][figureIndex]) {
+                  figureScores[item.dance_name][figureIndex] = [];
+                }
+                figureScores[item.dance_name][figureIndex].push(item.score);
+              }
+            }
+          }
+        });
+
+        // Calculate highest scores for each figure (only keep the best attempt)
+        Object.keys(figureScores).forEach(danceName => {
+          Object.keys(figureScores[danceName]).forEach(figureIndex => {
+            const scores = figureScores[danceName][figureIndex];
+            const highestScore = Math.max(...scores); // Get the highest score instead of average
+            progressData[danceName][parseInt(figureIndex)] = highestScore;
+          });
         });
 
         // Fill perfData with averages, keep all dances
@@ -271,7 +673,9 @@ const Profile = () => {
         const sorted = [...historyData].sort((a, b) => new Date(b.attempted_at) - new Date(a.attempted_at));
         setRecentActivities(sorted.slice(0, 5).map((item, idx) => ({
           id: idx + 1,
-          activity: item.dance_name,
+          activity: item.figure_name ? 
+            formatFigureName(item.figure_name) : 
+            item.dance_name,
           score: item.score,
           date: getRelativeDate(item.attempted_at),
           icon: '🎵'
@@ -281,8 +685,9 @@ const Profile = () => {
         setRecentActivities([]);
       }
 
-      // Always set performance data (all dances, sorted)
+      // Set all data
       setPerformanceData(perfData);
+      setDanceProgressData(progressData);
     };
 
     fetchData();
@@ -298,6 +703,59 @@ const Profile = () => {
     return `${diff} days ago`;
   }
 
+  // Helper to format figure names based on the mapping
+  function formatFigureName(figureName) {
+    if (!figureName) return '';
+    
+    // Remove .json extension if present
+    const cleanName = figureName.replace('.json', '');
+    
+    // Handle different patterns
+    const patterns = [
+      // BinungeyBoyFig1 -> Binungey - Boy: Figure 1
+      { regex: /^BinungeyBoyFig(\d+)$/, format: (match) => `Binungey - Boy: Figure ${match[1]}` },
+      
+      // PahidBoyFig1 -> Pahid - Boy: Figure 1  
+      { regex: /^PahidBoyFig(\d+)$/, format: (match) => `Pahid - Boy: Figure ${match[1]}` },
+      
+      // SuaKuSuaBoyFig1 -> Sua Ku Sua - Boy: Figure 1
+      { regex: /^SuaKuSuaBoyFig(\d+)$/, format: (match) => `Sua Ku Sua - Boy: Figure ${match[1]}` },
+      
+      // TiklosBoyFig1 -> Tiklos - Boy: Figure 1
+      { regex: /^TiklosBoyFig(\d+)$/, format: (match) => `Tiklos - Boy: Figure ${match[1]}` },
+      
+      // TiklosTutFig1-16 -> Tiklos - Figure: X (Step Y)
+      { regex: /^TiklosTutFig(\d+)$/, format: (match) => {
+        const figNum = parseInt(match[1]);
+        if (figNum >= 1 && figNum <= 5) return `Tiklos - Figure: 1 (Step ${figNum})`;
+        if (figNum >= 6 && figNum <= 8) return `Tiklos - Figure: 2 (Step ${figNum - 5})`;
+        if (figNum >= 9 && figNum <= 12) return `Tiklos - Figure: 3 (Step ${figNum - 8})`;
+        if (figNum >= 13 && figNum <= 16) return `Tiklos - Figure: 4 (Step ${figNum - 12})`;
+        return `Tiklos - Figure: ${figNum}`;
+      }}
+    ];
+    
+    // Try to match against patterns
+    for (const pattern of patterns) {
+      const match = cleanName.match(pattern.regex);
+      if (match) {
+        return pattern.format(match);
+      }
+    }
+    
+    // Fallback: try to extract dance name and figure info
+    const fallbackMatch = cleanName.match(/^(.+?)(Boy|Girl|Tut)?Fig(\d+)$/);
+    if (fallbackMatch) {
+      const danceName = fallbackMatch[1];
+      const gender = fallbackMatch[2] ? ` - ${fallbackMatch[2] === 'Tut' ? 'Tutorial' : fallbackMatch[2]}` : '';
+      const figureNum = fallbackMatch[3];
+      return `${danceName}${gender}: Figure ${figureNum}`;
+    }
+    
+    // Return original if no pattern matches
+    return figureName;
+  }
+
   return (
     <div className="profile">
       <Navbar />
@@ -309,234 +767,215 @@ const Profile = () => {
         gap: '2rem',
         alignItems: 'start'
       }}>
-        {/* Profile Section - Left Side */}
-        <div className="profile-card">
-          {loading && (
-            <div className="loading-overlay">
-              <div className="spinner"></div>
-            </div>
-          )}
-
-          <div className="profile-avatar">
-            <div className="avatar-circle">
-              <User size={50} />
-            </div>
-          </div>
-
-          <div className="profile-header">
-            <h2 className="profile-title" style={{ fontSize: '1.5rem' }}>My Profile</h2>
-            <p className="profile-subtitle">Manage your account information</p>
-          </div>
-
-          <div className="profile-actions">
-            {!isEditing ? (
-              <button className="btn-edit" onClick={handleEdit}>
-                <Edit3 size={16} />
-                Edit Username
-              </button>
-            ) : (
-              <div className="edit-actions">
-                <button className="btn-save" onClick={handleSave}>
-                  <Save size={16} />
-                  Save
-                </button>
-                <button className="btn-cancel" onClick={handleCancel}>
-                  <X size={16} />
-                  Cancel
-                </button>
+        {/* Left Column - Profile and Recent Activity */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Profile Section */}
+          <div className="profile-card">
+            {loading && (
+              <div className="loading-overlay">
+                <div className="spinner"></div>
               </div>
             )}
-          </div>
 
-          {/* Profile Fields */}
-          <div className="profile-fields">
-            <div className="field-group">
-              <label className="field-label">
-                <User size={16} />
-                Username
-              </label>
-              {isEditing ? (
-                <input
-                  className="field-input"
-                  type="text"
-                  value={editData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Enter your username"
-                  minLength={6}
-                  maxLength={16}
-                />
+            <div className="profile-avatar">
+              <img 
+                src={logo} 
+                alt="FLIPino" 
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: 'none',
+                  boxShadow: '0 8px 32px rgba(160, 133, 91, 0.3)'
+                }}
+              />
+            </div>
+
+            <div className="profile-header">
+              <h2 className="profile-title" style={{ fontSize: '1.5rem' }}>My Profile</h2>
+            </div>
+
+            <div className="profile-actions">
+              {!isEditing ? (
+                <button className="btn-edit" onClick={handleEdit}>
+                  <Edit3 size={16} />
+                  Edit Username
+                </button>
               ) : (
-                <div className="field-value">{profileData.name}</div>
-              )}
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">
-                <Mail size={16} />
-                Email Address
-              </label>
-              <div className="field-value">{profileData.email}</div>
-            </div>
-
-            <div className="field-group">
-              <label className="field-label">
-                <Calendar size={16} />
-                Member Since
-              </label>
-              <div className="field-value">{profileData.joinDate}</div>
-            </div>
-
-            {/* Password Section */}
-            {!showPasswordEdit ? (
-              <div className="field-group">
-                <label className="field-label">
-                  <Lock size={16} />
-                  Password
-                </label>
-                <div className="field-value" style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                  <span>••••••••</span>
-                  <button
-                    className="btn-edit-password"
-                    onClick={() => setShowPasswordEdit(true)}
-                  >
-                    <Lock size={12} />
-                    Edit
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="field-group">
-                  <label className="field-label">
-                    <Lock size={16} />
-                    Current Password
-                  </label>
-                  <div className="password-input-container">
-                    <input
-                      className="field-input password-input"
-                      type={showPasswords.current ? 'text' : 'password'}
-                      placeholder="Current Password"
-                      value={passwordFields.current}
-                      onChange={e => handlePasswordFieldChange('current', e.target.value)}
-                      minLength={6}
-                      maxLength={24}
-                    />
-                    <button
-                      className="password-toggle-btn"
-                      onClick={() => togglePasswordVisibility('current')}
-                    >
-                      {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label">
-                    <Lock size={16} />
-                    New Password
-                  </label>
-                  <div className="password-input-container">
-                    <input
-                      className="field-input password-input"
-                      type={showPasswords.new ? 'text' : 'password'}
-                      placeholder="New Password"
-                      value={passwordFields.new}
-                      onChange={e => handlePasswordFieldChange('new', e.target.value)}
-                      minLength={8}
-                      maxLength={24}
-                    />
-                    <button
-                      className="password-toggle-btn"
-                      onClick={() => togglePasswordVisibility('new')}
-                    >
-                      {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label">
-                    <Lock size={16} />
-                    Confirm New Password
-                  </label>
-                  <div className="password-input-container">
-                    <input
-                      className="field-input password-input"
-                      type={showPasswords.confirm ? 'text' : 'password'}
-                      placeholder="Confirm New Password"
-                      value={passwordFields.confirm}
-                      onChange={e => handlePasswordFieldChange('confirm', e.target.value)}
-                      minLength={8}
-                      maxLength={24}
-                    />
-                    <button
-                      className="password-toggle-btn"
-                      onClick={() => togglePasswordVisibility('confirm')}
-                    >
-                      {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="password-actions">
-                  <button className="btn-save" onClick={handlePasswordSave}>
+                <div className="edit-actions">
+                  <button className="btn-save" onClick={handleSave}>
                     <Save size={16} />
-                    Save Password
+                    Save
                   </button>
-                  <button
-                    className="btn-cancel"
-                    onClick={() => {
-                      setShowPasswordEdit(false);
-                      setPasswordFields({ current: '', new: '', confirm: '' });
-                      setShowPasswords({ current: false, new: false, confirm: false });
-                    }}
-                  >
+                  <button className="btn-cancel" onClick={handleCancel}>
                     <X size={16} />
                     Cancel
                   </button>
                 </div>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Right Side - Charts and Activity */}
-        <div>
-          {/* Performance Chart */}
-          <div className="chart-card" style={{
-            background: 'white',
-            borderRadius: '24px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-            padding: '2rem',
-            marginBottom: '2rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <BarChart3 size={24} style={{ color: '#a0855b' }} />
-              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>
-                Average Score
-              </h3>
+              )}
             </div>
-            <div className="chart-container" style={{ height: '300px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={performanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    contentStyle={{
-                      background: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                    }}
+
+            {/* Profile Fields */}
+            <div className="profile-fields">
+              <div className="field-group">
+                <label className="field-label">
+                  <User size={16} />
+                  Username
+                </label>
+                {isEditing ? (
+                  <input
+                    className="field-input"
+                    type="text"
+                    value={editData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    placeholder="Enter your username"
+                    minLength={6}
+                    maxLength={16}
                   />
-                  <Bar dataKey="score" fill="#a0855b" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+                ) : (
+                  <div className="field-value">{profileData.name}</div>
+                )}
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">
+                  <Mail size={16} />
+                  Email Address
+                </label>
+                <div className="field-value">{profileData.email}</div>
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">
+                  <Calendar size={16} />
+                  Member Since
+                </label>
+                <div className="field-value">{profileData.joinDate}</div>
+              </div>
+
+              {/* Password Section */}
+              {!showPasswordEdit ? (
+                <div className="field-group">
+                  <label className="field-label">
+                    <Lock size={16} />
+                    Password
+                  </label>
+                  <div className="field-value" style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <span>••••••••</span>
+                    <button
+                      className="btn-edit-password"
+                      onClick={() => setShowPasswordEdit(true)}
+                    >
+                      <Lock size={12} />
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="field-group">
+                    <label className="field-label">
+                      <Lock size={16} />
+                      Current Password
+                    </label>
+                    <div className="password-input-container">
+                      <input
+                        className="field-input password-input"
+                        type={showPasswords.current ? 'text' : 'password'}
+                        placeholder="Current Password"
+                        value={passwordFields.current}
+                        onChange={e => handlePasswordFieldChange('current', e.target.value)}
+                        minLength={6}
+                        maxLength={24}
+                      />
+                      <button
+                        className="password-toggle-btn"
+                        onClick={() => togglePasswordVisibility('current')}
+                      >
+                        {showPasswords.current ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="field-group">
+                    <label className="field-label">
+                      <Lock size={16} />
+                      New Password
+                    </label>
+                    <div className="password-input-container">
+                      <input
+                        className="field-input password-input"
+                        type={showPasswords.new ? 'text' : 'password'}
+                        placeholder="New Password"
+                        value={passwordFields.new}
+                        onChange={e => handlePasswordFieldChange('new', e.target.value)}
+                        onFocus={() => setShowPasswordRequirements(prev => ({...prev, new: true}))}
+                        onBlur={() => setTimeout(() => setShowPasswordRequirements(prev => ({...prev, new: false})), 150)}
+                        minLength={8}
+                        maxLength={24}
+                      />
+                      <button
+                        className="password-toggle-btn"
+                        onClick={() => togglePasswordVisibility('new')}
+                      >
+                        {showPasswords.new ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                    <PasswordRequirements 
+                      password={passwordFields.new} 
+                      isVisible={showPasswordRequirements.new} 
+                    />
+                  </div>
+
+                  <div className="field-group">
+                    <label className="field-label">
+                      <Lock size={16} />
+                      Confirm New Password
+                    </label>
+                    <div className="password-input-container">
+                      <input
+                        className="field-input password-input"
+                        type={showPasswords.confirm ? 'text' : 'password'}
+                        placeholder="Confirm New Password"
+                        value={passwordFields.confirm}
+                        onChange={e => handlePasswordFieldChange('confirm', e.target.value)}
+                        minLength={8}
+                        maxLength={24}
+                      />
+                      <button
+                        className="password-toggle-btn"
+                        onClick={() => togglePasswordVisibility('confirm')}
+                      >
+                        {showPasswords.confirm ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="password-actions">
+                    <button className="btn-save" onClick={handlePasswordSave}>
+                      <Save size={16} />
+                      Save Password
+                    </button>
+                    <button
+                      className="btn-cancel"
+                      onClick={() => {
+                        setShowPasswordEdit(false);
+                        setPasswordFields({ current: '', new: '', confirm: '' });
+                        setShowPasswords({ current: false, new: false, confirm: false });
+                        setShowPasswordRequirements({ new: false, confirm: false });
+                      }}
+                    >
+                      <X size={16} />
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -547,9 +986,12 @@ const Profile = () => {
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
             padding: '2rem'
           }}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', marginBottom: '1.5rem' }}>
-              Recent Activity
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <Activity size={24} style={{ color: '#a0855b' }} />
+              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>
+                Recent Activity
+              </h3>
+            </div>
             <div>
               {recentActivities.length === 0 && (
                 <div style={{ color: '#6b7280', fontSize: '1rem' }}>No activity yet.</div>
@@ -582,6 +1024,89 @@ const Profile = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Right Column - Charts and Progress */}
+        <div>
+          {/* Overall Performance Chart */}
+          <div className="chart-card" style={{
+            background: 'white',
+            borderRadius: '24px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            padding: '2rem',
+            marginBottom: '2rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <BarChart3 size={24} style={{ color: '#a0855b' }} />
+              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>
+                Overall Dance Performance Summary
+              </h3>
+            </div>
+            <div className="chart-container" style={{ 
+              height: '280px',
+              minHeight: '200px',
+              maxHeight: '350px',
+              width: '100%',
+              overflow: 'hidden'
+            }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart 
+                  data={performanceData}
+                  margin={{ top: 10, right: 20, left: 5, bottom: 35 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#6b7280"
+                    fontSize={12}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis 
+                    stroke="#6b7280" 
+                    domain={[0, 100]}
+                    fontSize={12}
+                    width={40}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      background: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      fontSize: '12px'
+                    }}
+                    formatter={(value) => [`${value}%`, 'Average Score']}
+                  />
+                  <Bar 
+                    dataKey="score" 
+                    fill="#a0855b" 
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={60}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Dance Progress Section */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem'
+          }}>
+            {/* Individual Dance Progress Tables */}
+            {DANCE_NAMES.map((danceName) => (
+              <DanceProgressTable
+                key={danceName}
+                danceName={danceName}
+                figureScores={danceProgressData[danceName] || []}
+                danceData={DANCE_DATA[danceName]}
+              />
+            ))}
           </div>
         </div>
       </div>
@@ -679,7 +1204,9 @@ const Profile = () => {
           }
           
           .chart-container {
-            height: 250px !important;
+            height: 240px !important;
+            min-height: 200px !important;
+            max-height: 280px !important;
           }
           
           /* Activity card responsiveness */
@@ -768,7 +1295,9 @@ const Profile = () => {
           }
           
           .chart-container {
-            height: 220px !important;
+            height: 200px !important;
+            min-height: 180px !important;
+            max-height: 220px !important;
           }
           
           /* Activity card responsiveness */
@@ -822,7 +1351,9 @@ const Profile = () => {
           }
           
           .chart-container {
-            height: 200px !important;
+            height: 180px !important;
+            min-height: 160px !important;
+            max-height: 200px !important;
           }
           
           .btn-edit,

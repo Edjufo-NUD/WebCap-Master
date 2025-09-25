@@ -3,13 +3,44 @@ import { useNavigate, useLocation } from "react-router-dom";
 import IndakHamakaLogo from "../assets/FLIPinoNLogo.png";
 import "./Login.css";
 import { supabase } from "../supabasebaseClient";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaCheck, FaTimes } from "react-icons/fa";
+
+// Password Requirements component (dark theme for reset password)
+const PasswordRequirements = ({ password, isVisible }) => {
+  const requirements = [
+    { key: 'length', text: '8-24 characters', check: password.length >= 8 && password.length <= 24 },
+    { key: 'lowercase', text: 'One lowercase letter', check: /(?=.*[a-z])/.test(password) },
+    { key: 'uppercase', text: 'One uppercase letter', check: /(?=.*[A-Z])/.test(password) },
+    { key: 'number', text: 'One number', check: /(?=.*\d)/.test(password) },
+    { key: 'special', text: 'One special character', check: /(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~])/.test(password) }
+  ];
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="password-requirements">
+      <div className="requirements-title">Password Requirements:</div>
+      {requirements.map(req => (
+        <div key={req.key} className={`requirement-item ${req.check ? 'valid' : 'invalid'}`}>
+          <span className="requirement-icon">
+            {req.check ? <FaCheck /> : <FaTimes />}
+          </span>
+          <span className="requirement-text">{req.text}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState({
+    new: false,
+    confirm: false
+  });
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -195,6 +226,8 @@ const ResetPassword = () => {
                     className="login-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setShowPasswordRequirements(prev => ({...prev, new: true}))}
+                    onBlur={() => setTimeout(() => setShowPasswordRequirements(prev => ({...prev, new: false})), 150)}
                     required
                     minLength={8}
                     maxLength={24}
@@ -216,6 +249,10 @@ const ResetPassword = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
+                <PasswordRequirements 
+                  password={password} 
+                  isVisible={showPasswordRequirements.new} 
+                />
               </div>
               <div className="input-group">
                 <label className="input-label">Confirm Password</label>

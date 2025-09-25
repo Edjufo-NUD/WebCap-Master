@@ -43,10 +43,10 @@ const Login = () => {
       // Get user id from Supabase Auth
       const userId = data.user?.id;
 
-      // Fetch user role and status from users table
+      // Fetch user role, status, and username from users table
       const { data: userData, error: userError } = await supabase
         .from("users")
-        .select("role, status")
+        .select("role, status, username")
         .eq("id", userId)
         .single();
 
@@ -68,8 +68,12 @@ const Login = () => {
         JSON.stringify({
           email,
           role: userData.role,
+          username: userData.username,
         })
       );
+
+      // Trigger custom event to update auth state in App.jsx
+      window.dispatchEvent(new Event('authChange'));
 
       // Redirect based on role
       if (userData.role === "superadmin") {
@@ -185,6 +189,43 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Floating Explore as Guest Button */}
+      <button
+        type="button"
+        onClick={() => navigate("/home")}
+        className="explore-guest-button"
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          background: "linear-gradient(135deg, #a0855b, #c9a876)",
+          border: "none",
+          color: "#fff",
+          padding: "12px 20px",
+          borderRadius: "25px",
+          fontSize: "14px",
+          fontWeight: "600",
+          cursor: "pointer",
+          boxShadow: "0 4px 12px rgba(160, 133, 91, 0.3), 0 0 0 0 rgba(160, 133, 91, 0.3)",
+          transition: "all 0.3s ease",
+          zIndex: 1000,
+          whiteSpace: "nowrap",
+          animation: "bounce 2s infinite, pulse 3s infinite"
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.transform = "translateY(-4px) scale(1.05)";
+          e.target.style.boxShadow = "0 8px 25px rgba(160, 133, 91, 0.5), 0 0 20px rgba(160, 133, 91, 0.3)";
+          e.target.style.animation = "none"; // Stop animations on hover
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.transform = "translateY(0) scale(1)";
+          e.target.style.boxShadow = "0 4px 12px rgba(160, 133, 91, 0.3), 0 0 0 0 rgba(160, 133, 91, 0.3)";
+          e.target.style.animation = "bounce 2s infinite, pulse 3s infinite"; // Resume animations
+        }}
+      >
+        🎭 Explore as Guest
+      </button>
     </div>
   );
 };
