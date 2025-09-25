@@ -1187,6 +1187,7 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
   padding: 1rem;
   backdrop-filter: blur(12px);
   animation: fadeInBackdrop 0.4s ease-out;
+  overflow-y: auto;
 }
 
 @keyframes fadeInBackdrop {
@@ -1202,14 +1203,17 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
 
 .login-invitation-modal {
   background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-  border-radius: 24px;
-  max-width: 480px;
-  width: 100%;
-  position: relative;
-  box-shadow: 0 30px 80px rgba(160, 133, 91, 0.3), 0 0 0 1px rgba(160, 133, 91, 0.1);
-  animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-origin: center bottom;
+  border-radius: 0;
+  max-width: 520px;
+  width: 90%;
+  max-height: 90vh;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(160, 133, 91, 0.25), 0 0 0 1px rgba(160, 133, 91, 0.08);
+  animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: center bottom;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideInUp {
@@ -1229,6 +1233,7 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
   text-align: center;
   padding: 1.5rem 2rem 0.5rem 2rem;
   position: relative;
+  flex-shrink: 0;
 }
 
 .login-invitation-icon {
@@ -1280,6 +1285,9 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
 
 .login-invitation-body {
   padding: 0 2rem 1.5rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .login-invitation-features {
@@ -1378,6 +1386,7 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
   padding: 1rem 2rem 2rem 2rem;
   border-top: 1px solid rgba(160, 133, 91, 0.1);
   animation: fadeIn 0.6s ease-out 1.6s both;
+  flex-shrink: 0;
 }
 
 .login-invitation-footer-text {
@@ -1680,8 +1689,59 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
   }
 }
 
+/* High zoom and smaller desktop screens (not mobile) */
+@media (min-width: 769px) and (max-height: 700px) {
+  .login-invitation-modal {
+    max-width: 480px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+}
+
+/* Zoomed in desktop screens */
+@media (min-width: 769px) and (max-width: 1200px) and (max-height: 800px) {
+  .login-invitation-modal {
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+}
+
+/* Small desktop windows but not mobile */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .login-invitation-modal {
+    max-width: 500px;
+    width: 85%;
+  }
+}
+
+/* Desktop overlay - only scroll if needed */
+@media (min-width: 769px) {
+  .login-invitation-overlay {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .login-invitation-modal {
+    max-height: 85vh;
+    border-radius: 0;
+  }
+}
+
+/* Very high zoom levels (desktop only) */
+@media (min-width: 769px) and (max-height: 600px) {
+  .login-invitation-modal {
+    max-width: 460px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}
+
 /* Mobile responsiveness for login invitation modal */
 @media (max-width: 768px) {
+  .login-invitation-modal {
+    border-radius: 24px;
+  }
   .login-invitation-overlay {
     padding: 1rem 0.75rem;
     align-items: center;

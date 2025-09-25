@@ -788,7 +788,7 @@ const Home = () => {
                 <div className="progress-cards">
                   <div className="progress-card">
                     <div className="progress-header">
-                      <span className="dance-name">🎭 Binungey</span>
+                      <span className="dance-name">Binungey</span>
                       <span className="progress-score">85%</span>
                     </div>
                     <div className="progress-bar">
@@ -801,7 +801,7 @@ const Home = () => {
                   
                   <div className="progress-card">
                     <div className="progress-header">
-                      <span className="dance-name">🌾 Tiklos</span>
+                      <span className="dance-name">Tiklos</span>
                       <span className="progress-score">72%</span>
                     </div>
                     <div className="progress-bar">
@@ -814,7 +814,7 @@ const Home = () => {
                   
                   <div className="progress-card">
                     <div className="progress-header">
-                      <span className="dance-name">👑 Sua Ku Sua</span>
+                      <span className="dance-name">Sua Ku Sua</span>
                       <span className="progress-score">93%</span>
                     </div>
                     <div className="progress-bar">

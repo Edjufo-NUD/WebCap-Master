@@ -91,7 +91,7 @@ const Navbar = () => {
     // Trigger custom event to update auth state in App.jsx
     window.dispatchEvent(new Event('authChange'));
     
-    navigate('/home'); // Go to home instead of login
+    navigate('/login'); // Redirect to login page after logout
   };
 
   const handleLogoutCancel = () => {
