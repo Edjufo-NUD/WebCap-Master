@@ -494,10 +494,32 @@ const DanceUpload = () => {
                     Remove
                   </button>
                 </div>
-                <video className="video-preview" controls>
-                  <source src={previewVideo.url} type={previewVideo.file.type} />
-                  Your browser does not support the video tag.
-                </video>
+                <div style={{ 
+                  width: '100%', 
+                  maxWidth: '600px', 
+                  height: 'auto', 
+                  minHeight: '300px',
+                  backgroundColor: '#f0f0f0', 
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  margin: '20px auto'
+                }}>
+                  <video 
+                    controls
+                    preload="metadata"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      minHeight: '300px',
+                      objectFit: 'contain',
+                      backgroundColor: '#000'
+                    }}
+                  >
+                    <source src={previewVideo.url} type={previewVideo.file.type} />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
               </div>
             )}
           </div>
@@ -533,27 +555,75 @@ const DanceUpload = () => {
             />
 
             {figureVideos.length > 0 && (
-              <div className="figures-grid">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px', marginTop: '20px' }}>
                 {figureVideos.map((video, idx) => (
-                  <div key={video.id} className="figure-item">
-                    <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                  <div key={video.id} style={{
+                    position: 'relative',
+                    background: 'white',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                  }}>
+                    <div style={{ fontWeight: 600, marginBottom: 10, color: '#2d3748' }}>
                       Figure {idx + 1}
                     </div>
                     <button
                       type="button"
-                      className="figure-remove-btn"
                       onClick={() => removeFigureVideo(video.id)}
                       title="Remove video"
                       disabled={isSubmitting}
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '32px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 10
+                      }}
                     >
                       ×
                     </button>
-                    <video className="figure-video" controls>
+                    
+                    <video 
+                      controls
+                      width="100%"
+                      height="200"
+                      style={{
+                        width: '100%',
+                        height: '200px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        backgroundColor: '#000',
+                        border: '2px solid #000'
+                      }}
+                      onError={(e) => console.error('Video error:', e)}
+                      onLoadStart={() => console.log('Video loading started')}
+                      onCanPlay={() => console.log('Video can play')}
+                    >
                       <source src={video.url} type={video.file.type} />
+                      <div style={{ padding: '20px', textAlign: 'center', color: 'white' }}>
+                        Video cannot be loaded
+                      </div>
                     </video>
-                    <div className="file-info">
-                      <div className="file-name">{truncateFileName(video.name)}</div>
-                      <div className="file-size">{video.size}</div>
+                    
+                    <div style={{ marginTop: '12px' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#2d3748', marginBottom: '4px' }}>
+                        {truncateFileName(video.name)}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#718096' }}>
+                        {video.size}
+                      </div>
                     </div>
                   </div>
                 ))}
