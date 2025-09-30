@@ -427,8 +427,9 @@
 
 .figure-video {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: auto; /* Changed from 200px */
+  max-height: 250px; /* Optional: set a max height if needed */
+  object-fit: contain; /* Changed from cover to contain */
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
