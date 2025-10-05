@@ -45,7 +45,9 @@ const ManageDance = () => {
     region: '',
     history: '',
     references: '',
-    duration: '',
+    durationHours: '',
+    durationMinutes: '',
+    durationSeconds: '',
     performers: '',
     music: '',
     costumes: ''
@@ -327,12 +329,28 @@ const ManageDance = () => {
 
   const handleEdit = (dance) => {
     setSelectedDance(dance);
+    
+    // Parse existing duration string into components
+    let hours = '', minutes = '', seconds = '';
+    if (dance.duration) {
+      const durationStr = dance.duration;
+      const hourMatch = durationStr.match(/(\d+)h/);
+      const minMatch = durationStr.match(/(\d+)m/);
+      const secMatch = durationStr.match(/(\d+)s/);
+      
+      if (hourMatch) hours = hourMatch[1];
+      if (minMatch) minutes = minMatch[1];
+      if (secMatch) seconds = secMatch[1];
+    }
+    
     setEditForm({
       title: dance.title || '',
       region: dance.region || '',
       history: dance.history || '',
       references: dance.references || '',
-      duration: dance.duration || '',
+      durationHours: hours,
+      durationMinutes: minutes,
+      durationSeconds: seconds,
       performers: dance.performers || '',
       music: dance.music || '',
       costumes: dance.costumes || ''
@@ -368,6 +386,16 @@ const ManageDance = () => {
     setLoading(true);
 
     try {
+      // Format duration
+      const hours = parseInt(editForm.durationHours) || 0;
+      const minutes = parseInt(editForm.durationMinutes) || 0;
+      const seconds = parseInt(editForm.durationSeconds) || 0;
+      const formattedDuration = hours > 0 
+        ? `${hours}h ${minutes}m ${seconds}s` 
+        : minutes > 0 
+          ? `${minutes}m ${seconds}s`
+          : `${seconds}s`;
+
       // 1. Update in Supabase
       const { error: updateError } = await supabase
         .from("dances")
@@ -376,7 +404,7 @@ const ManageDance = () => {
           island: editForm.region,
           history: editForm.history,
           references: editForm.references,
-          duration: editForm.duration,
+          duration: formattedDuration,
           performers: editForm.performers,
           music: editForm.music,
           costumes: editForm.costumes
@@ -397,7 +425,7 @@ const ManageDance = () => {
             region: editForm.region,
             history: editForm.history,
             references: editForm.references,
-            duration: editForm.duration,
+            duration: formattedDuration,
             performers: editForm.performers,
             music: editForm.music,
             costumes: editForm.costumes
@@ -418,7 +446,7 @@ const ManageDance = () => {
           category: editForm.region,
           history: editForm.history,
           references: editForm.references,
-          duration: editForm.duration,
+          duration: formattedDuration,
           performers: editForm.performers,
           music: editForm.music,
           costumes: editForm.costumes
@@ -518,15 +546,26 @@ const ManageDance = () => {
   // Add this function inside your component
   const isEditChanged = () => {
     if (!selectedDance) return false;
+    
+    // Format current duration from form components
+    const hours = parseInt(editForm.durationHours) || 0;
+    const minutes = parseInt(editForm.durationMinutes) || 0;
+    const seconds = parseInt(editForm.durationSeconds) || 0;
+    const formattedDuration = hours > 0 
+      ? `${hours}h ${minutes}m ${seconds}s`
+      : minutes > 0 
+      ? `${minutes}m ${seconds}s`
+      : `${seconds}s`;
+    
     return (
-      editForm.title.trim() !== (selectedDance.title || '').trim() ||
-      editForm.region.trim() !== (selectedDance.region || selectedDance.island || selectedDance.category || '').trim() ||
-      editForm.history.trim() !== (selectedDance.history || '').trim() ||
-      editForm.references.trim() !== (selectedDance.references || '').trim() ||
-      editForm.duration.trim() !== (selectedDance.duration || '').trim() ||
-      editForm.performers.trim() !== (selectedDance.performers || '').trim() ||
-      editForm.music.trim() !== (selectedDance.music || '').trim() ||
-      editForm.costumes.trim() !== (selectedDance.costumes || '').trim()
+      (editForm.title || '').trim() !== (selectedDance.title || '').trim() ||
+      (editForm.region || '').trim() !== (selectedDance.region || selectedDance.island || selectedDance.category || '').trim() ||
+      (editForm.history || '').trim() !== (selectedDance.history || '').trim() ||
+      (editForm.references || '').trim() !== (selectedDance.references || '').trim() ||
+      formattedDuration !== (selectedDance.duration || '').trim() ||
+      (editForm.performers || '').trim() !== (selectedDance.performers || '').trim() ||
+      (editForm.music || '').trim() !== (selectedDance.music || '').trim() ||
+      (editForm.costumes || '').trim() !== (selectedDance.costumes || '').trim()
     );
   };
 
@@ -847,42 +886,102 @@ const ManageDance = () => {
                 </div>
 
                 {/* Optional Fields */}
-                <div className="form-group">
-                  <label htmlFor="edit-duration">
-                    Duration<span className="required-asterisk">*</span>
-                  </label>
-                  <input
-                    id="edit-duration"
-                    type="text"
-                    value={editForm.duration}
-                    onChange={(e) => handleEditFormChange('duration', e.target.value)}
-                    className="form-input"
-                    placeholder="Enter duration"
-                  />
-                  {!editForm.duration && (
-                    <div className="form-note" style={{ color: '#888', fontSize: '0.95em' }}>
-                      No duration provided.
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="duration">
+                      Duration<span className="required-asterisk">*</span>
+                    </label>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <input
+                          type="number"
+                          id="durationHours"
+                          name="durationHours"
+                          className="form-input"
+                          value={editForm.durationHours || ''}
+                          onChange={(e) => setEditForm({
+                            ...editForm,
+                            durationHours: parseInt(e.target.value) || 0
+                          })}
+                          placeholder="0"
+                          min="0"
+                          max="5"
+                          step="1"
+                          style={{ width: '70px', padding: '12px 8px' }}
+                        />
+                        <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>h</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <input
+                          type="number"
+                          id="durationMinutes"
+                          name="durationMinutes"
+                          className="form-input"
+                          value={editForm.durationMinutes || ''}
+                          onChange={(e) => setEditForm({
+                            ...editForm,
+                            durationMinutes: parseInt(e.target.value) || 0
+                          })}
+                          placeholder="5"
+                          min="0"
+                          max="59"
+                          step="1"
+                          required
+                          style={{ width: '70px', padding: '12px 8px' }}
+                        />
+                        <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>m</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <input
+                          type="number"
+                          id="durationSeconds"
+                          name="durationSeconds"
+                          className="form-input"
+                          value={editForm.durationSeconds || ''}
+                          onChange={(e) => setEditForm({
+                            ...editForm,
+                            durationSeconds: parseInt(e.target.value) || 0
+                          })}
+                          placeholder="30"
+                          min="0"
+                          max="59"
+                          step="1"
+                          style={{ width: '70px', padding: '12px 8px' }}
+                        />
+                        <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>s</span>
+                      </div>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="edit-performers">
-                    Performers<span className="required-asterisk">*</span>
-                  </label>
-                  <input
-                    id="edit-performers"
-                    type="text"
-                    value={editForm.performers}
-                    onChange={(e) => handleEditFormChange('performers', e.target.value)}
-                    className="form-input"
-                    placeholder="Enter performers"
-                  />
-                  {!editForm.performers && (
-                    <div className="form-note" style={{ color: '#888', fontSize: '0.95em' }}>
-                      No performers specified.
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="edit-performers">
+                      Number of Performers<span className="required-asterisk">*</span>
+                    </label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <input
+                        type="number"
+                        id="edit-performers"
+                        name="performers"
+                        className="form-input"
+                        value={editForm.performers}
+                        onChange={(e) => handleEditFormChange('performers', e.target.value)}
+                        placeholder="4"
+                        min="1"
+                        max="50"
+                        step="1"
+                        required
+                        style={{ flex: '1' }}
+                      />
+                      <span style={{ 
+                        fontSize: '1rem', 
+                        color: '#718096', 
+                        fontWeight: '500',
+                        minWidth: 'fit-content'
+                      }}>
+                        dancers
+                      </span>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 <div className="form-group">

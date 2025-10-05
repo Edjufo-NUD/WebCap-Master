@@ -16,6 +16,12 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
+    // Validate Gmail format
+    if (!email.endsWith("@gmail.com")) {
+      setError("Please use a Gmail address (@gmail.com)");
+      return;
+    }
+
     if (email && password) {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
