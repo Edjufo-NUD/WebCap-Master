@@ -10,23 +10,40 @@ import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
 import pahidImage from '../assets/Pahid.png';
 
-// Helper function to convert YouTube URL to embed URL
-const getYouTubeEmbedUrl = (url) => {
-  if (!url) return '';
-  
-  // Handle different YouTube URL formats
-  let videoId = '';
-  
-  if (url.includes('youtube.com/shorts/')) {
-    videoId = url.split('youtube.com/shorts/')[1].split('?')[0];
-  } else if (url.includes('youtu.be/')) {
-    videoId = url.split('youtu.be/')[1].split('?')[0];
-  } else if (url.includes('youtube.com/watch?v=')) {
-    videoId = url.split('v=')[1].split('&')[0];
-  }
-  
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
-};
+// Import video files
+import BinungeyMainVideo from '../assets/Videos/Binungey.mp4';
+import BinungeyFig1 from '../assets/Videos/BinungeyBoyFig1.mp4';
+import BinungeyFig2 from '../assets/Videos/BinungeyBoyFig2.mp4';
+import BinungeyFig3 from '../assets/Videos/BinungeyBoyFig3.mp4';
+import BinungeyFig4 from '../assets/Videos/BinungeyBoyFig4.mp4';
+import BinungeyFig5 from '../assets/Videos/BinungeyBoyFig5.mp4';
+import BinungeyFig6 from '../assets/Videos/BinungeyBoyFig6.mp4';
+import BinungeyFig7 from '../assets/Videos/BinungeyBoyFig7.mp4';
+
+import PahidMainVideo from '../assets/Videos/Pahid.mp4';
+import PahidFig1 from '../assets/Videos/PahidBoyFig1.mp4';
+import PahidFig2 from '../assets/Videos/PahidBoyFig2.mp4';
+import PahidFig3 from '../assets/Videos/PahidBoyFig3.mp4';
+import PahidFig4 from '../assets/Videos/PahidBoyFig4.mp4';
+import PahidFig5 from '../assets/Videos/PahidBoyFig5.mp4';
+import PahidFig6 from '../assets/Videos/PahidBoyFig6.mp4';
+
+import SuaKuSuaFig1 from '../assets/Videos/SuaKuSuaBoyFig1.mp4';
+import SuaKuSuaFig2 from '../assets/Videos/SuaKuSuaBoyFig2.mp4';
+import SuaKuSuaFig3 from '../assets/Videos/SuaKuSuaBoyFig3.mp4';
+import SuaKuSuaFig4 from '../assets/Videos/SuaKuSuaBoyFig4.mp4';
+import SuaKuSuaFig5 from '../assets/Videos/SuaKuSuaBoyFig5.mp4';
+import SuaKuSuaFig6 from '../assets/Videos/SuaKuSuaBoyFig6.mp4';
+import SuaKuSuaFig7 from '../assets/Videos/SuaKuSuaBoyFig7.mp4';
+import SuaKuSuaFig8 from '../assets/Videos/SuaKuSuaBoyFig8.mp4';
+import SuaKuSuaFig9 from '../assets/Videos/SuaKuSuaBoyFig9.mp4';
+import SuaKuSuaFig10 from '../assets/Videos/SuaKuSuaBoyFig10.mp4';
+
+import TiklosMainVideo from '../assets/Videos/Tiklos.mp4';
+import TiklosFig1 from '../assets/Videos/TiklosBoyFig1.mp4';
+import TiklosFig2 from '../assets/Videos/TiklosBoyFig2.mp4';
+import TiklosFig3 from '../assets/Videos/TiklosBoyFig3.mp4';
+import TiklosFig4 from '../assets/Videos/TiklosBoyFig4.mp4';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -53,7 +70,7 @@ const Home = () => {
       description: 'A traditional dance from Abra celebrating harvest and community unity.',
       history: 'A traditional dance from Abra celebrating harvest and community unity. This dance represents the joy and gratitude of farmers during harvest season. Performers wear traditional Ilocano costumes and use farming tools as props.',
       references: 'Traditional Ilocano folk music with gongs and drums. Colorful traditional Ilocano attire with wide-brimmed hats.',
-      main_video_url: 'https://youtu.be/F9FhAKrlNMo', // Binungey Cultural Dance
+      main_video_url: BinungeyMainVideo,
       difficulty: 'Intermediate',
       duration: '4-6 minutes',
       performers: '6-8 dancers',
@@ -62,42 +79,41 @@ const Home = () => {
       music: 'Traditional Ilocano folk music with gongs and drums',
       costumes: 'Colorful traditional Ilocano attire with wide-brimmed hats',
       isFeatured: true,
-      // Figure videos for Binungey
       figureVideos: [
         {
           id: 'binungey-fig-1',
           figure_number: 1,
-          video_url: 'https://youtube.com/shorts/nHwHrEnLhi4?feature=share'
+          video_url: BinungeyFig1
         },
         {
           id: 'binungey-fig-2',
           figure_number: 2,
-          video_url: 'https://youtube.com/shorts/mCqgoAv4WzI?feature=share'
+          video_url: BinungeyFig2
         },
         {
           id: 'binungey-fig-3',
           figure_number: 3,
-          video_url: 'https://youtube.com/shorts/LSUvULJIyV4?feature=share'
+          video_url: BinungeyFig3
         },
         {
           id: 'binungey-fig-4',
           figure_number: 4,
-          video_url: 'https://youtube.com/shorts/Uk4FDTOZWPQ?feature=share'
+          video_url: BinungeyFig4
         },
         {
           id: 'binungey-fig-5',
           figure_number: 5,
-          video_url: 'https://youtube.com/shorts/a_b9blnDamc?feature=share'
+          video_url: BinungeyFig5
         },
         {
           id: 'binungey-fig-6',
           figure_number: 6,
-          video_url: 'https://youtube.com/shorts/n_r16_HlaGc?feature=share'
+          video_url: BinungeyFig6
         },
         {
           id: 'binungey-fig-7',
           figure_number: 7,
-          video_url: 'https://youtube.com/shorts/pPwaI_reVwA?feature=share'
+          video_url: BinungeyFig7
         }
       ]
     },
@@ -113,7 +129,7 @@ const Home = () => {
       description: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage.',
       history: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage. This dance demonstrates the refined artistry and storytelling tradition of Filipino culture through expressive choreography.',
       references: 'Traditional Filipino folk music with indigenous instruments. Traditional Filipino attire with cultural significance.',
-      main_video_url: 'https://youtube.com/shorts/9McsqHeMnmc', // No main video provided, will use first figure video
+      main_video_url: PahidMainVideo,
       difficulty: 'Intermediate',
       duration: '4-6 minutes',
       performers: '4-8 dancers',
@@ -122,37 +138,36 @@ const Home = () => {
       music: 'Traditional Filipino folk music with indigenous instruments',
       costumes: 'Traditional Filipino attire with cultural significance',
       isFeatured: true,
-      // Figure videos for Pahid
       figureVideos: [
         {
           id: 'pahid-fig-1',
           figure_number: 1,
-          video_url: 'https://youtube.com/shorts/AAM6CMk9E6s?feature=share'
+          video_url: PahidFig1
         },
         {
           id: 'pahid-fig-2',
           figure_number: 2,
-          video_url: 'https://youtube.com/shorts/-tEzpvd1oB8?feature=share'
+          video_url: PahidFig2
         },
         {
           id: 'pahid-fig-3',
           figure_number: 3,
-          video_url: 'https://youtube.com/shorts/kUVOrXvO9EQ?feature=share'
+          video_url: PahidFig3
         },
         {
           id: 'pahid-fig-4',
           figure_number: 4,
-          video_url: 'https://youtube.com/shorts/1TWD3F2ud_Y?feature=share'
+          video_url: PahidFig4
         },
         {
           id: 'pahid-fig-5',
           figure_number: 5,
-          video_url: 'https://youtube.com/shorts/kfL9hBx7Jx8?feature=share'
+          video_url: PahidFig5
         },
         {
           id: 'pahid-fig-6',
           figure_number: 6,
-          video_url: 'https://youtube.com/shorts/cXnMmvGtDIQ?feature=share'
+          video_url: PahidFig6
         }
       ]
     },
@@ -163,12 +178,12 @@ const Home = () => {
       island: 'Mindanao',
       region: 'Jolo, Sulu',
       province: 'Jolo, Sulu',
-      image: null, // No image available
-      image_url: null, // No image available
+      image: null,
+      image_url: null,
       description: 'A courtship dance from the Tausug people of Sulu.',
       history: 'A courtship dance from the Tausug people of Sulu. A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
       references: 'Traditional Tausug kulintang ensemble. Elaborate Muslim royal attire with intricate embroidery.',
-      main_video_url: '', // No main video provided
+      main_video_url: '',
       difficulty: 'Advanced',
       duration: '5-7 minutes',
       performers: '2-4 dancers',
@@ -177,57 +192,56 @@ const Home = () => {
       music: 'Traditional Tausug kulintang ensemble',
       costumes: 'Elaborate Muslim royal attire with intricate embroidery',
       isFeatured: true,
-      // Figure videos for Sua Ku Sua
       figureVideos: [
         {
           id: 'suakusua-fig-1',
           figure_number: 1,
-          video_url: 'https://youtube.com/shorts/0QybWUPPYiA?feature=share'
+          video_url: SuaKuSuaFig1
         },
         {
           id: 'suakusua-fig-2',
           figure_number: 2,
-          video_url: 'https://youtube.com/shorts/QHV3Tpqbulc?feature=share'
+          video_url: SuaKuSuaFig2
         },
         {
           id: 'suakusua-fig-3',
           figure_number: 3,
-          video_url: 'https://youtube.com/shorts/xVP-AzE9Ing?feature=share'
+          video_url: SuaKuSuaFig3
         },
         {
           id: 'suakusua-fig-4',
           figure_number: 4,
-          video_url: 'https://youtube.com/shorts/EBU8wY3mZjk?feature=share'
+          video_url: SuaKuSuaFig4
         },
         {
           id: 'suakusua-fig-5',
           figure_number: 5,
-          video_url: 'https://youtube.com/shorts/0DxN9IZHGVw?feature=share'
+          video_url: SuaKuSuaFig5
         },
         {
           id: 'suakusua-fig-6',
           figure_number: 6,
-          video_url: 'https://youtube.com/shorts/ZGjHBhKvngY?feature=share'
+          video_url: SuaKuSuaFig6
         },
         {
           id: 'suakusua-fig-7',
           figure_number: 7,
-          video_url: 'https://youtube.com/shorts/4XyxXhRWooI?feature=share'
+          video_url: SuaKuSuaFig7
         },
         {
           id: 'suakusua-fig-8',
           figure_number: 8,
-          video_url: 'https://youtube.com/shorts/i-t-1Re42cs?feature=share'
+          video_url: SuaKuSuaFig8
         },
         {
           id: 'suakusua-fig-9',
           figure_number: 9,
-          video_url: 'https://youtube.com/shorts/BCTQqVNfbbc'
+          video_url: SuaKuSuaFig9
         },
         {
           id: 'suakusua-fig-10',
           figure_number: 10,
-          video_url: 'https://youtube.com/shorts/_TP40XGCtHA?feature=share'
+          video_url: SuaKuSuaFig10
         }
       ]
     },
@@ -243,7 +257,7 @@ const Home = () => {
       description: 'A dance depicting the Bayanihan spirit of community cooperation.',
       history: 'A dance depicting the Bayanihan spirit of community cooperation. Represents the Filipino spirit of bayanihan (community cooperation) where neighbors help each other during planting and harvesting seasons.',
       references: 'Lively Visayan folk music with traditional instruments. Simple rural Filipino clothing reflecting farming attire.',
-      main_video_url: 'https://youtube.com/shorts/QnkC5NnK0L4?feature=share', // Tiklos Cultural Dance
+      main_video_url: TiklosMainVideo,
       difficulty: 'Beginner',
       duration: '3-5 minutes',
       performers: '8-12 dancers',
@@ -252,27 +266,26 @@ const Home = () => {
       music: 'Lively Visayan folk music with traditional instruments',
       costumes: 'Simple rural Filipino clothing reflecting farming attire',
       isFeatured: true,
-      // Figure videos for Tiklos
       figureVideos: [
         {
           id: 'tiklos-fig-1',
           figure_number: 1,
-          video_url: 'https://youtube.com/shorts/1HObuAVDv9o?feature=share'
+          video_url: TiklosFig1
         },
         {
           id: 'tiklos-fig-2',
           figure_number: 2,
-          video_url: 'https://youtube.com/shorts/hzBRQjOhJ-A?feature=share'
+          video_url: TiklosFig2
         },
         {
           id: 'tiklos-fig-3',
           figure_number: 3,
-          video_url: 'https://youtube.com/shorts/feTYg33dEUY?feature=share'
+          video_url: TiklosFig3
         },
         {
           id: 'tiklos-fig-4',
           figure_number: 4,
-          video_url: 'https://youtube.com/shorts/hWDzGWTix6g?feature=share'
+          video_url: TiklosFig4
         }
       ]
     }
@@ -302,9 +315,7 @@ const Home = () => {
       const newAuthState = !!accessToken;
       setIsAuthenticated(newAuthState);
       
-      // Show login invitation for guest users only once per session
       if (!newAuthState && !sessionStorage.getItem('loginInvitationShown')) {
-        // Show modal after a short delay to let the page load
         setTimeout(() => {
           setShowLoginInvitation(true);
         }, 2000);
@@ -313,7 +324,6 @@ const Home = () => {
 
     checkAuthStatus();
 
-    // Listen for auth changes
     const handleAuthChange = () => {
       checkAuthStatus();
     };
@@ -329,7 +339,7 @@ const Home = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
-    }, 4000); // Change slide every 4 seconds
+    }, 4000);
 
     return () => clearInterval(interval);
   }, [carouselImages.length]);
@@ -351,13 +361,11 @@ const Home = () => {
       document.body.style.overflow = 'unset';
     }
     
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [showLoginInvitation]);
 
-  // Scroll to top handler
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -387,10 +395,8 @@ const Home = () => {
     document.body.style.overflow = 'unset';
   };
 
-  // Login invitation modal handlers
   const closeLoginInvitation = () => {
     setShowLoginInvitation(false);
-    // Mark as shown for this session
     sessionStorage.setItem('loginInvitationShown', 'true');
     document.body.style.overflow = 'unset';
   };
@@ -407,19 +413,16 @@ const Home = () => {
 
   return (
     <div className="home">
-      {/* Side Design Elements - Only visible on large screens */}
       <div className="side-decoration left"></div>
       <div className="side-decoration right"></div>
       <div className="side-pattern left"></div>
       <div className="side-pattern right"></div>
 
-      {/* Vertical lines */}
       <div className="vertical-line left-1"></div>
       <div className="vertical-line left-2"></div>
       <div className="vertical-line right-1"></div>
       <div className="vertical-line right-2"></div>
 
-      {/* Floating elements */}
       <div className="floating-element diamond" style={{ top: '15%', left: '5%', animationDelay: '0s' }}></div>
       <div className="floating-element circle" style={{ top: '35%', left: '8%', animationDelay: '2s' }}></div>
       <div className="floating-element triangle" style={{ top: '55%', left: '3%', animationDelay: '4s' }}></div>
@@ -429,7 +432,6 @@ const Home = () => {
       <div className="floating-element diamond" style={{ top: '65%', right: '3%', animationDelay: '1.5s' }}></div>
       <div className="floating-element circle" style={{ top: '85%', right: '6%', animationDelay: '3.5s' }}></div>
 
-      {/* Background shapes */}
       <div className="bg-shape hexagon" style={{ top: '10%', left: '2%' }}></div>
       <div className="bg-shape octagon" style={{ top: '60%', left: '1%' }}></div>
       <div className="bg-shape hexagon" style={{ top: '30%', right: '2%' }}></div>
@@ -437,7 +439,6 @@ const Home = () => {
 
       <Navbar />
       
-      {/* Hero Section */}
       <section className="hero">
         <div className="hero-background">
           <div className="hero-overlay"></div>
@@ -468,7 +469,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Dances */}
       <section className="featured">
         <div className="container">
           <div className="section-header">
@@ -509,7 +509,6 @@ const Home = () => {
                 <div className="dance-content">
                   <div className="dance-header">
                     <h3 className="dance-name">{dance.title || dance.name}</h3>
-                    {/* Difficulty removed */}
                   </div>
                   <p className="dance-region">{dance.region}</p>
                   <p className="dance-description">{dance.description}</p>
@@ -540,7 +539,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Culture Section */}
       <section className="culture-preview">
         <div className="container">
           <div className="culture-content">
@@ -570,11 +568,9 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Enhanced Dance Modal - Similar to Dances Page Style */}
       {isModalOpen && selectedDance && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Thumbnail image or No Preview Available placeholder */}
             <div style={{
               width: '100%',
               height: 220,
@@ -614,7 +610,6 @@ const Home = () => {
                   No Preview Available
                 </div>
               )}
-              {/* Overlay title on image/placeholder */}
               <div style={{
                 position: 'absolute',
                 bottom: 0,
@@ -641,13 +636,11 @@ const Home = () => {
             </div>
             
             <div className="modal-body" style={{ padding: 24 }}>
-              {/* History */}
               <div className="modal-section">
                 <h3>History</h3>
                 <p>{selectedDance.history || selectedDance.significance}</p>
               </div>
 
-              {/* Performance Details */}
               <div className="modal-section">
                 <h3>Performance Details</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1rem 0' }}>
@@ -669,52 +662,28 @@ const Home = () => {
                 <p><strong>Costumes:</strong> {selectedDance.costumes}</p>
               </div>
 
-              {/* YouTube Video */}
-              {selectedDance.figureVideos && selectedDance.figureVideos.length > 0 && (
+              {selectedDance.main_video_url && (
                 <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
                   <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
-                  {selectedDance.main_video_url ? (
-                    <iframe
-                      width="100%"
-                      height="320"
-                      src={getYouTubeEmbedUrl(selectedDance.main_video_url)}
-                      title={`${selectedDance.title || selectedDance.name} Dance Video`}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      style={{
-                        maxWidth: 520,
-                        borderRadius: 12,
-                        boxShadow: '0 4px 24px #0002'
-                      }}
-                    ></iframe>
-                  ) : (
-                    // Show "No Preview Available" if no main video
-                    <div
-                      style={{
-                        width: '100%',
-                        maxWidth: 520,
-                        height: 320,
-                        borderRadius: 12,
-                        background: '#f5f5f5',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '2px dashed #ddd',
-                        color: '#666',
-                        fontSize: '18px',
-                        fontWeight: '500',
-                        boxShadow: '0 4px 24px #0002',
-                        margin: '0 auto'
-                      }}
-                    >
-                      No Preview Available
-                    </div>
-                  )}
+                  <video
+                    src={selectedDance.main_video_url}
+                    controls
+                    style={{
+                      width: '100%',
+                      maxWidth: 520,
+                      height: 320,
+                      borderRadius: 12,
+                      background: '#000',
+                      objectFit: 'contain',
+                      boxShadow: '0 4px 24px #0002',
+                      margin: '0 auto'
+                    }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
               )}
 
-              {/* Figures (YouTube Shorts) */}
               {selectedDance.figureVideos && selectedDance.figureVideos.length > 0 && (
                 <div className="modal-section">
                   <h3>Figures</h3>
@@ -729,36 +698,67 @@ const Home = () => {
                         <div style={{ fontWeight: 600, marginBottom: 6 }}>
                           Figure {fig.figure_number}
                         </div>
-                        <iframe
-                          width="100%"
-                          height="200"
-                          src={getYouTubeEmbedUrl(fig.video_url)}
-                          title={`${selectedDance.title || selectedDance.name} Figure ${fig.figure_number}`}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
+                        <video
+                          src={fig.video_url}
+                          controls
                           style={{
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: '400px',
+                            minHeight: '200px',
                             borderRadius: 6,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                            background: '#000',
+                            objectFit: 'contain'
                           }}
-                        ></iframe>
+                        >
+                          Your browser does not support the video tag.
+                        </video>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
+            
+            {/* Close Button at Bottom */}
+            <div style={{
+              padding: '24px',
+              textAlign: 'center',
+              borderTop: '1px solid #e5e7eb'
+            }}>
+              <button
+                onClick={closeModal}
+                style={{
+                  background: '#a0855b',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#8b7355';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#a0855b';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Close
+              </button>
             </div>
-
-
+            </div>
           </div>
         </div>
       )}
 
-      {/* Login Invitation Modal */}
       {showLoginInvitation && (
         <div className="login-invitation-overlay" onClick={closeLoginInvitation}>
-          <div className="login-invitation-modal" onClick={(e) => e.stopPropagation()}>
-            {/* Animated particles */}
+          <div className="login-invitation-modal" onClick={(e) =>e.stopPropagation()}>
             <div className="login-invitation-particles">
               <div className="particle"></div>
               <div className="particle"></div>
@@ -771,14 +771,11 @@ const Home = () => {
               <div className="particle"></div>
             </div>
 
-            {/* Header */}
             <div className="login-invitation-header">
               <h2 className="login-invitation-title">Create Your Account</h2>
             </div>
 
-            {/* Body */}
             <div className="login-invitation-body">
-              {/* Progress visualization */}
               <div className="progress-preview">
                 <div className="preview-header">
                   <div className="chart-icon">📊</div>
@@ -828,8 +825,8 @@ const Home = () => {
                 
                 <div className="preview-footer">
                   <div className="total-stats">
-                    <span class="total-dances">3 Dances Tracked</span>
-                    <span class="avg-score">Average: 83%</span>
+                    <span className="total-dances">3 Dances Tracked</span>
+                    <span className="avg-score">Average: 83%</span>
                   </div>
                 </div>
               </div>
@@ -850,7 +847,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="login-invitation-footer">
               <p className="login-invitation-footer-text">
                 You can always create an account later
@@ -863,7 +859,6 @@ const Home = () => {
         </div>
       )}
 
-      {/* Scroll to Top Button */}
       {showScrollTop && !isModalOpen && !showLoginInvitation && (
         <button
           className="scroll-to-top-btn"
