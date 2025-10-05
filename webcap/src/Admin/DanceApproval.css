@@ -1,5 +1,6 @@
 :root {
-  --sidebar-width: 260px; /* set to your Sidebar’s actual width */
+  --sidebar-width: 260px;              /* match your Sidebar width */
+  --navbar-height-mobile: 64px;        /* set to your mobile navbar height */
 }
 
 /* Reset styles */
@@ -13,18 +14,68 @@ body, html {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  background: #ffffff !important; /* FORCE WHITE EVERYWHERE */
 }
 
-/* Dance Approval Page Styles */
+/* FORCE WHITE BACKGROUND ONLY ON MAIN CONTENT - NOT SIDEBAR */
+.dance-approval-page {
+  background: #ffffff !important;
+}
+
+.dance-approval-page .history-sidebar,
+.dance-approval-page .search-filter-center,
+.dance-approval-page .results-info-center,
+.dance-approval-page .dances-grid-section {
+  background: #ffffff !important;
+}
+
+/* Page wrapper – fully responsive for all zoom levels */
 .dance-approval-page {
   min-height: 100vh;
-  width: calc(100vw - var(--sidebar-width));
-  max-width: 100%;
-  margin-left: var(--sidebar-width);
-  background: #fafafa;
+  background: #ffffff !important;
   overflow-x: hidden;
   padding: 0;
   box-sizing: border-box;
+  
+  /* Desktop layout with sidebar */
+  position: relative;
+  margin-left: 280px;
+  width: calc(100vw - 280px);
+  padding: 40px;
+  
+  /* Flexible padding that adapts to zoom */
+  padding-left: clamp(20px, 4vw, 40px);
+  padding-right: clamp(20px, 4vw, 40px);
+  padding-top: clamp(20px, 3vw, 40px);
+  padding-bottom: clamp(20px, 3vw, 40px);
+}
+
+/* FORCE WHITE BACKGROUND EVERYWHERE ABOVE THE PAGE */
+.dance-approval-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 280px;
+  right: 0;
+  bottom: 0;
+  background: #ffffff !important;
+  z-index: -999;
+}
+
+/* Mobile background fix */
+@media (max-width: 768px) {
+  .dance-approval-page::before {
+    left: 0 !important;
+  }
+}
+
+/* FORCE WHITE ON MAIN CONTENT SECTIONS ONLY */
+.dance-approval-page .history-sidebar,
+.dance-approval-page .search-filter-center,
+.dance-approval-page .results-info-center,
+.dance-approval-page .dances-grid-section,
+.dance-approval-page .container {
+  background: #ffffff !important;
 }
 
 /* Notification Styles */
@@ -77,12 +128,325 @@ body, html {
   }
 }
 
+/* History Section Styles - Horizontal scrollable above pending dances */
+.history-sidebar {
+  margin: 0 clamp(0.5rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1rem);
+}
 
-.container {
-  max-width: none;
+/* Search and Filter Center Section */
+.search-filter-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem 0 1rem 0;
   margin: 0 auto;
-  padding: 0 2rem;
+  max-width: 600px;
+}
+
+.search-filter-center .search-bar {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-filter-center .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+.search-filter-center .search-input {
   width: 100%;
+  padding: 1rem 1rem 1rem 3rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 50px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f9fafb;
+  color: #1f2937;
+}
+
+.search-filter-center .search-input:focus {
+  outline: none;
+  border-color: #a0855b;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+  color: #1f2937;
+}
+
+.search-filter-center .search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-filter-center .filter-icon {
+  color: #6b7280;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 50%;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  box-sizing: border-box;
+}
+
+.search-filter-center .filter-icon:hover {
+  border-color: #a0855b;
+  background: #f3f4f6;
+  color: #a0855b;
+  transform: scale(1.05);
+}
+
+.results-info-center {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Responsive adjustments for search center */
+@media (max-width: 768px) {
+  .search-filter-center {
+    flex-direction: row;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem 1rem 1rem;
+    align-items: center;
+  }
+  
+  .search-filter-center .search-bar {
+    flex: 1;
+    max-width: none;
+    width: auto;
+  }
+  
+  .sort-dropdown-container {
+    flex-shrink: 0;
+  }
+}
+
+.history-content {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: clamp(8px, 1.5vw, 12px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: clamp(0.75rem, 2vw, 1rem);
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.history-scroll-container {
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scroll-behavior: smooth;
+}
+
+.history-items-row {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.history-header {
+  position: sticky;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  z-index: 10;
+  text-align: center;
+  padding: 0.5rem;
+  flex-shrink: 0;
+  width: fit-content;
+}
+
+.history-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.history-loading,
+.history-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.history-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: clamp(6px, 1vw, 8px);
+  padding: clamp(0.75rem, 1.5vw, 1rem);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  flex: 0 0 clamp(240px, 20vw, 280px);
+  height: fit-content;
+}
+
+.history-item:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.history-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.history-status {
+  margin-bottom: 0.5rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-badge.approved {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.declined {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.history-uploader {
+  font-size: 0.75rem;
+  color: #8b7355;
+  font-style: italic;
+  margin-bottom: 0.25rem;
+}
+
+.history-date {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.history-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.history-scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.history-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.history-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive breakpoints for different zoom levels and screen sizes */
+
+/* Large screens and zoomed out views */
+@media (min-width: 1400px) {
+  .dance-approval-page {
+    margin-left: 280px;
+    width: calc(100vw - 280px);
+  }
+}
+
+/* Medium screens and moderate zoom */
+@media (min-width: 1025px) and (max-width: 1399px) {
+  .dance-approval-page {
+    margin-left: clamp(240px, 18vw, 280px);
+    width: calc(100vw - clamp(240px, 18vw, 280px));
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .dance-approval-page {
+    margin-left: 280px;
+    width: calc(100vw - 280px);
+    padding: clamp(32px, 5vw, 48px);
+  }
+}
+
+/* Medium screens */
+@media (max-width: 1199px) and (min-width: 993px) {
+  .dance-approval-page {
+    margin-left: 280px;
+    width: calc(100vw - 280px);
+    padding: clamp(24px, 4vw, 32px);
+  }
+}
+
+/* Tablets */
+@media (max-width: 992px) {
+  .dance-approval-page {
+    margin-left: 280px !important;
+    width: calc(100vw - 280px) !important;
+    padding: clamp(20px, 3vw, 32px);
+  }
+}
+
+/* Mobile - Below tablet breakpoint */
+@media (max-width: 768px) {
+  .dance-approval-page {
+    margin-top: 65px !important;
+    margin-left: 0 !important;
+    width: 100vw !important;
+    padding: clamp(16px, 4vw, 20px);
+  }
+  
+  .search-filter {
+    width: 100%;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .dance-approval-page {
+    margin-top: 65px !important;
+    margin-left: 0 !important;
+    width: 100vw !important;
+    padding: clamp(12px, 3vw, 16px);
+  }
+}
+
+/* Extra small mobile */
+@media (max-width: 360px) {
+  .dance-approval-page {
+    margin-top: 65px !important;
+    margin-left: 0 !important;
+    width: 100vw !important;
+    padding: 12px;
+  }
+}
+
+/* Container - responsive padding */
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 clamp(0.5rem, 2vw, 2rem);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Header Section - Full Width */
@@ -122,10 +486,10 @@ body, html {
   }
 }
 
-/* Search and Filter Section - Full Width */
+/* ===== Search + Filter ===== */
 .search-filter {
   background: #fff;
-  padding: 2rem 0;
+  padding: clamp(1rem, 3vw, 2rem) 0;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
@@ -138,18 +502,17 @@ body, html {
 .search-filter .container {
   display: flex;
   align-items: center;
-  justify-content: center;  /* centers them together */
-  gap: 1rem;                /* less gap */
+  justify-content: center;
+  gap: clamp(0.5rem, 2vw, 1rem);
   flex-wrap: wrap;
 }
-
 
 .search-bar {
   position: relative;
   flex: 1;
-  max-width: 380px;
-  min-width: 220px;
-  margin-left: 1rem;   /* move search bar right */
+  max-width: clamp(280px, 40vw, 380px);
+  min-width: clamp(200px, 25vw, 220px);
+  margin-left: clamp(0.5rem, 2vw, 1rem);
 }
 
 .search-icon {
@@ -265,10 +628,10 @@ body, html {
   }
 }
 
-/* Dances Grid Section - Full Width */
+/* Dances Grid Section - Responsive */
 .dances-grid-section {
-  background: #fafafa;
-  padding: 3rem 0;
+  background: #ffffff !important;
+  padding: clamp(2rem, 4vw, 3rem) 0;
   width: 100%;
   max-width: 100%;
   position: relative;
@@ -285,11 +648,11 @@ body, html {
 
 .dances-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(280px, 25vw, 320px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
   max-width: 100%;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 3vw, 2rem);
   width: 100%;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -878,102 +1241,173 @@ body, html {
   }
 }
 
+/* Complete responsive grid system */
+@media (max-width: 1400px) {
+  .dances-grid {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(260px, 28vw, 300px), 1fr));
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+  }
+}
+
+@media (max-width: 1200px) {
+  .dances-grid {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(240px, 30vw, 280px), 1fr));
+    gap: clamp(0.75rem, 2vw, 1.25rem);
+  }
+}
+
+@media (max-width: 992px) {
+  .dances-grid {
+    grid-template-columns: repeat(auto-fill, minmax(clamp(220px, 35vw, 260px), 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+  }
+}
+
 @media (max-width: 768px) {
   .dances-grid {
     grid-template-columns: 1fr;
-    padding: 0 1rem;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    padding: 0 clamp(1rem, 3vw, 2rem);
   }
   
   .dance-card {
-    margin-bottom: 1rem;
+    margin-bottom: clamp(0.5rem, 1vw, 1rem);
+    max-width: 100%;
   }
   
   .search-filter {
-    padding: 1.5rem 0;
+    padding: clamp(1rem, 2vw, 1.5rem) 0;
   }
   
-  .filter-tabs {
-    flex-direction: column;
-    gap: 1rem;
+  .search-filter-center {
+    flex-direction: row;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 2vw, 2rem);
+    align-items: center;
   }
   
-  .region-tabs {
-    justify-content: center;
+  .search-filter-center .search-bar {
+    flex: 1;
+    max-width: none;
+    width: auto;
   }
   
-  .region-tab {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
+  .sort-dropdown-container {
+    flex-shrink: 0;
   }
   
-  .page-title {
-    font-size: 2rem;
-  }
-  
-  .page-subtitle {
-    font-size: 1rem;
+  .search-filter-center .search-input {
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2vw, 3rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
   }
   
   .dance-meta {
-    gap: 0.5rem;
+    gap: clamp(0.25rem, 1vw, 0.5rem);
   }
   
   .meta-item {
-    font-size: 0.8rem;
+    font-size: clamp(0.75rem, 1.5vw, 0.8rem);
   }
   
   .dance-footer {
     flex-direction: column;
-    gap: 1rem;
+    gap: clamp(0.75rem, 2vw, 1rem);
     align-items: stretch;
   }
   
   .review-button {
     text-align: center;
+    padding: clamp(0.5rem, 1.5vw, 0.6rem) clamp(1rem, 2vw, 1.2rem);
+    font-size: clamp(0.8rem, 1.5vw, 0.85rem);
   }
   
   /* Modal responsive */
   .preview-modal {
-    padding: 1rem;
+    padding: clamp(0.5rem, 2vw, 1rem);
   }
   
   .modal-content {
     max-height: 95vh;
+    border-radius: clamp(12px, 2vw, 20px);
   }
   
   .modal-body {
-    padding: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
+  }
+  
+  .modal-title {
+    font-size: clamp(1.25rem, 4vw, 1.5rem);
+  }
+  
+  .approval-actions {
+    flex-direction: column;
+    gap: clamp(0.75rem, 2vw, 1rem);
+  }
+  
+  .accept-button, .decline-button {
+    width: 100%;
+    padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
   }
 }
 
 @media (max-width: 480px) {
   .container {
-    padding: 0 0.5rem;
-  }
-  
-  .approval-header {
-    padding: 2rem 0;
-  }
-  
-  .page-title {
-    font-size: 1.5rem;
+    padding: 0 clamp(0.25rem, 1vw, 0.5rem);
   }
   
   .dance-content {
-    padding: 1rem;
+    padding: clamp(0.75rem, 2vw, 1rem);
   }
   
   .dance-name {
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 3vw, 1.2rem);
   }
   
-  .search-input {
-    font-size: 0.9rem;
+  .search-filter-center .search-input {
+    font-size: clamp(0.85rem, 2vw, 0.9rem);
+    padding: clamp(0.6rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem) clamp(0.6rem, 1.5vw, 0.75rem) clamp(2rem, 5vw, 2.5rem);
   }
   
-  .region-tab {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
+  .dance-card {
+    border-radius: clamp(12px, 3vw, 20px);
+  }
+  
+  .dance-image {
+    height: clamp(180px, 40vw, 250px);
+  }
+  
+  .modal-section h3 {
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+  }
+  
+  .modal-section p,
+  .modal-section div {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+  }
+}
+
+/* Extra responsive tweaks for very small screens */
+@media (max-width: 360px) {
+  .dances-grid {
+    padding: 0 0.5rem;
+    gap: 0.75rem;
+  }
+  
+  .search-filter-center {
+    padding: 1rem 0.5rem;
+  }
+  
+  .dance-card {
+    border-radius: 12px;
+  }
+  
+  .dance-content {
+    padding: 0.75rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
   }
 }
 
@@ -1056,5 +1490,94 @@ body, html {
   /* Optional: add a little extra top space to the whole grid section */
   .dances-grid-section {
     padding-top: 2rem;
+  }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Ensure the sticky bar sits *below* the mobile navbar */
+  .search-filter { top: var(--navbar-height-mobile); }
+
+  .search-filter .container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;      /* children take full width */
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;                 /* remove left margin that can push it off-canvas */
+  }
+
+  .search-input {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.85rem 1rem 0.85rem 2.5rem; /* smaller padding for tighter mobile look */
+  }
+
+  .filter-tabs {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-right: 0;
+  }
+
+  .region-tabs {
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .region-tab {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    min-width: 90px;
+  }
+
+  .dances-grid { grid-template-columns: 1fr; padding: 0 1rem; }
+
+  .preview-modal { padding: 1rem; }
+  .modal-content { max-height: 95vh; }
+  .modal-body { padding: 1.5rem; }
+
+  .results-info {
+    margin-top: 1rem;   /* space below the sticky search bar */
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .history-sidebar {
+    margin: 0 clamp(0.25rem, 1vw, 0.5rem) clamp(0.75rem, 2vw, 1.5rem) clamp(0.25rem, 1vw, 0.5rem);
+  }
+  
+  .history-item {
+    flex: 0 0 clamp(200px, 25vw, 250px);
+    padding: clamp(0.5rem, 1vw, 0.75rem);
+  }
+
+  .history-items-row {
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .container { padding: 0 0.5rem; }
+
+  .region-tab { min-width: 80px; padding: 0.5rem 1rem; font-size: 0.8rem; }
+  .region-tabs { gap: 0.25rem; }
+
+  .dance-content { padding: 1rem; }
+  .dance-name { font-size: 1.2rem; }
+  .search-input { font-size: 0.9rem; }
+
+  .history-item {
+    flex: 0 0 clamp(180px, 30vw, 220px);
+    padding: clamp(0.5rem, 1vw, 0.75rem);
+  }
+  
+  .history-items-row {
+    gap: clamp(0.25rem, 0.75vw, 0.5rem);
   }
 }

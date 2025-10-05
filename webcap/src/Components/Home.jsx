@@ -779,7 +779,7 @@ const Home = () => {
               <div className="progress-preview">
                 <div className="preview-header">
                   <div className="chart-icon">📊</div>
-                  <span className="preview-title">Your Progress Dashboard</span>
+                  <span className="preview-title">Sample Progress Dashboard</span>
                 </div>
                 
                 <div className="progress-cards">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Play, MapPin, ChevronUp, Check, X, AlertTriangle } from 'lucide-react';
+import { Play, MapPin, ChevronUp, Check, X, AlertTriangle, Search, Filter } from 'lucide-react';
 import Navbar from '../Admin/Sidebar';
 import './DanceApproval.css';
 import { supabase } from '../supabasebaseClient';
@@ -55,8 +55,16 @@ const DanceApproval = () => {
   const [dances, setDances] = useState([]);
   const [loading, setLoading] = useState(true);
   
+  // History sidebar state
+  const [historyDances, setHistoryDances] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  
   // Notification state
   const [notification, setNotification] = useState(null);
+
+  // Search and sort state
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [sortOption, setSortOption] = useState('newest');
 
   // For modal
   const [figures, setFigures] = useState([]);
@@ -66,7 +74,7 @@ const DanceApproval = () => {
   // Get current user role - DanceApproval is only for superadmin
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const userRole = currentUser?.role;
-
+    
   useEffect(() => {
     const fetchDances = async () => {
       setLoading(true);
@@ -137,6 +145,37 @@ const DanceApproval = () => {
     fetchDances();
   }, []);
 
+  // Fetch history of approved/declined dances for superadmin
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoadingHistory(true);
+      try {
+        const { data: historyData, error: historyError } = await supabase
+          .from('dances')
+          .select(`
+            id, title, status, created_at, user_id,
+            users:user_id (
+              username
+            )
+          `)
+          .in('status', ['approved', 'declined'])
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (!historyError) {
+          setHistoryDances(historyData || []);
+        } else {
+          console.error('Error fetching history:', historyError);
+        }
+      } catch (error) {
+        console.error('Error in fetchHistory:', error);
+      }
+      setLoadingHistory(false);
+    };
+
+    fetchHistory();
+  }, []);
+
   // Fetch figures, main video, and images for modal
   useEffect(() => {
     const fetchFiguresAndMedia = async () => {
@@ -172,12 +211,44 @@ const DanceApproval = () => {
     fetchFiguresAndMedia();
   }, [selectedDance]);
 
-  // Filtering logic
+  // Filtering and sorting logic
   const filteredDances = dances.filter(dance => {
     const matchesRegion = selectedRegion === 'All' || (dance.island && dance.island.toLowerCase() === selectedRegion.toLowerCase());
-    const matchesSearch = dance.title?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = dance.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      dance.uploader?.username?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesRegion && matchesSearch;
   });
+
+  // Sorting logic
+  const sortedDances = [...filteredDances].sort((a, b) => {
+    switch (sortOption) {
+      case 'a-z':
+        return a.title?.localeCompare(b.title) || 0;
+      case 'z-a':
+        return b.title?.localeCompare(a.title) || 0;
+      case 'oldest':
+        return new Date(a.created_at) - new Date(b.created_at);
+      case 'newest':
+      default:
+        return new Date(b.created_at) - new Date(a.created_at);
+    }
+  });
+
+  const handleSortChange = (option) => {
+    setSortOption(option);
+    setShowSortDropdown(false);
+  };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showSortDropdown && !e.target.closest('.sort-dropdown-container')) {
+        setShowSortDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSortDropdown]);
 
   const openPreview = (dance) => {
     setSelectedDance(dance);
@@ -215,6 +286,17 @@ const DanceApproval = () => {
           ? ` by ${selectedDance.uploader.username}` 
           : '';
         showNotification(`Dance "${selectedDance.title}" uploaded${uploaderInfo} has been approved successfully!`, 'success');
+        
+        // Add approved dance to history
+        const approvedDance = {
+          id: selectedDance.id,
+          title: selectedDance.title,
+          status: 'approved',
+          created_at: new Date().toISOString(),
+          users: selectedDance.uploader
+        };
+        setHistoryDances(prev => [approvedDance, ...prev.slice(0, 19)]);
+        
         // Remove from current list
         setDances(prev => prev.filter(d => d.id !== danceId));
       } else {
@@ -241,6 +323,17 @@ const DanceApproval = () => {
           ? ` by ${selectedDance.uploader.username}` 
           : '';
         showNotification(`Dance "${selectedDance.title}" uploaded${uploaderInfo} has been declined.`, 'warning');
+        
+        // Add declined dance to history
+        const declinedDance = {
+          id: selectedDance.id,
+          title: selectedDance.title,
+          status: 'declined',
+          created_at: new Date().toISOString(),
+          users: selectedDance.uploader
+        };
+        setHistoryDances(prev => [declinedDance, ...prev.slice(0, 19)]);
+        
         // Remove from current list
         setDances(prev => prev.filter(d => d.id !== danceId));
       } else {
@@ -288,7 +381,7 @@ const DanceApproval = () => {
 
   return (
     <div className="dance-approval-page">
-      <Navbar activeItem={activeItem} setActiveItem={setActiveItem} />
+        <Navbar activeItem={activeItem} setActiveItem={setActiveItem} />
       
       {/* Notification */}
       {notification && (
@@ -302,36 +395,128 @@ const DanceApproval = () => {
         </div>
       )}
 
+      {/* Dance Review History */}
+      <div className="history-sidebar">
+        <div className="history-content">
+          {loadingHistory ? (
+            <div className="history-loading">Loading history...</div>
+          ) : historyDances.length === 0 ? (
+            <div className="history-empty">No review history yet</div>
+          ) : (
+            <div className="history-scroll-container">
+              <div className="history-header">
+                <h3>Dance Review History</h3>
+              </div>
+              <div className="history-items-row">
+                {historyDances.map(dance => (
+                  <div 
+                    key={dance.id} 
+                    className={`history-item ${dance.status}`}
+                  >
+                    <div className="history-title">{dance.title}</div>
+                    <div className="history-status">
+                      <span className={`status-badge ${dance.status}`}>
+                        {dance.status === 'approved' ? '✓ Approved' : '✗ Declined'}
+                      </span>
+                    </div>
+                    {userRole === 'superadmin' && dance.users && (
+                      <div className="history-uploader">
+                        by {dance.users.username}
+                      </div>
+                    )}
+                    <div className="history-date">
+                      {formatDate(dance.created_at)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Search and Filter Section */}
-      <section className="search-filter">
-        <div className="container">
-          <div className="search-bar">
-            <Search className="search-icon" size={20} />
-            <input
-              type="text"
-              placeholder="Search dances..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-            />
-          </div>
+      <div className="search-filter-center">
+        <div className="search-bar">
+          <Search className="search-icon" size={20} />
+          <input
+            type="text"
+            placeholder="Search dances or uploaders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        
+        {/* Sort Dropdown */}
+        <div className="sort-dropdown-container" style={{ position: 'relative' }}>
+          <Filter 
+            className="filter-icon" 
+            size={20} 
+            onClick={() => setShowSortDropdown(!showSortDropdown)}
+            style={{ cursor: 'pointer' }}
+          />
           
-          <div className="filter-tabs">
-            <Filter className="filter-icon" size={20} />
-            <div className="region-tabs">
-              {regions.map(region => (
+          {showSortDropdown && (
+            <div
+              className="sort-dropdown"
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 12px)',
+                right: 0,
+                background: 'rgba(210, 180, 140, 0.95)',
+                backdropFilter: 'blur(10px)',
+                border: '2px solid rgba(160, 133, 91, 0.3)',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15)',
+                minWidth: '220px',
+                padding: '12px',
+                zIndex: 1000,
+                animation: 'fadeIn 0.15s ease-out'
+              }}
+            >
+              {['a-z', 'z-a', 'newest', 'oldest'].map((option) => (
                 <button
-                  key={region}
-                  className={`region-tab ${selectedRegion === region ? 'active' : ''}`}
-                  onClick={() => setSelectedRegion(region)}
+                  key={option}
+                  onClick={() => handleSortChange(option)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 18px',
+                    marginBottom: option === 'oldest' ? '0' : '8px',
+                    background: sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    color: '#ffffff',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    boxShadow: sortOption === option ? '0 2px 8px rgba(0, 0, 0, 0.2)' : 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(160, 133, 91, 0.85)';
+                    e.currentTarget.style.transform = 'translateX(-4px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)';
+                    e.currentTarget.style.transform = 'translateX(0)';
+                  }}
                 >
-                  {region}
+                  {option === 'a-z' ? 'A-Z' : option === 'z-a' ? 'Z-A' : option === 'newest' ? 'Newest' : 'Oldest'}
                 </button>
               ))}
             </div>
-          </div>
+          )}
         </div>
-      </section>
+      </div>
+
+      {/* Results Info */}
+      <div className="results-info-center">
+        <p>{sortedDances.length} pending dances found</p>
+      </div>
 
       {/* Dances Grid */}
       <section className="dances-grid-section">
@@ -339,12 +524,12 @@ const DanceApproval = () => {
           <div className="dances-grid">
             {loading ? (
               <div style={{ textAlign: 'center', width: '100%' }}>Loading pending dances...</div>
-            ) : filteredDances.length === 0 ? (
+            ) : sortedDances.length === 0 ? (
               <div style={{ textAlign: 'center', width: '100%' }}>
                 {/* Empty state - no message */}
               </div>
             ) : (
-              filteredDances.map(dance => (
+              sortedDances.map(dance => (
                 <div key={dance.id} className="dance-card" onClick={() => openPreview(dance)}>
                   {/* Pending badge */}
                   <div className="pending-badge">Pending Approval</div>

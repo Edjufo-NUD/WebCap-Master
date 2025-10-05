@@ -12,7 +12,9 @@ const DanceUpload = () => {
     history: "",
     references: "",
     region: "",
-    duration: "",
+    durationHours: "",
+    durationMinutes: "",
+    durationSeconds: "",
     performers: "",
     music: "",
     costumes: ""
@@ -134,11 +136,21 @@ const DanceUpload = () => {
 
     try {
       // Validate required fields
-      if (!formData.title || !formData.references || !formData.region || !formData.duration || !formData.performers || !formData.music || !formData.costumes) {
+      if (!formData.title || !formData.references || !formData.region || !formData.durationMinutes || !formData.performers || !formData.music || !formData.costumes) {
         alert('Please fill in all required fields');
         setIsSubmitting(false);
         return;
       }
+      
+      // Format duration
+      const hours = parseInt(formData.durationHours) || 0;
+      const minutes = parseInt(formData.durationMinutes) || 0;
+      const seconds = parseInt(formData.durationSeconds) || 0;
+      const formattedDuration = hours > 0 
+        ? `${hours}h ${minutes}m ${seconds}s` 
+        : minutes > 0 
+          ? `${minutes}m ${seconds}s`
+          : `${seconds}s`;
       if (!previewVideo) {
         alert('Preview video is required.');
         setIsSubmitting(false);
@@ -216,7 +228,7 @@ const DanceUpload = () => {
           references: formData.references,
           main_video_url: mainVideoUrl,
           island: formData.region,
-          duration: formData.duration,
+          duration: formattedDuration,
           performers: formData.performers,
           music: formData.music,
           costumes: formData.costumes,
@@ -336,38 +348,97 @@ const DanceUpload = () => {
               </select>
             </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="duration">
-                Duration<span className="required-asterisk">*</span>
-              </label>
-              <input
-                type="text"
-                id="duration"
-                name="duration"
-                className="form-input"
-                value={formData.duration}
-                onChange={handleInputChange}
-                placeholder="e.g. 5-7 minutes"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="duration">
+                  Duration<span className="required-asterisk">*</span>
+                </label>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input
+                      type="number"
+                      id="durationHours"
+                      name="durationHours"
+                      className="form-input"
+                      value={formData.durationHours || ''}
+                      onChange={handleInputChange}
+                      placeholder="0"
+                      min="0"
+                      max="5"
+                      step="1"
+                      disabled={isSubmitting}
+                      style={{ width: '70px', padding: '12px 8px' }}
+                    />
+                    <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>h</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input
+                      type="number"
+                      id="durationMinutes"
+                      name="durationMinutes"
+                      className="form-input"
+                      value={formData.durationMinutes || ''}
+                      onChange={handleInputChange}
+                      placeholder="5"
+                      min="0"
+                      max="59"
+                      step="1"
+                      required
+                      disabled={isSubmitting}
+                      style={{ width: '70px', padding: '12px 8px' }}
+                    />
+                    <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>m</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <input
+                      type="number"
+                      id="durationSeconds"
+                      name="durationSeconds"
+                      className="form-input"
+                      value={formData.durationSeconds || ''}
+                      onChange={handleInputChange}
+                      placeholder="30"
+                      min="0"
+                      max="59"
+                      step="1"
+                      disabled={isSubmitting}
+                      style={{ width: '70px', padding: '12px 8px' }}
+                    />
+                    <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>s</span>
+                  </div>
+                </div>
+              </div>
 
-            <div className="form-group">
-              <label className="form-label" htmlFor="performers">
-                Performers<span className="required-asterisk">*</span>
-              </label>
-              <input
-                type="text"
-                id="performers"
-                name="performers"
-                className="form-input"
-                value={formData.performers}
-                onChange={handleInputChange}
-                placeholder="e.g. 2-4 dancers"
-                required
-                disabled={isSubmitting}
-              />
+              <div className="form-group">
+                <label className="form-label" htmlFor="performers">
+                  Number of Performers<span className="required-asterisk">*</span>
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <input
+                    type="number"
+                    id="performers"
+                    name="performers"
+                    className="form-input"
+                    value={formData.performers}
+                    onChange={handleInputChange}
+                    placeholder="4"
+                    min="1"
+                    max="50"
+                    step="1"
+                    required
+                    disabled={isSubmitting}
+                    style={{ flex: '1' }}
+                  />
+                  <span style={{ 
+                    fontSize: '1rem', 
+                    color: '#718096', 
+                    fontWeight: '500',
+                    minWidth: 'fit-content'
+                  }}>
+                    dancers
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="form-group">

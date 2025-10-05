@@ -25,6 +25,7 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
     // read cached username right away
     localStorage.getItem("username")
   );
+  const [userId, setUserId] = useState(null);
 
   // read stored user object
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -32,41 +33,60 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
   const email = currentUser?.email;
 
   useEffect(() => {
-    // only fetch if we have email and no cached username
-    const getUsername = async () => {
-      if (!email || username) return;
+    // Get username and user ID from database
+    const getUserData = async () => {
+      if (!email) return;
 
       const { data, error } = await supabase
         .from("users")
-        .select("username")
+        .select("username, id")
         .eq("email", email)
         .single();
 
       if (error) {
-        console.error("Error fetching username:", error);
+        console.error("Error fetching user data:", error);
         return;
       }
 
-      // store to state + cache in localStorage
-      setUsername(data.username);
-      localStorage.setItem("username", data.username);
+      // Set username if not cached
+      if (!username && data.username) {
+        setUsername(data.username);
+        localStorage.setItem("username", data.username);
+      }
+
+      // Set user ID for pending count queries
+      setUserId(data.id);
     };
 
-    getUsername();
+    getUserData();
   }, [email, username]);
 
   // Fetch pending dances count
   useEffect(() => {
     const fetchPendingCount = async () => {
-      if (role !== 'superadmin') return; // Only fetch for superadmin
+      if (role === 'superadmin') {
+        // Superadmin sees total pending dances for approval
+        const { count, error } = await supabase
+          .from('dances')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending');
 
-      const { count, error } = await supabase
-        .from('dances')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
+        if (!error) {
+          setPendingDancesCount(count || 0);
+        }
+      } else if (role === 'admin' && userId) {
+        // Admin sees their own pending dance uploads
+        const { count, error } = await supabase
+          .from('dances')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending')
+          .eq('user_id', userId);
 
-      if (!error) {
-        setPendingDancesCount(count || 0);
+        if (!error) {
+          setPendingDancesCount(count || 0);
+        } else {
+          console.error('Error fetching admin pending count:', error);
+        }
       }
     };
 
@@ -75,18 +95,20 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
     // Refresh count every 30 seconds for real-time updates
     const interval = setInterval(fetchPendingCount, 30000);
     
-    // Listen for custom events from DanceApproval component
+    // Listen for custom events from DanceApproval and DanceRequest components
     const handlePendingCountChanged = () => {
       fetchPendingCount();
     };
     
     window.addEventListener('pendingCountChanged', handlePendingCountChanged);
+    window.addEventListener('adminRequestCountChanged', handlePendingCountChanged);
     
     return () => {
       clearInterval(interval);
       window.removeEventListener('pendingCountChanged', handlePendingCountChanged);
+      window.removeEventListener('adminRequestCountChanged', handlePendingCountChanged);
     };
-  }, [role]);
+  }, [role, userId]);
 
   // Filter menu items based on role
   const menuItems = [
@@ -171,7 +193,10 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
         <nav className="sidebar-nav">
           {menuItems.map((item) => {
             const IconComponent = item.icon;
-            const showBadge = item.id === "dance-approval" && role === "superadmin" && pendingDancesCount > 0;
+            const showBadge = (
+              (item.id === "dance-approval" && role === "superadmin" && pendingDancesCount > 0) ||
+              (item.id === "dance-request" && role === "admin" && pendingDancesCount > 0)
+            );
             
             return (
               <div
@@ -208,7 +233,10 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
           <nav>
             {menuItems.map((item) => {
               const IconComponent = item.icon;
-              const showBadge = item.id === "dance-approval" && role === "superadmin" && pendingDancesCount > 0;
+              const showBadge = (
+                (item.id === "dance-approval" && role === "superadmin" && pendingDancesCount > 0) ||
+                (item.id === "dance-request" && role === "admin" && pendingDancesCount > 0)
+              );
               
               return (
                 <div

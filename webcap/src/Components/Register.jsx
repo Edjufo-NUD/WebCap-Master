@@ -84,6 +84,13 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Gmail validation
+    if (!email.endsWith("@gmail.com")) {
+      showSnackbar("Please use a Gmail address (@gmail.com)", "error");
+      setLoading(false);
+      return;
+    }
+
     // Username validation: min 6, max 16
     if (username.length < 6 || username.length > 16) {
       showSnackbar("Username must be between 6 and 16 characters!", "error");
