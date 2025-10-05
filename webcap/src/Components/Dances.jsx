@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Play, MapPin, ChevronUp, ArrowUp } from 'lucide-react';
+import { Search, Filter, Play, MapPin, ChevronUp, ArrowUp, X } from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import './Dances.css';
 import { supabase } from '../supabasebaseClient';
@@ -7,9 +7,44 @@ import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
 import pahidImage from '../assets/Pahid.png';
 
+// Import video files
+import BinungeyMainVideo from '../assets/Videos/Binungey.mp4';
+import BinungeyFig1 from '../assets/Videos/BinungeyBoyFig1.mp4';
+import BinungeyFig2 from '../assets/Videos/BinungeyBoyFig2.mp4';
+import BinungeyFig3 from '../assets/Videos/BinungeyBoyFig3.mp4';
+import BinungeyFig4 from '../assets/Videos/BinungeyBoyFig4.mp4';
+import BinungeyFig5 from '../assets/Videos/BinungeyBoyFig5.mp4';
+import BinungeyFig6 from '../assets/Videos/BinungeyBoyFig6.mp4';
+import BinungeyFig7 from '../assets/Videos/BinungeyBoyFig7.mp4';
+
+import PahidMainVideo from '../assets/Videos/Pahid.mp4';
+import PahidFig1 from '../assets/Videos/PahidBoyFig1.mp4';
+import PahidFig2 from '../assets/Videos/PahidBoyFig2.mp4';
+import PahidFig3 from '../assets/Videos/PahidBoyFig3.mp4';
+import PahidFig4 from '../assets/Videos/PahidBoyFig4.mp4';
+import PahidFig5 from '../assets/Videos/PahidBoyFig5.mp4';
+import PahidFig6 from '../assets/Videos/PahidBoyFig6.mp4';
+
+import SuaKuSuaFig1 from '../assets/Videos/SuaKuSuaBoyFig1.mp4';
+import SuaKuSuaFig2 from '../assets/Videos/SuaKuSuaBoyFig2.mp4';
+import SuaKuSuaFig3 from '../assets/Videos/SuaKuSuaBoyFig3.mp4';
+import SuaKuSuaFig4 from '../assets/Videos/SuaKuSuaBoyFig4.mp4';
+import SuaKuSuaFig5 from '../assets/Videos/SuaKuSuaBoyFig5.mp4';
+import SuaKuSuaFig6 from '../assets/Videos/SuaKuSuaBoyFig6.mp4';
+import SuaKuSuaFig7 from '../assets/Videos/SuaKuSuaBoyFig7.mp4';
+import SuaKuSuaFig8 from '../assets/Videos/SuaKuSuaBoyFig8.mp4';
+import SuaKuSuaFig9 from '../assets/Videos/SuaKuSuaBoyFig9.mp4';
+import SuaKuSuaFig10 from '../assets/Videos/SuaKuSuaBoyFig10.mp4';
+
+import TiklosMainVideo from '../assets/Videos/Tiklos.mp4';
+import TiklosFig1 from '../assets/Videos/TiklosBoyFig1.mp4';
+import TiklosFig2 from '../assets/Videos/TiklosBoyFig2.mp4';
+import TiklosFig3 from '../assets/Videos/TiklosBoyFig3.mp4';
+import TiklosFig4 from '../assets/Videos/TiklosBoyFig4.mp4';
+
 const regions = ['All', 'Luzon', 'Visayas', 'Mindanao'];
 
-// Helper function to convert YouTube URL to embed URL
+// Helper function to convert YouTube URL to embed URL (kept for database dances)
 const getYouTubeEmbedUrl = (url) => {
   if (!url) return '';
   
@@ -27,7 +62,7 @@ const getYouTubeEmbedUrl = (url) => {
   return videoId ? `https://www.youtube.com/embed/${videoId}` : '';
 };
 
-// Hardcoded featured dances with correct YouTube videos
+// Hardcoded featured dances with local video files
 const featuredDances = [
   {
     id: 'featured-1',
@@ -37,7 +72,7 @@ const featuredDances = [
     image_url: binungeyImage,
     history: 'A traditional dance from Abra celebrating harvest and community unity. This dance represents the joy and gratitude of farmers during harvest season. Performers wear traditional Ilocano costumes and use farming tools as props.',
     references: 'Traditional Ilocano folk music with gongs and drums. Colorful traditional Ilocano attire with wide-brimmed hats.',
-    main_video_url: 'https://youtu.be/F9FhAKrlNMo', // Binungey Cultural Dance
+    main_video_url: BinungeyMainVideo,
     difficulty: 'Intermediate',
     duration: '4-6 minutes',
     performers: '6-8 dancers',
@@ -46,54 +81,53 @@ const featuredDances = [
     music: 'Traditional Ilocano folk music with gongs and drums',
     costumes: 'Colorful traditional Ilocano attire with wide-brimmed hats',
     isFeatured: true,
-    // Figure videos for Binungey
     figureVideos: [
       {
         id: 'binungey-fig-1',
         figure_number: 1,
-        video_url: 'https://youtube.com/shorts/nHwHrEnLhi4?feature=share'
+        video_url: BinungeyFig1
       },
       {
         id: 'binungey-fig-2',
         figure_number: 2,
-        video_url: 'https://youtube.com/shorts/mCqgoAv4WzI?feature=share'
+        video_url: BinungeyFig2
       },
       {
         id: 'binungey-fig-3',
         figure_number: 3,
-        video_url: 'https://youtube.com/shorts/LSUvULJIyV4?feature=share'
+        video_url: BinungeyFig3
       },
       {
         id: 'binungey-fig-4',
         figure_number: 4,
-        video_url: 'https://youtube.com/shorts/Uk4FDTOZWPQ?feature=share'
+        video_url: BinungeyFig4
       },
       {
         id: 'binungey-fig-5',
         figure_number: 5,
-        video_url: 'https://youtube.com/shorts/a_b9blnDamc?feature=share'
+        video_url: BinungeyFig5
       },
       {
         id: 'binungey-fig-6',
         figure_number: 6,
-        video_url: 'https://youtube.com/shorts/n_r16_HlaGc?feature=share'
+        video_url: BinungeyFig6
       },
       {
         id: 'binungey-fig-7',
         figure_number: 7,
-        video_url: 'https://youtube.com/shorts/pPwaI_reVwA?feature=share'
+        video_url: BinungeyFig7
       }
     ]
   },
   {
     id: 'featured-4',
     title: 'Pahid',
-    island: 'Luzon', // You can adjust this if needed
-    province: 'Northern Luzon', // You can adjust this if needed
+    island: 'Luzon',
+    province: 'Northern Luzon',
     image_url: pahidImage,
     history: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage. This dance demonstrates the refined artistry and storytelling tradition of Filipino culture through expressive choreography.',
     references: 'Traditional Filipino folk music with indigenous instruments. Traditional Filipino attire with cultural significance.',
-    main_video_url: 'https://youtube.com/shorts/9McsqHeMnmc', // No main video provided, will use first figure video
+    main_video_url: PahidMainVideo,
     difficulty: 'Intermediate',
     duration: '4-6 minutes',
     performers: '4-8 dancers',
@@ -102,37 +136,36 @@ const featuredDances = [
     music: 'Traditional Filipino folk music with indigenous instruments',
     costumes: 'Traditional Filipino attire with cultural significance',
     isFeatured: true,
-    // Figure videos for Pahid
     figureVideos: [
       {
         id: 'pahid-fig-1',
         figure_number: 1,
-        video_url: 'https://youtube.com/shorts/AAM6CMk9E6s?feature=share'
+        video_url: PahidFig1
       },
       {
         id: 'pahid-fig-2',
         figure_number: 2,
-        video_url: 'https://youtube.com/shorts/-tEzpvd1oB8?feature=share'
+        video_url: PahidFig2
       },
       {
         id: 'pahid-fig-3',
         figure_number: 3,
-        video_url: 'https://youtube.com/shorts/kUVOrXvO9EQ?feature=share'
+        video_url: PahidFig3
       },
       {
         id: 'pahid-fig-4',
         figure_number: 4,
-        video_url: 'https://youtube.com/shorts/1TWD3F2ud_Y?feature=share'
+        video_url: PahidFig4
       },
       {
         id: 'pahid-fig-5',
         figure_number: 5,
-        video_url: 'https://youtube.com/shorts/kfL9hBx7Jx8?feature=share'
+        video_url: PahidFig5
       },
       {
         id: 'pahid-fig-6',
         figure_number: 6,
-        video_url: 'https://youtube.com/shorts/cXnMmvGtDIQ?feature=share'
+        video_url: PahidFig6
       }
     ]
   },
@@ -143,12 +176,12 @@ const featuredDances = [
     island: 'Mindanao',
     region: 'Jolo, Sulu',
     province: 'Jolo, Sulu',
-    image: null, // No image available
-    image_url: null, // No image available
+    image: null,
+    image_url: null,
     description: 'A courtship dance from the Tausug people of Sulu.',
     history: 'A courtship dance from the Tausug people of Sulu. A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
     references: 'Traditional Tausug kulintang ensemble. Elaborate Muslim royal attire with intricate embroidery.',
-    main_video_url: '', // No main video provided
+    main_video_url: '',
     difficulty: 'Advanced',
     duration: '5-7 minutes',
     performers: '2-4 dancers',
@@ -157,57 +190,56 @@ const featuredDances = [
     music: 'Traditional Tausug kulintang ensemble',
     costumes: 'Elaborate Muslim royal attire with intricate embroidery',
     isFeatured: true,
-    // Figure videos for Sua Ku Sua
     figureVideos: [
       {
         id: 'suakusua-fig-1',
         figure_number: 1,
-        video_url: 'https://youtube.com/shorts/0QybWUPPYiA?feature=share'
+        video_url: SuaKuSuaFig1
       },
       {
         id: 'suakusua-fig-2',
         figure_number: 2,
-        video_url: 'https://youtube.com/shorts/QHV3Tpqbulc?feature=share'
+        video_url: SuaKuSuaFig2
       },
       {
         id: 'suakusua-fig-3',
         figure_number: 3,
-        video_url: 'https://youtube.com/shorts/xVP-AzE9Ing?feature=share'
+        video_url: SuaKuSuaFig3
       },
       {
         id: 'suakusua-fig-4',
         figure_number: 4,
-        video_url: 'https://youtube.com/shorts/EBU8wY3mZjk?feature=share'
+        video_url: SuaKuSuaFig4
       },
       {
         id: 'suakusua-fig-5',
         figure_number: 5,
-        video_url: 'https://youtube.com/shorts/0DxN9IZHGVw?feature=share'
+        video_url: SuaKuSuaFig5
       },
       {
         id: 'suakusua-fig-6',
         figure_number: 6,
-        video_url: 'https://youtube.com/shorts/ZGjHBhKvngY?feature=share'
+        video_url: SuaKuSuaFig6
       },
       {
         id: 'suakusua-fig-7',
         figure_number: 7,
-        video_url: 'https://youtube.com/shorts/4XyxXhRWooI?feature=share'
+        video_url: SuaKuSuaFig7
       },
       {
         id: 'suakusua-fig-8',
         figure_number: 8,
-        video_url: 'https://youtube.com/shorts/i-t-1Re42cs?feature=share'
+        video_url: SuaKuSuaFig8
       },
       {
         id: 'suakusua-fig-9',
         figure_number: 9,
-        video_url: 'https://youtube.com/shorts/BCTQqVNfbbc'
+        video_url: SuaKuSuaFig9
       },
       {
         id: 'suakusua-fig-10',
         figure_number: 10,
-        video_url: 'https://youtube.com/shorts/_TP40XGCtHA?feature=share'
+        video_url: SuaKuSuaFig10
       }
     ]
   },
@@ -219,7 +251,7 @@ const featuredDances = [
     image_url: tiklosImage,
     history: 'A dance depicting the Bayanihan spirit of community cooperation. Represents the Filipino spirit of bayanihan (community cooperation) where neighbors help each other during planting and harvesting seasons.',
     references: 'Lively Visayan folk music with traditional instruments. Simple rural Filipino clothing reflecting farming attire.',
-    main_video_url: 'https://youtube.com/shorts/QnkC5NnK0L4?feature=share', // Tiklos Cultural Dance
+    main_video_url: TiklosMainVideo,
     difficulty: 'Beginner',
     duration: '3-5 minutes',
     performers: '8-12 dancers',
@@ -228,27 +260,26 @@ const featuredDances = [
     music: 'Lively Visayan folk music with traditional instruments',
     costumes: 'Simple rural Filipino clothing reflecting farming attire',
     isFeatured: true,
-    // Figure videos for Tiklos
     figureVideos: [
       {
         id: 'tiklos-fig-1',
         figure_number: 1,
-        video_url: 'https://youtube.com/shorts/1HObuAVDv9o?feature=share'
+        video_url: TiklosFig1
       },
       {
         id: 'tiklos-fig-2',
         figure_number: 2,
-        video_url: 'https://youtube.com/shorts/hzBRQjOhJ-A?feature=share'
+        video_url: TiklosFig2
       },
       {
         id: 'tiklos-fig-3',
         figure_number: 3,
-        video_url: 'https://youtube.com/shorts/feTYg33dEUY?feature=share'
+        video_url: TiklosFig3
       },
       {
         id: 'tiklos-fig-4',
         figure_number: 4,
-        video_url: 'https://youtube.com/shorts/hWDzGWTix6g?feature=share'
+        video_url: TiklosFig4
       }
     ]
   }
@@ -267,6 +298,10 @@ const Dances = () => {
   const [dances, setDances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [videoModalUrl, setVideoModalUrl] = useState('');
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [sortOption, setSortOption] = useState('latest');
 
   // For modal
   const [figures, setFigures] = useState([]);
@@ -313,23 +348,17 @@ const Dances = () => {
           ...d,
           image_url: imageMap[d.id] || null,
           isFeatured: false,
-          // Ensure new fields are always present for modal display
           duration: d.duration || '',
           performers: d.performers || '',
           music: d.music || '',
           costumes: d.costumes || '',
-          // Capitalize island for display
           island: capitalize(d.island || ''),
-          // Add origin field for modal, same as island
           origin: capitalize(d.island || '')
         }));
 
-        // Combine featured dances with database dances
-        // Featured dances first, then database dances
         const combinedDances = [...featuredDances, ...databaseDances];
         setDances(combinedDances);
       } else {
-        // If there's an error with database, just show featured dances
         setDances(featuredDances);
       }
       setLoading(false);
@@ -347,7 +376,6 @@ const Dances = () => {
         return;
       }
 
-      // For featured dances, use the figureVideos array
       if (selectedDance.isFeatured) {
         setFigures(selectedDance.figureVideos || []);
         setMainVideoUrl(selectedDance.main_video_url || '');
@@ -355,8 +383,6 @@ const Dances = () => {
         return;
       }
 
-      // For database dances, fetch from Supabase
-      // Fetch figures (order by figure_number)
       const { data: figuresData } = await supabase
         .from('dance_figures')
         .select('*')
@@ -365,7 +391,6 @@ const Dances = () => {
 
       setFigures(figuresData || []);
 
-      // Fetch images (order by position)
       const { data: imagesData } = await supabase
         .from('dance_images')
         .select('*')
@@ -374,7 +399,6 @@ const Dances = () => {
 
       setImages(imagesData || []);
 
-      // Main video: first video_url in dance_images with position 0, fallback to 1
       let mainVideo = imagesData?.find(img => img.position === 0 && img.video_url) ||
                       imagesData?.find(img => img.position === 1 && img.video_url);
       setMainVideoUrl(mainVideo?.video_url || selectedDance.main_video_url || '');
@@ -391,9 +415,59 @@ const Dances = () => {
     return matchesRegion && matchesSearch;
   });
 
+  // Sorting logic
+  const sortedDances = [...filteredDances].sort((a, b) => {
+    switch (sortOption) {
+      case 'a-z':
+        return a.title.localeCompare(b.title);
+      case 'z-a':
+        return b.title.localeCompare(a.title);
+      case 'latest':
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        return 0;
+      case 'oldest':
+        if (!a.isFeatured && b.isFeatured) return -1;
+        if (a.isFeatured && !b.isFeatured) return 1;
+        return 0;
+      default:
+        return 0;
+    }
+  });
+
+  const handleSortChange = (option) => {
+    setSortOption(option);
+    setShowSortDropdown(false);
+  };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showSortDropdown && !e.target.closest('.sort-dropdown-container')) {
+        setShowSortDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSortDropdown]);
+
   const openPreview = (dance) => {
     setSelectedDance(dance);
     setShowPreview(true);
+  };
+
+  const openVideoModal = (dance, e) => {
+    e.stopPropagation();
+    const videoUrl = dance.main_video_url || '';
+    if (videoUrl) {
+      setVideoModalUrl(videoUrl);
+      setShowVideoModal(true);
+    }
+  };
+
+  const closeVideoModal = () => {
+    setShowVideoModal(false);
+    setVideoModalUrl('');
   };
 
   const closePreview = () => {
@@ -406,13 +480,10 @@ const Dances = () => {
 
   useEffect(() => {
     if (showPreview) {
-      // Prevent background scroll
       document.body.style.overflow = 'hidden';
     } else {
-      // Restore scroll
       document.body.style.overflow = '';
     }
-    // Cleanup on unmount
     return () => {
       document.body.style.overflow = '';
     };
@@ -423,7 +494,6 @@ const Dances = () => {
     if (!showPreview) return;
 
     const preventScroll = (e) => {
-      // Only prevent if not inside modal-content
       const modalContent = document.querySelector('.modal-content');
       if (modalContent && !modalContent.contains(e.target)) {
         e.preventDefault();
@@ -471,7 +541,70 @@ const Dances = () => {
           </div>
           
           <div className="filter-tabs">
-            <Filter className="filter-icon" size={20} />
+            {/* Sort Dropdown */}
+            <div className="sort-dropdown-container" style={{ position: 'relative', marginRight: '16px' }}>
+              <Filter 
+                className="filter-icon" 
+                size={20} 
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                style={{ cursor: 'pointer' }}
+              />
+              
+              {showSortDropdown && (
+                <div
+                  className="sort-dropdown"
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 12px)',
+                    left: 0,
+                    background: 'rgba(210, 180, 140, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    border: '2px solid rgba(160, 133, 91, 0.3)',
+                    borderRadius: '16px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15)',
+                    minWidth: '220px',
+                    padding: '12px',
+                    zIndex: 1000,
+                    animation: 'fadeIn 0.15s ease-out'
+                  }}
+                >
+                  {['a-z', 'z-a', 'latest', 'oldest'].map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => handleSortChange(option)}
+                      style={{
+                        width: '100%',
+                        padding: '14px 18px',
+                        marginBottom: option === 'oldest' ? '0' : '8px',
+                        background: sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)',
+                        border: 'none',
+                        borderRadius: '12px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#ffffff',
+                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        boxShadow: sortOption === option ? '0 2px 8px rgba(0, 0, 0, 0.2)' : 'none'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(160, 133, 91, 0.85)';
+                        e.currentTarget.style.transform = 'translateX(4px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)';
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }}
+                    >
+                      {option === 'a-z' ? 'A-Z' : option === 'z-a' ? 'Z-A' : option === 'latest' ? 'Latest Upload' : 'Oldest Upload'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             <div className="region-tabs">
               {regions.map(region => (
                 <button
@@ -487,38 +620,35 @@ const Dances = () => {
         </div>
       </section>
 
-      {/* --- News Ticker / Announcement Bar --- */}
-<div className="news-ticker-bar">
-  <div className="news-ticker-content">
-    <span role="img" aria-label="megaphone" style={{ marginRight: 8 }}>📢</span>
-    <span>
-      🎉 Exciting news! <strong>FLIPino</strong> is now live on the Play Store and App Store.  
-      <span style={{ marginLeft: 4 }}>
-        Explore Filipino cultural dances like never before — watch, learn, and even <strong>simulate our featured dances</strong> right from your phone.  
-        Search for <strong>FLIPino</strong> today and start dancing with us! 💃🕺
-      </span>
-    </span>
-  </div>
-</div>
-
-      {/* --- End News Ticker --- */}
+      {/* News Ticker / Announcement Bar */}
+      <div className="news-ticker-bar">
+        <div className="news-ticker-content">
+          <span role="img" aria-label="megaphone" style={{ marginRight: 8 }}>📢</span>
+          <span>
+            🎉 Exciting news! <strong>FLIPino</strong> is now live on the Play Store and App Store.  
+            <span style={{ marginLeft: 4 }}>
+              Explore Filipino cultural dances like never before — watch, learn, and even <strong>simulate our featured dances</strong> right from your phone.  
+              Search for <strong>FLIPino</strong> today and start dancing with us! 💃🕺
+            </span>
+          </span>
+        </div>
+      </div>
 
       {/* Dances Grid */}
       <section className="dances-grid-section">
         <div className="container">
           <div className="results-info">
-            <p>{filteredDances.length} dances found</p>
+            <p>{sortedDances.length} dances found</p>
           </div>
           
           <div className="dances-grid">
             {loading ? (
               <div style={{ textAlign: 'center', width: '100%' }}>Loading dances...</div>
-            ) : filteredDances.length === 0 ? (
+            ) : sortedDances.length === 0 ? (
               <div style={{ textAlign: 'center', width: '100%' }}>No dances found.</div>
             ) : (
-              filteredDances.map(dance => (
-                <div key={dance.id} className="dance-card" onClick={() => openPreview(dance)}>
-                  {/* Featured badge for featured dances */}
+              sortedDances.map(dance => (
+                <div key={dance.id} className="dance-card">
                   {dance.isFeatured && (
                     <div className="featured-badge">Featured</div>
                   )}
@@ -541,16 +671,18 @@ const Dances = () => {
                       </div>
                     )}
                     <div className="dance-overlay">
-                      <button className="play-button">
+                      <button 
+                        className="play-button"
+                        onClick={(e) => openVideoModal(dance, e)}
+                      >
                         <Play size={24} />
                       </button>
                     </div>
                   </div>
                   
-                  <div className="dance-content">
+                  <div className="dance-content" onClick={() => openPreview(dance)}>
                     <div className="dance-header">
                       <h3 className="dance-name">{dance.title}</h3>
-                      {/* Show difficulty for featured dances */}
                       {dance.difficulty && (
                         <span className={`difficulty ${dance.difficulty.toLowerCase()}`}>
                           {dance.difficulty}
@@ -570,7 +702,6 @@ const Dances = () => {
                       )}
                     </div>
                     
-                    {/* Show only up to 2 lines of history, then "..." */}
                     <p
                       className="dance-description"
                       style={{
@@ -585,284 +716,335 @@ const Dances = () => {
                     >
                       {dance.history}
                     </p>
-                    <div className="dance-footer">
-                      <button className="learn-button">
-                        View Details
-                      </button>
-                    </div>
+                    <div
+                    className="dance-footer">
+                    <button className="learn-button">
+                      View Details
+                    </button>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              </div>
+            ))
+          )}
         </div>
-      </section>
+      </div>
+    </section>
 
-      {/* Scroll to Top Button - always on right, responsive */}
-      {showScrollTop && !showPreview && (
+    {/* Scroll to Top Button */}
+    {showScrollTop && !showPreview && !showVideoModal && (
+      <button
+        className="scroll-to-top-btn"
+        onClick={scrollToTop}
+        style={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 9999,
+          background: '#a0855b',
+          border: '1.5px solid #a0855b',
+          borderRadius: '50%',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+          width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+          height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          transition: 'opacity 0.2s, width 0.2s, height 0.2s',
+        }}
+        aria-label="Scroll to top"
+      >
+        <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
+      </button>
+    )}
+
+    {/* Video Modal - Fullscreen */}
+    {showVideoModal && videoModalUrl && (
+      <div 
+        className="preview-modal" 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.95)',
+          zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}
+      >
         <button
-          className="scroll-to-top-btn"
-          onClick={scrollToTop}
+          onClick={closeVideoModal}
           style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 9999,
-            background: '#a0855b',
-            border: '1.5px solid #a0855b',
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            background: 'rgba(255,255,255,0.2)',
+            border: 'none',
+            color: 'white',
+            fontSize: '32px',
+            width: 48,
+            height: 48,
             borderRadius: '50%',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
-            height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'opacity 0.2s, width 0.2s, height 0.2s',
+            zIndex: 10001,
+            transition: 'background 0.2s'
           }}
-          aria-label="Scroll to top"
+          onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
+          onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
         >
-          <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
+          ×
         </button>
-      )}
-
-      {/* Preview Modal */}
-      {showPreview && selectedDance && (
-        <div className="preview-modal">
-          <div className="modal-backdrop" onClick={closePreview}></div>
-          <div
-            className="modal-content"
+        <div style={{
+          width: '100%',
+          maxWidth: '1200px',
+          aspectRatio: '16/9',
+          position: 'relative'
+        }}>
+          <video
+            src={videoModalUrl}
+            controls
+            autoPlay
             style={{
-              padding: 0,
-              overflow: 'auto', // allow scroll inside modal
-              maxHeight: '90vh', // limit modal height
+              width: '100%',
+              height: '100%',
+              borderRadius: 8,
+              objectFit: 'contain'
             }}
           >
-            {/* Thumbnail image or No Preview Available placeholder */}
-            <div className="modal-header">
-              {selectedDance.image_url ? (
-                <img
-                  src={selectedDance.image_url}
-                  alt={selectedDance.title}
-                  className="modal-image"
-                />
-              ) : (
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  background: '#f5f5f5',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px dashed #ddd',
-                  color: '#666',
-                  fontSize: '18px',
-                  fontWeight: '500'
-                }}>
-                  No Preview Available
-                </div>
-              )}
-              {/* Overlay title on image/placeholder */}
-              <div className="modal-header-content">
-                <h2 className="modal-title" style={{ margin: 0 }}>{selectedDance.title}</h2>
-                <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance</p>
-                <div className="modal-meta-badges">
-                  <span className="region-badge">{capitalize(selectedDance.island)}</span>
-                  {selectedDance.difficulty && (
-                    <span className={`difficulty ${selectedDance.difficulty.toLowerCase()}`}>
-                      {selectedDance.difficulty}
-                    </span>
-                  )}
-                  {selectedDance.isFeatured && (
-                    <span className="featured-badge-modal">Featured</span>
-                  )}
-                </div>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    )}
+
+    {/* Preview Modal */}
+    {showPreview && selectedDance && (
+      <div className="preview-modal">
+        <div className="modal-backdrop" onClick={closePreview}></div>
+        <div
+          className="modal-content"
+          style={{
+            padding: 0,
+            overflow: 'auto',
+            maxHeight: '90vh',
+          }}
+        >
+
+          <div className="modal-header">
+            {selectedDance.image_url ? (
+              <img
+                src={selectedDance.image_url}
+                alt={selectedDance.title}
+                className="modal-image"
+              />
+            ) : (
+              <div style={{
+                width: '100%',
+                height: '100%',
+                background: '#f5f5f5',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px dashed #ddd',
+                color: '#666',
+                fontSize: '18px',
+                fontWeight: '500'
+              }}>
+                No Preview Available
               </div>
-            </div>
-            <div className="modal-body" style={{ padding: 24 }}>
-              {/* History */}
-              <div className="modal-section">
-                <h3>History</h3>
-                <p>{selectedDance.history}</p>
-              </div>
-
-              {/* Additional info for featured dances */}
-              {selectedDance.isFeatured && (
-                <>
-                  <div className="modal-section">
-                    <h3>Performance Details</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1rem 0' }}>
-                      <div><strong>Duration:</strong> {displayOrNA(selectedDance.duration)}</div>
-                      <div><strong>Performers:</strong> {displayOrNA(selectedDance.performers)}</div>
-                      <div><strong>Origin:</strong> {displayOrNA(selectedDance.origin)}</div>
-                      <div><strong>Difficulty:</strong> {displayOrNA(selectedDance.difficulty)}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="modal-section">
-                    <h3>Cultural Significance</h3>
-                    <p>{selectedDance.significance}</p>
-                  </div>
-
-                  <div className="modal-section">
-                    <h3>Music & Costumes</h3>
-                    <p><strong>Music:</strong> {displayOrNA(selectedDance.music)}</p>
-                    <p><strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}</p>
-                  </div>
-                </>
-              )}
-
-              {/* For database dances: show new info (no difficulty) */}
-              {!selectedDance.isFeatured && (
-                <>
-                  <div className="modal-section">
-                    <h3>Performance Details</h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1rem 0' }}>
-                      <div><strong>Duration:</strong> {displayOrNA(selectedDance.duration)}</div>
-                      <div><strong>Performers:</strong> {displayOrNA(selectedDance.performers)}</div>
-                      <div><strong>Origin:</strong> {displayOrNA(selectedDance.origin)}</div>
-                    </div>
-                  </div>
-                  <div className="modal-section">
-                    <h3>Music & Costumes</h3>
-                    <p><strong>Music:</strong> {displayOrNA(selectedDance.music)}</p>
-                    <p><strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}</p>
-                  </div>
-                  <div className="modal-section">
-                    <h3>References</h3>
-                    <p style={{
-                      whiteSpace: 'pre-line',
-                      wordBreak: 'break-word',
-                      overflowWrap: 'break-word'
-                    }}>
-                      {displayOrNA(selectedDance.references)}
-                    </p>
-                  </div>
-                </>
-              )}
-
-              {/* Main Video - Handle both featured (YouTube) and database (video) dances */}
-              {selectedDance.isFeatured && (
-                <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
-                  <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
-                  {mainVideoUrl ? (
-                    // Show YouTube embed if video URL exists
-                    <iframe
-                      src={getYouTubeEmbedUrl(mainVideoUrl)}
-                      title={`${selectedDance.title} - Main Video`}
-                      width="100%"
-                      height="320"
-                      style={{
-                        maxWidth: 520,
-                        borderRadius: 12,
-                        border: 'none',
-                        boxShadow: '0 4px 24px #0002'
-                      }}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    // Show "No Preview Available" if no main video
-                    <div
-                      style={{
-                        width: '100%',
-                        maxWidth: 520,
-                        height: 320,
-                        borderRadius: 12,
-                        background: '#f5f5f5',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '2px dashed #ddd',
-                        color: '#666',
-                        fontSize: '18px',
-                        fontWeight: '500',
-                        boxShadow: '0 4px 24px #0002',
-                        margin: '0 auto'
-                      }}
-                    >
-                      No Preview Available
-                    </div>
-                  )}
-                </div>
-              )}
-              {/* Database dances main video section */}
-              {!selectedDance.isFeatured && mainVideoUrl && (
-                <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
-                  <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
-                  <video
-                    src={mainVideoUrl}
-                    controls
-                    style={{
-                      width: '100%',
-                      maxWidth: 520,
-                      height: 320,
-                      borderRadius: 12,
-                      background: '#000',
-                      objectFit: 'cover',
-                      boxShadow: '0 4px 24px #0002'
-                    }}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
-              )}
-
-              {/* Figures - Show for both featured and database dances */}
-              <div className="modal-section">
-                <h3>Figures</h3>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '24px',
-                  margin: '1rem 0'
-                }}>
-                  {figures.length === 0 && <span style={{ gridColumn: '1 / -1' }}>No figures uploaded.</span>}
-                  {figures.map((fig, idx) => (
-                    <div key={fig.id} className="figure-box">
-                      <div style={{ fontWeight: 600, marginBottom: 6 }}>
-                        Figure {fig.figure_number ?? idx + 1}
-                      </div>
-                      {selectedDance.isFeatured ? (
-                        // For featured dances, use YouTube embed
-                        <iframe
-                          src={getYouTubeEmbedUrl(fig.video_url)}
-                          title={`${selectedDance.title} - Figure ${fig.figure_number ?? idx + 1}`}
-                          width="100%"
-                          height="200"
-                          frameBorder="0"
-                          style={{
-                            borderRadius: 6,
-                            border: 'none',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                          }}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        // For database dances, use video element
-                        <video
-                          src={fig.video_url}
-                          controls
-                          style={{
-                            width: '100%',
-                            height: 200,
-                            borderRadius: 6,
-                            background: '#000',
-                            objectFit: 'cover'
-                          }}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
+            )}
+            <div className="modal-header-content">
+              <h2 className="modal-title" style={{ margin: 0 }}>{selectedDance.title}</h2>
+              <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance</p>
+              <div className="modal-meta-badges">
+                <span className="region-badge">{capitalize(selectedDance.island)}</span>
+                {selectedDance.difficulty && (
+                  <span className={`difficulty ${selectedDance.difficulty.toLowerCase()}`}>
+                    {selectedDance.difficulty}
+                  </span>
+                )}
+                {selectedDance.isFeatured && (
+                  <span className="featured-badge-modal">Featured</span>
+                )}
               </div>
             </div>
           </div>
+          <div className="modal-body" style={{ padding: 24 }}>
+            <div className="modal-section">
+              <h3>History</h3>
+              <p>{selectedDance.history}</p>
+            </div>
+
+            {selectedDance.isFeatured && (
+              <>
+                <div className="modal-section">
+                  <h3>Performance Details</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1rem 0' }}>
+                    <div><strong>Duration:</strong> {displayOrNA(selectedDance.duration)}</div>
+                    <div><strong>Performers:</strong> {displayOrNA(selectedDance.performers)}</div>
+                    <div><strong>Origin:</strong> {displayOrNA(selectedDance.origin)}</div>
+                    <div><strong>Difficulty:</strong> {displayOrNA(selectedDance.difficulty)}</div>
+                  </div>
+                </div>
+                
+                <div className="modal-section">
+                  <h3>Cultural Significance</h3>
+                  <p>{selectedDance.significance}</p>
+                </div>
+
+                <div className="modal-section">
+                  <h3>Music & Costumes</h3>
+                  <p><strong>Music:</strong> {displayOrNA(selectedDance.music)}</p>
+                  <p><strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}</p>
+                </div>
+              </>
+            )}
+
+            {!selectedDance.isFeatured && (
+              <>
+                <div className="modal-section">
+                  <h3>Performance Details</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', margin: '1rem 0' }}>
+                    <div><strong>Duration:</strong> {displayOrNA(selectedDance.duration)}</div>
+                    <div><strong>Performers:</strong> {displayOrNA(selectedDance.performers)}</div>
+                    <div><strong>Origin:</strong> {displayOrNA(selectedDance.origin)}</div>
+                  </div>
+                </div>
+                <div className="modal-section">
+                  <h3>Music & Costumes</h3>
+                  <p><strong>Music:</strong> {displayOrNA(selectedDance.music)}</p>
+                  <p><strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}</p>
+                </div>
+                <div className="modal-section">
+                  <h3>References</h3>
+                  <p style={{
+                    whiteSpace: 'pre-line',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word'
+                  }}>
+                    {displayOrNA(selectedDance.references)}
+                  </p>
+                </div>
+              </>
+            )}
+
+            {selectedDance.isFeatured && mainVideoUrl && (
+              <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
+                <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
+                <video
+                  src={mainVideoUrl}
+                  controls
+                  style={{
+                    width: '520px',
+                    height: '320px',
+                    borderRadius: 12,
+                    background: '#000',
+                    objectFit: 'contain',
+                    boxShadow: '0 4px 24px #0002',
+                    margin: '0 auto'
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            )}
+            
+            {!selectedDance.isFeatured && mainVideoUrl && (
+              <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
+                <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
+                <video
+                  src={mainVideoUrl}
+                  controls
+                  style={{
+                    width: '520px',
+                    height: '320px',
+                    borderRadius: 12,
+                    background: '#000',
+                    objectFit: 'contain',
+                    boxShadow: '0 4px 24px #0002'
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            )}
+
+            <div className="modal-section">
+              <h3>Figures</h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: figures.length === 1 ? '1fr' : '1fr 1fr',
+                gap: '24px',
+                margin: '1rem 0',
+                justifyItems: figures.length === 1 ? 'center' : 'stretch'
+              }}>
+                {figures.length === 0 && <span style={{ gridColumn: '1 / -1' }}>No figures uploaded.</span>}
+                {figures.map((fig, idx) => (
+                  <div key={fig.id} className="figure-box">
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                      Figure {fig.figure_number ?? idx + 1}
+                    </div>
+                    <video
+                      src={fig.video_url}
+                      controls
+                      style={{
+                        width: '350px',
+                        height: '250px',
+                        borderRadius: 6,
+                        background: '#000',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Close Button at Bottom */}
+            <div style={{
+              padding: '24px',
+              textAlign: 'center',
+              borderTop: '1px solid #e5e7eb'
+            }}>
+              <button
+                onClick={closePreview}
+                style={{
+                  background: '#a0855b',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  minWidth: '120px'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#8b7355';
+                  e.target.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#a0855b';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
 };
 
 export default Dances;
