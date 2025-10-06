@@ -44,6 +44,100 @@ const PasswordRequirements = ({ password, isVisible }) => {
   );
 };
 
+// Terms Modal component
+const TermsModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="terms-modal-overlay" onClick={onClose}>
+      <div className="terms-modal-content" onClick={e => e.stopPropagation()}>
+        <div className="terms-modal-header">
+          <h2>Terms and Conditions</h2>
+          <button className="terms-modal-close" onClick={onClose}>
+            <FaTimes />
+          </button>
+        </div>
+        <div className="terms-modal-body">
+          <div className="terms-content">
+            <h3>Terms of Service - FLIPino</h3>
+            <p><strong>Last Updated:</strong> October 6, 2025</p>
+            
+            <h4>1. Acceptance of Terms</h4>
+            <p>By accessing or using FLIPino ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Service.</p>
+            
+            <h4>2. Description of Service</h4>
+            <p>FLIPino is an educational platform dedicated to Filipino traditional dance learning and cultural preservation. The Service provides:</p>
+            <ul>
+              <li>Dance tutorials and step-by-step instructions</li>
+              <li>Performance tracking and progress analytics</li>
+              <li>Cultural education resources</li>
+            </ul>
+            
+            <h4>3. User Accounts and Registration</h4>
+            <p><strong>3.1 Account Requirements</strong></p>
+            <ul>
+              <li>You must provide a valid Gmail address (@gmail.com)</li>
+              <li>Username must be 6-16 characters long and unique</li>
+              <li>Password must meet security requirements (8-24 characters with uppercase, lowercase, number, and special character)</li>
+            </ul>
+            
+            <h4>4. Data Collection and Privacy</h4>
+            <p><strong>4.1 Personal Information Collected</strong></p>
+            <ul>
+              <li>Email address (Gmail accounts only)</li>
+              <li>Account creation date and status</li>
+              <li>User role and permissions</li>
+            </ul>
+            
+            <p><strong>4.2 Performance and Learning Data</strong></p>
+            <ul>
+              <li>Dance attempt scores and timestamps</li>
+              <li>Figure-specific performance metrics</li>
+              <li>Progress tracking and completion rates</li>
+              <li>User feedback and ratings (0-5 scale)</li>
+              <li>Learning analytics and preferences</li>
+            </ul>
+            
+            <h4>5. Acceptable Use Policy</h4>
+            <p><strong>5.1 Permitted Uses</strong></p>
+            <ul>
+              <li>Educational and cultural learning purposes</li>
+              <li>Personal skill development in Filipino traditional dance</li>
+              <li>Sharing knowledge and cultural appreciation</li>
+            </ul>
+            
+            <p><strong>5.2 Prohibited Activities</strong></p>
+            <ul>
+              <li>Uploading false, misleading, or culturally insensitive content</li>
+              <li>Attempting to gain unauthorized access to other user accounts</li>
+              <li>Using the Service for commercial purposes without permission</li>
+              <li>Harassment, bullying, or inappropriate behavior toward other users</li>
+              <li>Violating intellectual property rights</li>
+            </ul>
+            
+            <h4>6. Cultural Sensitivity and Respect</h4>
+            <ul>
+              <li>Content must respect Filipino cultural traditions</li>
+              <li>Regional variations and interpretations are acknowledged</li>
+              <li>Traditional knowledge is treated with appropriate reverence</li>
+              <li>Primary goal is cultural preservation and education</li>
+            </ul>
+            
+            <p className="terms-footer">
+              <strong>By using FLIPino, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy.</strong>
+            </p>
+          </div>
+        </div>
+        <div className="terms-modal-footer">
+          <button className="terms-modal-accept" onClick={onClose}>
+            I Understand
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -54,6 +148,8 @@ const Register = () => {
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
   const [snackbar, setSnackbar] = useState({ message: "", type: "" });
   const [loading, setLoading] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const navigate = useNavigate();
 
   const showSnackbar = (message, type) => {
@@ -83,6 +179,13 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Terms and Conditions validation
+    if (!acceptTerms) {
+      showSnackbar("Please accept the Terms and Conditions to continue", "error");
+      setLoading(false);
+      return;
+    }
 
     // Gmail validation
     if (!email.endsWith("@gmail.com")) {
@@ -328,7 +431,31 @@ const Register = () => {
                 </div>
               </div>
 
-              <button type="submit" className="register-button" disabled={loading}>
+              <div className="terms-checkbox-container">
+                <label className="terms-checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className="terms-checkbox"
+                  />
+                  <span className="checkbox-custom"></span>
+                  <span className="terms-text">
+                    I have read and agree to the{" "}
+                    <span
+                      className="terms-link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowTermsModal(true);
+                      }}
+                    >
+                      Terms and Conditions
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              <button type="submit" className="register-button" disabled={loading || !acceptTerms}>
                 {loading ? "Registering..." : "Register"}
               </button>
             </form>
@@ -349,6 +476,11 @@ const Register = () => {
           onClose={() => setSnackbar({ message: "", type: "" })}
         />
       )}
+      
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+      />
     </div>
   );
 };
