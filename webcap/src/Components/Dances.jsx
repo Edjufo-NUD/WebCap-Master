@@ -794,7 +794,9 @@ const Dances = () => {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 10001,
-            transition: 'background 0.2s'
+            transition: 'background 0.2s',
+            padding:0,
+            paddingBottom: 7
           }}
           onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.3)'}
           onMouseLeave={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
