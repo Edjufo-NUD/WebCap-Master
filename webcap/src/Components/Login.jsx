@@ -61,7 +61,7 @@ const Login = () => {
         return;
       }
 
-      // ✅ Block login if status is Disabled
+      // ✅ Block login only if status is Disabled (Allow Enabled and Maintenance users)
       if (userData.status.toLowerCase() === "disabled") {
         await supabase.auth.signOut(); // Clear session
         setError("Your account is disabled. Please contact support.");

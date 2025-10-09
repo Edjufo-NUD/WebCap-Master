@@ -1581,3 +1581,274 @@ body, html {
     gap: clamp(0.25rem, 0.75vw, 0.5rem);
   }
 }
+
+/* Modal Styles for Confirmation and Reason Display */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.confirm-modal,
+.reason-modal {
+  background: #ffffff !important;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: modalSlideIn 0.3s ease;
+  color: #000000 !important;
+}
+
+/* NUCLEAR OPTION: Force ALL modal content to be black text on white background */
+.confirm-modal *,
+.reason-modal *,
+[data-theme="dark"] .confirm-modal,
+[data-theme="dark"] .reason-modal,
+[data-theme="dark"] .confirm-modal *,
+[data-theme="dark"] .reason-modal * {
+  color: #000000 !important;
+  background-color: inherit !important;
+}
+
+/* Override ANY dark mode for modals */
+@media (prefers-color-scheme: dark) {
+  .confirm-modal,
+  .reason-modal {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .confirm-modal *,
+  .reason-modal * {
+    color: #000000 !important;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirm-modal h3,
+.reason-modal h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.confirm-modal p {
+  margin: 0 0 20px 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.decline-reason-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.decline-reason-input:focus {
+  outline: none;
+  border-color: #4f46e5;
+}
+
+.character-count {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.confirm-actions,
+.reason-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.cancel-btn,
+.close-btn {
+  padding: 10px 20px;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover,
+.close-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.approve-btn {
+  padding: 10px 20px;
+  background: #059669;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.approve-btn:hover {
+  background: #047857;
+}
+
+.decline-btn {
+  padding: 10px 20px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.decline-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.decline-btn:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.dance-info {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 4px solid #4f46e5;
+}
+
+.decline-reason-display {
+  margin-bottom: 1rem;
+}
+
+.decline-reason-display label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700 !important;
+  color: #000000 !important;
+  font-size: 16px !important;
+}
+
+/* Force dark label in ALL scenarios */
+.decline-reason-display label,
+.modal-overlay .decline-reason-display label,
+.reason-modal .decline-reason-display label,
+[data-theme="dark"] .decline-reason-display label,
+[data-theme="light"] .decline-reason-display label {
+  color: #000000 !important;
+}
+
+/* Override system dark mode for labels */
+@media (prefers-color-scheme: dark) {
+  .decline-reason-display label {
+    color: #000000 !important;
+  }
+}
+
+.reason-text {
+  padding: 12px;
+  background: #ffffff !important;
+  border: 2px solid #374151 !important;
+  border-radius: 6px;
+  min-height: 80px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  color: #000000 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+/* Force dark text in ALL possible scenarios */
+.reason-text,
+.reason-text *,
+.modal-overlay .reason-text,
+.reason-modal .reason-text,
+[data-theme="dark"] .reason-text,
+[data-theme="light"] .reason-text {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Override any system dark mode preferences */
+@media (prefers-color-scheme: dark) {
+  .reason-text {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-color: #374151 !important;
+  }
+}
+
+/* Clickable History Item Styles */
+.history-item.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.history-item.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #f8f9ff;
+}
+
+.history-item.declined.clickable {
+  border-left: 4px solid #dc2626;
+}
+
+.history-item.declined.clickable:hover {
+  border-left-color: #b91c1c;
+}
+
+/* Responsive Modal Styles */
+@media (max-width: 768px) {
+  .confirm-modal,
+  .reason-modal {
+    width: 95%;
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .confirm-actions,
+  .reason-actions {
+    flex-direction: column;
+  }
+  
+  .cancel-btn,
+  .approve-btn,
+  .decline-btn,
+  .close-btn {
+    width: 100%;
+    padding: 12px;
+  }
+}

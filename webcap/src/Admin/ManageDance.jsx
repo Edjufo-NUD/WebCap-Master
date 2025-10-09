@@ -38,6 +38,25 @@ const ManageDance = () => {
   const [danceToDelete, setDanceToDelete] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
   const [notification, setNotification] = useState(null);
+  
+  // Video/Image editing states
+  const [previewVideo, setPreviewVideo] = useState(null);
+  const [figureVideos, setFigureVideos] = useState([]);
+  const [danceImage, setDanceImage] = useState(null);
+  
+  // Existing media states
+  const [existingPreviewVideo, setExistingPreviewVideo] = useState(null);
+  const [existingFigureVideos, setExistingFigureVideos] = useState([]);
+  const [existingDanceImage, setExistingDanceImage] = useState(null);
+  
+  // Deleted media tracking
+  const [deletedPreviewVideo, setDeletedPreviewVideo] = useState(false);
+  const [deletedFigureVideos, setDeletedFigureVideos] = useState([]);
+  const [deletedDanceImage, setDeletedDanceImage] = useState(false);
+  
+  // Confirmation modal states
+  const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
+  const [showDiscardConfirmModal, setShowDiscardConfirmModal] = useState(false);
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -55,6 +74,25 @@ const ManageDance = () => {
 
   // Validation errors state
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Get current user role and ID for permission checking
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const userRole = currentUser?.role;
+  const currentUserId = localStorage.getItem("user_id");
+
+  // Check if current user can edit a dance
+  const canEditDance = (dance) => {
+    // SuperAdmin can edit any dance
+    if (userRole === 'superadmin') return true;
+    
+    // Admin can only edit their own uploaded dances
+    if (userRole === 'admin') {
+      return dance.user_id === currentUserId;
+    }
+    
+    // Default: no permission
+    return false;
+  };
 
   // Show notification function
   const showNotification = (message, type = 'success') => {
@@ -257,6 +295,182 @@ const ManageDance = () => {
     return Object.keys(errors).length === 0;
   };
 
+  // --- FILE HANDLING FUNCTIONS ---
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleFileUpload = (file, type) => {
+    const fileUrl = URL.createObjectURL(file);
+
+    switch (type) {
+      case 'preview':
+        setPreviewVideo({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+        break;
+      case 'figures':
+        const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const newFigure = {
+          id: uniqueId,
+          file,
+          url: fileUrl,
+          name: file.name,
+          size: formatFileSize(file.size)
+        };
+        setFigureVideos(prev => [...prev, newFigure]);
+        break;
+      case 'image':
+        setDanceImage({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+        break;
+      default:
+        break;
+    }
+  };
+
+  const removeFigureVideo = (id) => {
+    setFigureVideos(prev => prev.filter(video => video.id !== id));
+    // Clear the file input to allow re-uploading the same file
+    const figuresInput = document.getElementById('edit-figures-input');
+    if (figuresInput) figuresInput.value = '';
+  };
+
+  const removePreviewVideo = () => {
+    if (previewVideo) {
+      URL.revokeObjectURL(previewVideo.url);
+      setPreviewVideo(null);
+      // Clear the file input to allow re-uploading the same file
+      const previewInput = document.getElementById('edit-preview-video-input');
+      if (previewInput) previewInput.value = '';
+    }
+  };
+
+  const removeDanceImage = () => {
+    if (danceImage) {
+      URL.revokeObjectURL(danceImage.url);
+      setDanceImage(null);
+      // Clear the file input to allow re-uploading the same file
+      const imageInput = document.getElementById('edit-image-input');
+      if (imageInput) imageInput.value = '';
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('dragover');
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+  };
+
+  const handleDrop = (e, type) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      const file = files[0];
+      if (type === 'preview' && file.type.startsWith('video/')) {
+        handleFileUpload(file, 'preview');
+      } else if (type === 'figures' && file.type.startsWith('video/')) {
+        handleFileUpload(file, 'figures');
+      } else if (type === 'image' && file.type.startsWith('image/')) {
+        handleFileUpload(file, 'image');
+      }
+    }
+  };
+
+  const truncateFileName = (name, maxLength = 18) => {
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength - 3) + '...';
+  };
+
+  // Load existing media from database
+  const loadExistingMedia = async (danceId) => {
+    try {
+      // Get dance with main video info
+      const { data: danceData, error: danceError } = await supabase
+        .from('dances')
+        .select('main_video_url')
+        .eq('id', danceId)
+        .single();
+
+      if (danceError) {
+        console.error('Error loading dance media:', danceError);
+        return;
+      }
+
+      // Set existing preview video (main video)
+      if (danceData.main_video_url) {
+        setExistingPreviewVideo({
+          url: danceData.main_video_url,
+          name: 'Current Preview Video'
+        });
+      }
+
+      // Get dance image from dance_images table
+      const { data: imageData, error: imageError } = await supabase
+        .from('dance_images')
+        .select('id, image_url')
+        .eq('dance_id', danceId)
+        .single();
+
+      if (imageError && imageError.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error loading dance image:', imageError);
+      } else if (imageData && imageData.image_url) {
+        setExistingDanceImage({
+          id: imageData.id,
+          url: imageData.image_url,
+          name: 'Current Dance Image'
+        });
+      }
+
+      // Get figure videos from dance_figures table
+      const { data: figureData, error: figureError } = await supabase
+        .from('dance_figures')
+        .select('id, video_url, figure_number')
+        .eq('dance_id', danceId)
+        .order('figure_number');
+
+      if (figureError) {
+        console.error('Error loading figure videos:', figureError);
+      } else if (figureData && figureData.length > 0) {
+        const existingFigures = figureData.map((video) => ({
+          id: video.id,
+          url: video.video_url,
+          name: `Figure Video ${video.figure_number}`,
+          figure_number: video.figure_number,
+          isExisting: true
+        }));
+        setExistingFigureVideos(existingFigures);
+      }
+
+    } catch (error) {
+      console.error('Error loading existing media:', error);
+    }
+  };
+
+  // Functions to handle existing media deletion
+  const deleteExistingPreviewVideo = () => {
+    setExistingPreviewVideo(null);
+    setDeletedPreviewVideo(true);
+  };
+
+  const deleteExistingDanceImage = () => {
+    const imageToDelete = existingDanceImage;
+    setExistingDanceImage(null);
+    setDeletedDanceImage(imageToDelete); // Store the image object instead of just true
+  };
+
+  const deleteExistingFigureVideo = (figureId) => {
+    setExistingFigureVideos(prev => prev.filter(video => video.id !== figureId));
+    setDeletedFigureVideos(prev => [...prev, figureId]);
+  };
+
   // --- DELETE FUNCTION ---
   const handleDeleteDance = async (danceId) => {
     if (!danceId) return;
@@ -327,7 +541,13 @@ const ManageDance = () => {
     }
   };
 
-  const handleEdit = (dance) => {
+  const handleEdit = async (dance) => {
+    // Check permissions before allowing edit
+    if (!canEditDance(dance)) {
+      showNotification('You can only edit dances you have uploaded', 'error');
+      return;
+    }
+    
     setSelectedDance(dance);
     
     // Parse existing duration string into components
@@ -355,6 +575,25 @@ const ManageDance = () => {
       music: dance.music || '',
       costumes: dance.costumes || ''
     });
+    
+    // Reset new upload states
+    setPreviewVideo(null);
+    setFigureVideos([]);
+    setDanceImage(null);
+    
+    // Reset existing media states
+    setExistingPreviewVideo(null);
+    setExistingFigureVideos([]);
+    setExistingDanceImage(null);
+    
+    // Reset deleted tracking
+    setDeletedPreviewVideo(false);
+    setDeletedFigureVideos([]);
+    setDeletedDanceImage(false);
+    
+    // Load existing media from database
+    await loadExistingMedia(dance.id);
+    
     setValidationErrors({}); // Clear any previous validation errors
     setShowEditModal(true);
   };
@@ -372,6 +611,19 @@ const ManageDance = () => {
         [field]: ''
       }));
     }
+  };
+
+  // --- CONFIRMATION FUNCTIONS ---
+  const handleSaveClick = () => {
+    if (!validateForm()) {
+      return; // Don't proceed if validation fails
+    }
+    setShowSaveConfirmModal(true);
+  };
+
+  const confirmSave = () => {
+    setShowSaveConfirmModal(false);
+    handleSaveEdit();
   };
 
   // --- EDIT FUNCTION ---
@@ -396,24 +648,170 @@ const ManageDance = () => {
           ? `${minutes}m ${seconds}s`
           : `${seconds}s`;
 
-      // 1. Update in Supabase
+      // 1. Handle deletions first
+      // Delete figure videos that were marked for deletion
+      if (deletedFigureVideos.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('dance_figures')
+          .delete()
+          .in('id', deletedFigureVideos);
+
+        if (deleteError) {
+          console.error('Error deleting figure videos:', deleteError);
+          showNotification('Failed to delete some figure videos: ' + deleteError.message, 'warning');
+        }
+      }
+
+      // Delete dance image if marked for deletion
+      if (deletedDanceImage && deletedDanceImage.id) {
+        const { error: deleteImageError } = await supabase
+          .from('dance_images')
+          .delete()
+          .eq('id', deletedDanceImage.id);
+
+        if (deleteImageError) {
+          console.error('Error deleting dance image:', deleteImageError);
+          showNotification('Failed to delete dance image: ' + deleteImageError.message, 'warning');
+        }
+      }
+
+      // 2. Handle file uploads to Supabase Storage
+      let previewVideoUrl = null;
+      let figureVideoUrls = [];
+      let imageUrl = null;
+
+      // Upload new preview video if exists
+      if (previewVideo) {
+        const videoFileName = `preview_${Date.now()}_${previewVideo.file.name}`;
+        const { data: videoData, error: videoError } = await supabase.storage
+          .from('dances')
+          .upload(videoFileName, previewVideo.file);
+
+        if (videoError) {
+          console.error('Error uploading preview video:', videoError);
+          showNotification('Failed to upload preview video: ' + videoError.message, 'error');
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('dances')
+            .getPublicUrl(videoFileName);
+          previewVideoUrl = publicUrl;
+        }
+      }
+
+      // Upload new figure videos if exists
+      if (figureVideos.length > 0) {
+        for (const video of figureVideos) {
+          const videoFileName = `figure_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${video.file.name}`;
+          const { data: videoData, error: videoError } = await supabase.storage
+            .from('dances')
+            .upload(videoFileName, video.file);
+
+          if (videoError) {
+            console.error('Error uploading figure video:', videoError);
+            showNotification('Failed to upload figure video: ' + videoError.message, 'error');
+          } else {
+            const { data: { publicUrl } } = supabase.storage
+              .from('dances')
+              .getPublicUrl(videoFileName);
+            figureVideoUrls.push(publicUrl);
+          }
+        }
+      }
+
+      // Upload new dance image if exists
+      if (danceImage) {
+        const imageFileName = `image_${Date.now()}_${danceImage.file.name}`;
+        const { data: imageData, error: imageError } = await supabase.storage
+          .from('dances')
+          .upload(imageFileName, danceImage.file);
+
+        if (imageError) {
+          console.error('Error uploading image:', imageError);
+          showNotification('Failed to upload image: ' + imageError.message, 'error');
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('dances')
+            .getPublicUrl(imageFileName);
+          imageUrl = publicUrl;
+        }
+      }
+
+      // 3. Update dance in Supabase database
+      const updateData = {
+        title: editForm.title,
+        island: editForm.region,
+        history: editForm.history,
+        references: editForm.references,
+        duration: formattedDuration,
+        performers: editForm.performers,
+        music: editForm.music,
+        costumes: editForm.costumes
+      };
+
+      // Handle main video updates/deletions
+      if (previewVideoUrl) {
+        updateData.main_video_url = previewVideoUrl;
+      } else if (deletedPreviewVideo) {
+        updateData.main_video_url = null;
+      }
+
       const { error: updateError } = await supabase
         .from("dances")
-        .update({
-          title: editForm.title,
-          island: editForm.region,
-          history: editForm.history,
-          references: editForm.references,
-          duration: formattedDuration,
-          performers: editForm.performers,
-          music: editForm.music,
-          costumes: editForm.costumes
-        })
+        .update(updateData)
         .eq("id", selectedDance.id);
 
       if (updateError) throw updateError;
 
-    // 2. Update in localStorage
+      // 4. Handle new figure videos and images
+      if (figureVideoUrls.length > 0) {
+        // Get the highest existing figure number
+        const { data: maxFigureData } = await supabase
+          .from('dance_figures')
+          .select('figure_number')
+          .eq('dance_id', selectedDance.id)
+          .order('figure_number', { ascending: false })
+          .limit(1);
+
+        let nextFigureNumber = 1;
+        if (maxFigureData && maxFigureData.length > 0) {
+          nextFigureNumber = maxFigureData[0].figure_number + 1;
+        }
+
+        // Insert new figure videos into dance_figures table
+        const figureVideoData = figureVideoUrls.map((url, index) => ({
+          dance_id: selectedDance.id,
+          video_url: url,
+          figure_number: nextFigureNumber + index
+        }));
+
+        const { error: figureError } = await supabase
+          .from('dance_figures')
+          .insert(figureVideoData);
+
+        if (figureError) {
+          console.error('Error saving figure videos:', figureError);
+          showNotification('Dance updated, but failed to save figure videos: ' + figureError.message, 'warning');
+        }
+      }
+
+      // Handle new dance image
+      if (imageUrl) {
+        // Insert new dance image (or update if replacing)
+        const { error: imageInsertError } = await supabase
+          .from('dance_images')
+          .insert([{
+            dance_id: selectedDance.id,
+            image_url: imageUrl,
+            position: 0
+          }]);
+
+        if (imageInsertError) {
+          console.error('Error saving dance image:', imageInsertError);
+          showNotification('Dance updated, but failed to save image: ' + imageInsertError.message, 'warning');
+        }
+      }
+
+    // 5. Update in localStorage
     const storedDances = localStorage.getItem('uploadedDances');
     if (storedDances) {
       const uploadedDances = JSON.parse(storedDances);
@@ -436,7 +834,7 @@ const ManageDance = () => {
       localStorage.setItem('uploadedDances', JSON.stringify(updatedStoredDances));
     }
 
-    // 3. Update UI state
+    // 6. Update UI state
     const updatedDances = dances.map(dance => {
       if (dance.id === selectedDance.id) {
         return {
@@ -456,9 +854,36 @@ const ManageDance = () => {
     });
     setDances(updatedDances);
 
-    // 4. Close modal and reset
+    // 7. Close modal and reset
+    // Clear video/image states and revoke URLs
+    if (previewVideo) {
+      URL.revokeObjectURL(previewVideo.url);
+    }
+    figureVideos.forEach(video => {
+      URL.revokeObjectURL(video.url);
+    });
+    if (danceImage) {
+      URL.revokeObjectURL(danceImage.url);
+    }
+    
     setShowEditModal(false);
     setSelectedDance(null);
+    
+    // Reset new upload states
+    setPreviewVideo(null);
+    setFigureVideos([]);
+    setDanceImage(null);
+    
+    // Reset existing media states
+    setExistingPreviewVideo(null);
+    setExistingFigureVideos([]);
+    setExistingDanceImage(null);
+    
+    // Reset deletion tracking
+    setDeletedPreviewVideo(false);
+    setDeletedFigureVideos([]);
+    setDeletedDanceImage(false);
+    
     setEditForm({
       title: '',
       region: '',
@@ -470,7 +895,13 @@ const ManageDance = () => {
       costumes: ''
     });
     setValidationErrors({});
-    showNotification("Dance updated successfully", 'success');
+    
+    const hasMediaChanges = previewVideo || figureVideos.length > 0 || danceImage || 
+                           deletedPreviewVideo || deletedFigureVideos.length > 0 || deletedDanceImage;
+    const updatedMessage = hasMediaChanges 
+      ? "Dance and media files updated successfully" 
+      : "Dance updated successfully";
+    showNotification(updatedMessage, 'success');
     setLoading(false);
     } catch (error) {
       console.error('Error updating dance:', error);
@@ -479,9 +910,51 @@ const ManageDance = () => {
     }
   };
 
+  const handleCancelClick = () => {
+    const hasChanges = isEditChanged();
+    
+    if (hasChanges) {
+      setShowDiscardConfirmModal(true);
+    } else {
+      handleCancelEdit();
+    }
+  };
+
+  const confirmDiscard = () => {
+    setShowDiscardConfirmModal(false);
+    handleCancelEdit();
+  };
+
   const handleCancelEdit = () => {
+    // Clear video/image states and revoke URLs
+    if (previewVideo) {
+      URL.revokeObjectURL(previewVideo.url);
+    }
+    figureVideos.forEach(video => {
+      URL.revokeObjectURL(video.url);
+    });
+    if (danceImage) {
+      URL.revokeObjectURL(danceImage.url);
+    }
+    
     setShowEditModal(false);
     setSelectedDance(null);
+    
+    // Reset new upload states
+    setPreviewVideo(null);
+    setFigureVideos([]);
+    setDanceImage(null);
+    
+    // Reset existing media states
+    setExistingPreviewVideo(null);
+    setExistingFigureVideos([]);
+    setExistingDanceImage(null);
+    
+    // Reset deletion tracking
+    setDeletedPreviewVideo(false);
+    setDeletedFigureVideos([]);
+    setDeletedDanceImage(false);
+    
     setEditForm({
       title: '',
       region: '',
@@ -547,6 +1020,12 @@ const ManageDance = () => {
   const isEditChanged = () => {
     if (!selectedDance) return false;
     
+    // Check for new file uploads
+    const hasNewFileChanges = previewVideo !== null || figureVideos.length > 0 || danceImage !== null;
+    
+    // Check for existing media deletions
+    const hasMediaDeletions = deletedPreviewVideo || (deletedDanceImage && deletedDanceImage !== false) || deletedFigureVideos.length > 0;
+    
     // Format current duration from form components
     const hours = parseInt(editForm.durationHours) || 0;
     const minutes = parseInt(editForm.durationMinutes) || 0;
@@ -557,7 +1036,7 @@ const ManageDance = () => {
       ? `${minutes}m ${seconds}s`
       : `${seconds}s`;
     
-    return (
+    const hasFormChanges = (
       (editForm.title || '').trim() !== (selectedDance.title || '').trim() ||
       (editForm.region || '').trim() !== (selectedDance.region || selectedDance.island || selectedDance.category || '').trim() ||
       (editForm.history || '').trim() !== (selectedDance.history || '').trim() ||
@@ -567,6 +1046,8 @@ const ManageDance = () => {
       (editForm.music || '').trim() !== (selectedDance.music || '').trim() ||
       (editForm.costumes || '').trim() !== (selectedDance.costumes || '').trim()
     );
+    
+    return hasFormChanges || hasNewFileChanges || hasMediaDeletions;
   };
 
   useEffect(() => {
@@ -733,9 +1214,14 @@ const ManageDance = () => {
                     <td>
                       <div className="action-buttons">
                         <button 
-                          className="btn-icon btn-edit"
-                          onClick={() => handleEdit(dance)}
-                          title="Edit"
+                          className={`btn-icon btn-edit ${!canEditDance(dance) ? 'disabled' : ''}`}
+                          onClick={canEditDance(dance) ? () => handleEdit(dance) : undefined}
+                          title={canEditDance(dance) ? "Edit" : "You can only edit your own dances"}
+                          disabled={!canEditDance(dance)}
+                          style={{
+                            opacity: canEditDance(dance) ? 1 : 0.5,
+                            cursor: canEditDance(dance) ? 'pointer' : 'not-allowed'
+                          }}
                         >
                           <Edit size={16} />
                         </button>
@@ -1021,11 +1507,451 @@ const ManageDance = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Video Preview Upload Section */}
+                <div className="form-group">
+                  <label>Video Preview (Optional)</label>
+                  
+                  {/* Show existing preview video if it exists */}
+                  {existingPreviewVideo && !deletedPreviewVideo && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <div style={{ 
+                        background: '#e8f5e8', 
+                        border: '1px solid #c3e6cb', 
+                        borderRadius: '8px', 
+                        padding: '15px',
+                        marginBottom: '10px'
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between',
+                          marginBottom: '10px'
+                        }}>
+                          <div style={{ fontWeight: '600', color: '#155724' }}>
+                            📹 Current Preview Video
+                          </div>
+                          <button
+                            type="button"
+                            onClick={deleteExistingPreviewVideo}
+                            style={{
+                              background: '#dc3545',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '4px 8px',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem'
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <video 
+                          controls
+                          style={{
+                            width: '100%',
+                            height: '200px',
+                            objectFit: 'contain',
+                            backgroundColor: '#000',
+                            borderRadius: '8px'
+                          }}
+                        >
+                          <source src={existingPreviewVideo.url} />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div
+                    className="upload-area"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, 'preview')}
+                    onClick={() => document.getElementById('edit-preview-video-input').click()}
+                    style={{
+                      border: '2px dashed #e9ecef',
+                      borderRadius: '12px',
+                      padding: '40px 20px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      backgroundColor: '#f8f9fa',
+                      transition: 'all 0.3s ease',
+                      marginBottom: '15px'
+                    }}
+                  >
+                    <div style={{ fontSize: '2rem', marginBottom: '10px', opacity: '0.5' }}>📹</div>
+                    <div style={{ fontWeight: '600', marginBottom: '5px' }}>
+                      {existingPreviewVideo && !deletedPreviewVideo ? 'Replace Preview Video' : 'Upload New Preview Video'}
+                    </div>
+                    <div style={{ color: '#6c757d', fontSize: '0.9rem' }}>Drag and drop a video file or click to browse</div>
+                  </div>
+                  
+                  <input
+                    type="file"
+                    id="edit-preview-video-input"
+                    style={{ display: 'none' }}
+                    accept="video/*"
+                    onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0], 'preview')}
+                  />
+
+                  {previewVideo && (
+                    <div style={{ marginTop: '15px' }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: '#f8f9fa',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        marginBottom: '10px'
+                      }}>
+                        <div>
+                          <span style={{ fontWeight: '600' }}>{previewVideo.name}</span>
+                          <span style={{ color: '#6c757d', marginLeft: '10px' }}>({previewVideo.size})</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={removePreviewVideo}
+                          style={{
+                            background: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                            fontSize: '0.8rem'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <video 
+                        controls
+                        style={{
+                          width: '100%',
+                          height: '200px',
+                          objectFit: 'contain',
+                          backgroundColor: '#000',
+                          borderRadius: '8px'
+                        }}
+                      >
+                        <source src={previewVideo.url} type={previewVideo.file.type} />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
+
+                {/* Figure Videos Upload Section */}
+                <div className="form-group">
+                  <label>Figure Videos (Optional)</label>
+                  
+                  {/* Show existing figure videos */}
+                  {existingFigureVideos.length > 0 && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <div style={{ 
+                        background: '#e8f5e8', 
+                        border: '1px solid #c3e6cb', 
+                        borderRadius: '8px', 
+                        padding: '15px'
+                      }}>
+                        <div style={{ fontWeight: '600', color: '#155724', marginBottom: '10px' }}>
+                          🎬 Current Figure Videos
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
+                          {existingFigureVideos.map((video, idx) => (
+                            <div key={video.id} style={{
+                              position: 'relative',
+                              background: 'white',
+                              border: '1px solid #28a745',
+                              borderRadius: '8px',
+                              padding: '10px',
+                              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                            }}>
+                              <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '0.9rem', color: '#155724' }}>
+                                {video.name}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => deleteExistingFigureVideo(video.id)}
+                                style={{
+                                  position: 'absolute',
+                                  top: '5px',
+                                  right: '5px',
+                                  background: '#ef4444',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '50%',
+                                  width: '20px',
+                                  height: '20px',
+                                  cursor: 'pointer',
+                                  fontSize: '12px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                ×
+                              </button>
+                              
+                              <video 
+                                controls
+                                style={{
+                                  width: '100%',
+                                  height: '120px',
+                                  objectFit: 'cover',
+                                  borderRadius: '4px',
+                                  backgroundColor: '#000'
+                                }}
+                              >
+                                <source src={video.url} />
+                                Video cannot be loaded
+                              </video>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div
+                    className="upload-area"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, 'figures')}
+                    onClick={() => document.getElementById('edit-figures-input').click()}
+                    style={{
+                      border: '2px dashed #e9ecef',
+                      borderRadius: '12px',
+                      padding: '40px 20px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      backgroundColor: '#f8f9fa',
+                      transition: 'all 0.3s ease',
+                      marginBottom: '15px'
+                    }}
+                  >
+                    <div style={{ fontSize: '2rem', marginBottom: '10px', opacity: '0.5' }}>🎬</div>
+                    <div style={{ fontWeight: '600', marginBottom: '5px' }}>
+                      {existingFigureVideos.length > 0 ? 'Add More Figure Videos' : 'Upload Figure Videos'}
+                    </div>
+                    <div style={{ color: '#6c757d', fontSize: '0.9rem' }}>Drag and drop video files or click to browse (one at a time)</div>
+                  </div>
+                  
+                  <input
+                    type="file"
+                    id="edit-figures-input"
+                    style={{ display: 'none' }}
+                    accept="video/*"
+                    onChange={(e) => {
+                      if (e.target.files[0]) {
+                        handleFileUpload(e.target.files[0], 'figures');
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+
+                  {figureVideos.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px', marginTop: '15px' }}>
+                      {figureVideos.map((video, idx) => (
+                        <div key={video.id} style={{
+                          position: 'relative',
+                          background: 'white',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          padding: '10px',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                        }}>
+                          <div style={{ fontWeight: '600', marginBottom: '8px', fontSize: '0.9rem' }}>
+                            Figure {idx + 1}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeFigureVideo(video.id)}
+                            style={{
+                              position: 'absolute',
+                              top: '5px',
+                              right: '5px',
+                              background: '#ef4444',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '20px',
+                              height: '20px',
+                              cursor: 'pointer',
+                              fontSize: '12px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            ×
+                          </button>
+                          
+                          <video 
+                            controls
+                            style={{
+                              width: '100%',
+                              height: '120px',
+                              objectFit: 'cover',
+                              borderRadius: '4px',
+                              backgroundColor: '#000'
+                            }}
+                          >
+                            <source src={video.url} type={video.file.type} />
+                            Video cannot be loaded
+                          </video>
+                          
+                          <div style={{ marginTop: '8px', fontSize: '0.8rem' }}>
+                            <div style={{ fontWeight: '600', color: '#2d3748' }}>
+                              {truncateFileName(video.name, 15)}
+                            </div>
+                            <div style={{ color: '#718096' }}>
+                              {video.size}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dance Image Upload Section */}
+                <div className="form-group">
+                  <label>Dance Image (Optional)</label>
+                  
+                  {/* Show existing dance image if it exists */}
+                  {existingDanceImage && (deletedDanceImage === false) && (
+                    <div style={{ marginBottom: '15px' }}>
+                      <div style={{ 
+                        background: '#e8f5e8', 
+                        border: '1px solid #c3e6cb', 
+                        borderRadius: '8px', 
+                        padding: '15px',
+                        marginBottom: '10px'
+                      }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between',
+                          marginBottom: '10px'
+                        }}>
+                          <div style={{ fontWeight: '600', color: '#155724' }}>
+                            🖼️ Current Dance Image
+                          </div>
+                          <button
+                            type="button"
+                            onClick={deleteExistingDanceImage}
+                            style={{
+                              background: '#dc3545',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '4px 8px',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem'
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <img 
+                          src={existingDanceImage.url} 
+                          alt="Current dance" 
+                          style={{
+                            width: '100%',
+                            height: '200px',
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div
+                    className="upload-area"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, 'image')}
+                    onClick={() => document.getElementById('edit-image-input').click()}
+                    style={{
+                      border: '2px dashed #e9ecef',
+                      borderRadius: '12px',
+                      padding: '40px 20px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      backgroundColor: '#f8f9fa',
+                      transition: 'all 0.3s ease',
+                      marginBottom: '15px'
+                    }}
+                  >
+                    <div style={{ fontSize: '2rem', marginBottom: '10px', opacity: '0.5' }}>🖼️</div>
+                    <div style={{ fontWeight: '600', marginBottom: '5px' }}>
+                      {existingDanceImage && (deletedDanceImage === false) ? 'Replace Dance Image' : 'Upload New Dance Image'}
+                    </div>
+                    <div style={{ color: '#6c757d', fontSize: '0.9rem' }}>Drag and drop an image file or click to browse</div>
+                  </div>
+                  
+                  <input
+                    type="file"
+                    id="edit-image-input"
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0], 'image')}
+                  />
+
+                  {danceImage && (
+                    <div style={{ marginTop: '15px' }}>
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: '#f8f9fa',
+                        padding: '10px 15px',
+                        borderRadius: '8px',
+                        marginBottom: '10px'
+                      }}>
+                        <div>
+                          <span style={{ fontWeight: '600' }}>{danceImage.name}</span>
+                          <span style={{ color: '#6c757d', marginLeft: '10px' }}>({danceImage.size})</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={removeDanceImage}
+                          style={{
+                            background: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '4px 8px',
+                            cursor: 'pointer',
+                            fontSize: '0.8rem'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <img 
+                        src={danceImage.url} 
+                        alt="Dance preview" 
+                        style={{
+                          width: '100%',
+                          height: '200px',
+                          objectFit: 'cover',
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="modal-actions">
                 <button
                   className="btn btn-primary"
-                  onClick={handleSaveEdit}
+                  onClick={handleSaveClick}
                   disabled={!isEditChanged()}
                 >
                   <Check size={16} />
@@ -1033,7 +1959,7 @@ const ManageDance = () => {
                 </button>
                 <button
                   className="btn btn-cancel"
-                  onClick={handleCancelEdit}
+                  onClick={handleCancelClick}
                 >
                   <X size={16} />
                   Cancel
@@ -1089,6 +2015,66 @@ const ManageDance = () => {
                   onClick={() => setShowDeleteModal(false)}
                 >
                   Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Save Confirmation Modal */}
+        {showSaveConfirmModal && (
+          <div className="modal-overlay" onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              setShowSaveConfirmModal(false);
+            }
+          }}>
+            <div className="modal">
+              <h3>Confirm Save Changes</h3>
+              <p>Are you sure you want to save the changes to this dance?</p>
+              <div className="modal-actions">
+                <button
+                  className="btn btn-primary"
+                  onClick={confirmSave}
+                >
+                  <Check size={16} />
+                  Yes, Save Changes
+                </button>
+                <button
+                  className="btn btn-cancel"
+                  onClick={() => setShowSaveConfirmModal(false)}
+                >
+                  <X size={16} />
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Discard Changes Confirmation Modal */}
+        {showDiscardConfirmModal && (
+          <div className="modal-overlay" onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              setShowDiscardConfirmModal(false);
+            }
+          }}>
+            <div className="modal">
+              <h3>Discard Changes</h3>
+              <p>You have unsaved changes. Are you sure you want to discard them?</p>
+              <div className="modal-actions">
+                <button
+                  className="btn btn-danger"
+                  onClick={confirmDiscard}
+                >
+                  <AlertCircle size={16} />
+                  Yes, Discard Changes
+                </button>
+                <button
+                  className="btn btn-cancel"
+                  onClick={() => setShowDiscardConfirmModal(false)}
+                >
+                  <X size={16} />
+                  Keep Editing
                 </button>
               </div>
             </div>

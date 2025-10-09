@@ -296,8 +296,20 @@
   color: #f57c00;
 }
 
-.btn-edit:hover {
+.btn-edit:hover:not(.disabled) {
   background: #ffe0b2;
+}
+
+.btn-edit.disabled {
+  background: #f5f5f5;
+  color: #bbb;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-edit.disabled:hover {
+  background: #f5f5f5;
+  color: #bbb;
 }
 
 .btn-delete {

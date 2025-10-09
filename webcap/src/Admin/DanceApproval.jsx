@@ -66,6 +66,17 @@ const DanceApproval = () => {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [sortOption, setSortOption] = useState('newest');
 
+  // Confirmation modals state
+  const [showApproveModal, setShowApproveModal] = useState(false);
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
+  const [declineReason, setDeclineReason] = useState('');
+  const [danceToApprove, setDanceToApprove] = useState(null);
+  const [danceToDecline, setDanceToDecline] = useState(null);
+
+  // Reason display modal
+  const [showReasonModal, setShowReasonModal] = useState(false);
+  const [selectedReasonDance, setSelectedReasonDance] = useState(null);
+
   // For modal
   const [figures, setFigures] = useState([]);
   const [mainVideoUrl, setMainVideoUrl] = useState('');
@@ -272,14 +283,29 @@ const DanceApproval = () => {
     window.dispatchEvent(new CustomEvent('pendingCountChanged'));
   };
 
-  // Handle Accept dance
-  const handleAccept = async (danceId) => {
+  // Show approve confirmation modal
+  const handleApproveClick = (danceId) => {
+    setDanceToApprove(danceId);
+    setShowApproveModal(true);
+  };
+
+  // Show decline confirmation modal
+  const handleDeclineClick = (danceId) => {
+    setDanceToDecline(danceId);
+    setShowDeclineModal(true);
+    setDeclineReason('');
+  };
+
+  // Handle Accept dance (confirmed)
+  const handleAccept = async () => {
+    if (!danceToApprove) return;
+    
     try {
       // Update database dance status to approved
       const { error } = await supabase
         .from('dances')
         .update({ status: 'approved' })
-        .eq('id', danceId);
+        .eq('id', danceToApprove.id);
       
       if (!error) {
         const uploaderInfo = selectedDance.uploader 
@@ -298,25 +324,38 @@ const DanceApproval = () => {
         setHistoryDances(prev => [approvedDance, ...prev.slice(0, 19)]);
         
         // Remove from current list
-        setDances(prev => prev.filter(d => d.id !== danceId));
+        setDances(prev => prev.filter(d => d.id !== danceToApprove.id));
       } else {
         showNotification('Error approving dance: ' + error.message, 'error');
       }
+      
+      setShowApproveModal(false);
+      setDanceToApprove(null);
       closePreview();
     } catch (error) {
       console.error('Error approving dance:', error);
       showNotification('Error approving dance', 'error');
+      setShowApproveModal(false);
+      setDanceToApprove(null);
     }
   };
 
-  // Handle Decline dance
-  const handleDecline = async (danceId) => {
+  // Handle Decline dance (confirmed with reason)
+  const handleDecline = async () => {
+    if (!danceToDecline || !declineReason.trim()) {
+      showNotification('Please provide a reason for declining', 'error');
+      return;
+    }
+    
     try {
-      // Update database dance status to declined
+      // Update database dance status to declined with reason
       const { error } = await supabase
         .from('dances')
-        .update({ status: 'declined' })
-        .eq('id', danceId);
+        .update({ 
+          status: 'declined',
+          decline_reason: declineReason.trim()
+        })
+        .eq('id', danceToDecline.id);
       
       if (!error) {
         const uploaderInfo = selectedDance.uploader 
@@ -324,25 +363,53 @@ const DanceApproval = () => {
           : '';
         showNotification(`Dance "${selectedDance.title}" uploaded${uploaderInfo} has been declined.`, 'warning');
         
-        // Add declined dance to history
+        // Add declined dance to history with reason
         const declinedDance = {
           id: selectedDance.id,
           title: selectedDance.title,
           status: 'declined',
+          decline_reason: declineReason.trim(),
           created_at: new Date().toISOString(),
           users: selectedDance.uploader
         };
         setHistoryDances(prev => [declinedDance, ...prev.slice(0, 19)]);
         
         // Remove from current list
-        setDances(prev => prev.filter(d => d.id !== danceId));
+        setDances(prev => prev.filter(d => d.id !== danceToDecline.id));
       } else {
         showNotification('Error declining dance: ' + error.message, 'error');
       }
+      
+      setShowDeclineModal(false);
+      setDanceToDecline(null);
+      setDeclineReason('');
       closePreview();
     } catch (error) {
       console.error('Error declining dance:', error);
       showNotification('Error declining dance', 'error');
+      setShowDeclineModal(false);
+      setDanceToDecline(null);
+    }
+  };
+
+  // Handle clicking on declined history items to show reason
+  const handleHistoryClick = async (dance) => {
+    if (dance.status === 'declined') {
+      // Fetch the full dance data including decline reason
+      const { data: danceData, error } = await supabase
+        .from('dances')
+        .select('decline_reason, title')
+        .eq('id', dance.id)
+        .single();
+      
+      if (!error && danceData) {
+        setSelectedReasonDance({
+          ...dance,
+          decline_reason: danceData.decline_reason,
+          title: danceData.title
+        });
+        setShowReasonModal(true);
+      }
     }
   };
 
@@ -411,7 +478,9 @@ const DanceApproval = () => {
                 {historyDances.map(dance => (
                   <div 
                     key={dance.id} 
-                    className={`history-item ${dance.status}`}
+                    className={`history-item ${dance.status} ${dance.status === 'declined' ? 'clickable' : ''}`}
+                    onClick={dance.status === 'declined' ? () => handleHistoryClick(dance) : undefined}
+                    title={dance.status === 'declined' ? 'Click to view decline reason' : ''}
                   >
                     <div className="history-title">{dance.title}</div>
                     <div className="history-status">
@@ -762,19 +831,117 @@ const DanceApproval = () => {
               <div className="approval-actions">
                 <button
                   className="decline-button"
-                  onClick={() => handleDecline(selectedDance.id)}
+                  onClick={() => handleDeclineClick(selectedDance)}
                 >
                   <X size={20} />
                   Decline Dance
                 </button>
                 <button
                   className="accept-button"
-                  onClick={() => handleAccept(selectedDance.id)}
+                  onClick={() => handleApproveClick(selectedDance)}
                 >
                   <Check size={20} />
                   Approve Dance
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approve Confirmation Modal */}
+      {showApproveModal && (
+        <div className="modal-overlay" onClick={() => setShowApproveModal(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <h3>Approve Dance</h3>
+            <p>Are you sure you want to approve "{danceToApprove?.title}"?</p>
+            <div className="confirm-actions">
+              <button 
+                className="cancel-btn"
+                onClick={() => setShowApproveModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="approve-btn"
+                onClick={handleAccept}
+              >
+                Approve
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Decline Confirmation Modal */}
+      {showDeclineModal && (
+        <div className="modal-overlay" onClick={() => setShowDeclineModal(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <h3>Decline Dance</h3>
+            <p>Please provide a reason for declining "{danceToDecline?.title}":</p>
+            <textarea
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+              placeholder="Enter decline reason (required, max 150 characters)"
+              maxLength={150}
+              rows={4}
+              className="decline-reason-input"
+            />
+            <div className="character-count">
+              {declineReason.length}/150 characters
+            </div>
+            <div className="confirm-actions">
+              <button 
+                className="cancel-btn"
+                onClick={() => {
+                  setShowDeclineModal(false);
+                  setDeclineReason('');
+                }}
+              >
+                Cancel
+              </button>
+              <button 
+                className="decline-btn"
+                onClick={handleDecline}
+                disabled={!declineReason.trim()}
+              >
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Decline Reason Display Modal */}
+      {showReasonModal && selectedReasonDance && (
+        <div className="modal-overlay" onClick={() => setShowReasonModal(false)}>
+          <div className="reason-modal" onClick={e => e.stopPropagation()}>
+            <h3>Decline Reason</h3>
+            <div className="dance-info">
+              <strong>Dance:</strong> {selectedReasonDance.title}
+            </div>
+            <div className="decline-reason-display">
+              <label style={{ color: '#000000 !important', fontWeight: 'bold', fontSize: '16px' }}>Reason for Decline:</label>
+              <div 
+                className="reason-text"
+                style={{
+                  color: '#000000 !important',
+                  backgroundColor: '#ffffff !important',
+                  border: '2px solid #374151 !important',
+                  fontWeight: '600 !important',
+                  fontSize: '14px !important'
+                }}
+              >
+                {selectedReasonDance.decline_reason || 'No reason provided'}
+              </div>
+            </div>
+            <div className="reason-actions">
+              <button 
+                className="close-btn"
+                onClick={() => setShowReasonModal(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
