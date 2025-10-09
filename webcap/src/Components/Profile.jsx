@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Calendar, Edit3, Save, X, Lock, BarChart3, TrendingUp, Target, Activity } from 'lucide-react';
+import { User, Mail, Calendar, Edit3, Save, X, Lock, BarChart3, TrendingUp, Target, Activity, ChevronDown, ChevronUp } from 'lucide-react';
 import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
 import Navbar from '../Components/Navbar';
 import './Profile.css';
@@ -77,6 +77,7 @@ const PasswordRequirements = ({ password, isVisible }) => {
 
 // Dance Progress Table Component
 const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const totalFigures = danceData.totalFigures;
   const completedFigures = figureScores.filter(score => score > 0).length;
   const completionRate = totalFigures > 0 ? Math.round((completedFigures / totalFigures) * 100) : 0;
@@ -114,14 +115,18 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
       boxShadow: '0 8px 25px rgba(0, 0, 0, 0.08)',
       padding: '1.5rem',
       marginBottom: '1.5rem',
-      border: `2px solid ${completionRate === 100 ? '#10b981' : '#e5e7eb'}`
-    }}>
-      {/* Header */}
+      border: `2px solid ${completionRate === 100 ? '#10b981' : '#e5e7eb'}`,
+      cursor: 'pointer',
+      transition: 'all 0.3s ease'
+    }}
+    onClick={() => setIsExpanded(!isExpanded)}
+    >
+      {/* Header - Always Visible */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: '1rem',
+        marginBottom: isExpanded ? '1rem' : '0',
         flexWrap: 'wrap',
         gap: '0.5rem'
       }}>
@@ -144,16 +149,6 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
           flexWrap: 'wrap'
         }}>
           <span style={{
-            background: completionRate === 100 ? '#10b981' : completionRate > 0 ? '#f59e0b' : '#ef4444',
-            color: 'white',
-            padding: '0.25rem 0.75rem',
-            borderRadius: '12px',
-            fontSize: '0.8rem',
-            fontWeight: '600'
-          }}>
-            {completedFigures}/{totalFigures} Figures
-          </span>
-          <span style={{
             background: '#a0855b',
             color: 'white',
             padding: '0.25rem 0.75rem',
@@ -163,10 +158,34 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
           }}>
             {finalScore}% Final
           </span>
+          {isExpanded ? <ChevronUp size={20} style={{ color: '#a0855b' }} /> : <ChevronDown size={20} style={{ color: '#a0855b' }} />}
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {/* Collapsed Summary */}
+      {!isExpanded && (
+        <div style={{
+          marginTop: '1rem',
+          padding: '1rem',
+          background: '#f9fafb',
+          borderRadius: '8px',
+          border: '1px solid #e5e7eb'
+        }}>
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#374151',
+            fontWeight: '600',
+            textAlign: 'center'
+          }}>
+            Final Score = (Sum of all figure scores) ÷ {totalFigures} figures
+          </div>
+        </div>
+      )}
+
+      {/* Expanded Details */}
+      {isExpanded && (
+        <>
+          {/* Progress Bar */}
       <div style={{
         background: '#f3f4f6',
         borderRadius: '8px',
@@ -340,6 +359,8 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
           {finalScore}%
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };
@@ -1029,84 +1050,36 @@ const Profile = () => {
 
         {/* Right Column - Charts and Progress */}
         <div>
-          {/* Overall Performance Chart */}
-          <div className="chart-card" style={{
-            background: 'white',
-            borderRadius: '24px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-            padding: '2rem',
-            marginBottom: '2rem'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-              <BarChart3 size={24} style={{ color: '#a0855b' }} />
-              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>
-                Overall Dance Performance Summary
-              </h3>
-            </div>
-            <div className="chart-container" style={{ 
-              height: '280px',
-              minHeight: '200px',
-              maxHeight: '350px',
-              width: '100%',
-              overflow: 'hidden'
-            }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={performanceData}
-                  margin={{ top: 10, right: 20, left: 5, bottom: 35 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#6b7280"
-                    fontSize={12}
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
-                    interval={0}
-                  />
-                  <YAxis 
-                    stroke="#6b7280" 
-                    domain={[0, 100]}
-                    fontSize={12}
-                    width={40}
-                  />
-                  <Tooltip 
-                    contentStyle={{
-                      background: 'white',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      fontSize: '12px'
-                    }}
-                    formatter={(value) => [`${value}%`, 'Average Score']}
-                  />
-                  <Bar 
-                    dataKey="score" 
-                    fill="#a0855b" 
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={60}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
           {/* Dance Progress Section */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             gap: '1.5rem'
           }}>
-            {/* Individual Dance Progress Tables */}
-            {DANCE_NAMES.map((danceName) => (
-              <DanceProgressTable
-                key={danceName}
-                danceName={danceName}
-                figureScores={danceProgressData[danceName] || []}
-                danceData={DANCE_DATA[danceName]}
-              />
-            ))}
+            {/* Individual Dance Progress Tables - Sorted by Final Score */}
+            {DANCE_NAMES
+              .map((danceName) => {
+                const figureScores = danceProgressData[danceName] || [];
+                const totalFigures = DANCE_DATA[danceName].totalFigures;
+                const finalScore = figureScores.length > 0 ? 
+                  Math.round(figureScores.reduce((sum, score) => sum + score, 0) / totalFigures) : 0;
+                
+                return {
+                  danceName,
+                  finalScore,
+                  figureScores,
+                  danceData: DANCE_DATA[danceName]
+                };
+              })
+              .sort((a, b) => b.finalScore - a.finalScore) // Sort by finalScore descending (highest to lowest)
+              .map(({ danceName, figureScores, danceData }) => (
+                <DanceProgressTable
+                  key={danceName}
+                  danceName={danceName}
+                  figureScores={figureScores}
+                  danceData={danceData}
+                />
+              ))}
           </div>
         </div>
       </div>
@@ -1393,7 +1366,7 @@ const Profile = () => {
           .chart-container {
             height: 350px !important;
           }
-        }
+        } 
       `}</style>
     </div>
   );

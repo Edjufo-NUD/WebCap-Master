@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Tiklos Figure Count</title>
+</head>
+<body>
+    <h1>Debug Tiklos: Step-by-Step Figure Count</h1>
+    
+    <h2>Expected Pattern from Profile.jsx:</h2>
+    <div id="profile-pattern"></div>
+    
+    <h2>Analytics.jsx Array:</h2>
+    <div id="analytics-array"></div>
+    
+    <h2>UserRatings.jsx Mapping:</h2>
+    <div id="userratings-mapping"></div>
+
+    <script>
+        // Simulate the arrays from the files
+        
+        // From Profile.jsx logic (lines 750-753)
+        const profilePattern = [];
+        for (let figNum = 1; figNum <= 16; figNum++) {
+            let mapping;
+            if (figNum >= 1 && figNum <= 5) mapping = `Tiklos - Figure: 1 (Step ${figNum})`;
+            else if (figNum >= 6 && figNum <= 8) mapping = `Tiklos - Figure: 2 (Step ${figNum - 5})`;
+            else if (figNum >= 9 && figNum <= 12) mapping = `Tiklos - Figure: 3 (Step ${figNum - 8})`;
+            else if (figNum >= 13 && figNum <= 16) mapping = `Tiklos - Figure: 4 (Step ${figNum - 12})`;
+            
+            profilePattern.push({
+                file: `TiklosTutFig${figNum}.json`,
+                mapping: mapping
+            });
+        }
+        
+        // From Analytics.jsx
+        const analyticsArray = [
+            "TiklosTutFig1.json", "TiklosTutFig2.json", "TiklosTutFig3.json", "TiklosTutFig4.json",
+            "TiklosTutFig5.json", "TiklosTutFig6.json", "TiklosTutFig7.json", "TiklosTutFig8.json",
+            "TiklosTutFig9.json", "TiklosTutFig10.json", "TiklosTutFig11.json", "TiklosTutFig12.json",
+            "TiklosTutFig13.json", "TiklosTutFig14.json", "TiklosTutFig15.json", "TiklosTutFig16.json"
+        ];
+        
+        // From UserRatings.jsx mapping
+        const userRatingsMapping = {
+            "TiklosTutFig1.json": "Tiklos - Figure: 1 (Step 1)",
+            "TiklosTutFig2.json": "Tiklos - Figure: 1 (Step 2)",
+            "TiklosTutFig3.json": "Tiklos - Figure: 1 (Step 3)",
+            "TiklosTutFig4.json": "Tiklos - Figure: 1 (Step 4)",
+            "TiklosTutFig5.json": "Tiklos - Figure: 1 (Step 5)",  // <-- EXTRA STEP IN FIGURE 1
+            "TiklosTutFig6.json": "Tiklos - Figure: 2 (Step 1)",
+            "TiklosTutFig7.json": "Tiklos - Figure: 2 (Step 2)",
+            "TiklosTutFig8.json": "Tiklos - Figure: 2 (Step 3)",
+            // MISSING: Figure 2 Step 4
+            "TiklosTutFig9.json": "Tiklos - Figure: 3 (Step 1)",
+            "TiklosTutFig10.json": "Tiklos - Figure: 3 (Step 2)",
+            "TiklosTutFig11.json": "Tiklos - Figure: 3 (Step 3)",
+            "TiklosTutFig12.json": "Tiklos - Figure: 3 (Step 4)",
+            "TiklosTutFig13.json": "Tiklos - Figure: 4 (Step 1)",
+            "TiklosTutFig14.json": "Tiklos - Figure: 4 (Step 2)",
+            "TiklosTutFig15.json": "Tiklos - Figure: 4 (Step 3)",
+            "TiklosTutFig16.json": "Tiklos - Figure: 4 (Step 4)"
+        };
+        
+        // Analyze the patterns
+        function analyzePatterns() {
+            console.log('=== TIKLOS STEP-BY-STEP DEBUG ANALYSIS ===');
+            
+            console.log('\n1. PROFILE.JSX PATTERN:');
+            console.log(`Total figures: ${profilePattern.length}`);
+            
+            const figureBreakdown = {};
+            profilePattern.forEach(item => {
+                const figureMatch = item.mapping.match(/Figure: (\d+)/);
+                if (figureMatch) {
+                    const figNum = figureMatch[1];
+                    if (!figureBreakdown[figNum]) figureBreakdown[figNum] = 0;
+                    figureBreakdown[figNum]++;
+                }
+            });
+            
+            console.log('Steps per figure:', figureBreakdown);
+            
+            console.log('\n2. ANALYTICS.JSX ARRAY:');
+            console.log(`Array length: ${analyticsArray.length}`);
+            console.log('Array contents:', analyticsArray);
+            
+            console.log('\n3. USERRATINGS.JSX MAPPING:');
+            console.log(`Mapping entries: ${Object.keys(userRatingsMapping).length}`);
+            
+            const userRatingBreakdown = {};
+            Object.values(userRatingsMapping).forEach(mapping => {
+                const figureMatch = mapping.match(/Figure: (\d+)/);
+                if (figureMatch) {
+                    const figNum = figureMatch[1];
+                    if (!userRatingBreakdown[figNum]) userRatingBreakdown[figNum] = 0;
+                    userRatingBreakdown[figNum]++;
+                }
+            });
+            
+            console.log('UserRatings steps per figure:', userRatingBreakdown);
+            
+            console.log('\n4. INCONSISTENCY ANALYSIS:');
+            console.log('Profile.jsx pattern: Figure 1 has 5 steps, Figure 2 has 3 steps');
+            console.log('UserRatings.jsx: Figure 1 has 5 steps, Figure 2 has 3 steps');
+            console.log('Expected: Each figure should have 4 steps (4x4=16 total)');
+            console.log('ISSUE: The database structure is 5+3+4+4=16 instead of 4+4+4+4=16');
+        }
+        
+        // Display results
+        document.getElementById('profile-pattern').innerHTML = `
+            <p><strong>Count:</strong> ${profilePattern.length}</p>
+            <p><strong>Pattern breakdown:</strong></p>
+            <ul>
+                <li>Figure 1: Steps 1-5 (5 steps) ❌ Should be 4</li>
+                <li>Figure 2: Steps 1-3 (3 steps) ❌ Should be 4</li>
+                <li>Figure 3: Steps 1-4 (4 steps) ✅</li>
+                <li>Figure 4: Steps 1-4 (4 steps) ✅</li>
+            </ul>
+            <p><strong>Total:</strong> 5+3+4+4 = 16 figures</p>
+        `;
+        
+        document.getElementById('analytics-array').innerHTML = `
+            <p><strong>Array length:</strong> ${analyticsArray.length}</p>
+            <p><strong>Files:</strong> ${analyticsArray.join(', ')}</p>
+        `;
+        
+        document.getElementById('userratings-mapping').innerHTML = `
+            <p><strong>Mapping count:</strong> ${Object.keys(userRatingsMapping).length}</p>
+            <p><strong>Issue:</strong> UserRatings.jsx has the same 5+3+4+4 pattern as Profile.jsx</p>
+        `;
+        
+        // Run analysis
+        analyzePatterns();
+        
+        console.log('\n=== SOLUTION ===');
+        console.log('The issue is that the database has an irregular pattern: 5+3+4+4=16');
+        console.log('Analytics.jsx is correctly expecting 16 figures, but the pattern is irregular');
+        console.log('This is why you see only 13 figures instead of 16 in the chart');
+        console.log('The missing 3 figures are likely due to:');
+        console.log('1. Figure 1 has an extra step (5 instead of 4)');
+        console.log('2. Figure 2 is missing a step (3 instead of 4)');
+        console.log('3. Some figures may not have data in the database');
+    </script>
+</body>
+</html>

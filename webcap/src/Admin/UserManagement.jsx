@@ -13,6 +13,9 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [notification, setNotification] = useState(null);
+  const [maintenanceMode, setMaintenanceMode] = useState(false);
+  const [originalUserStatuses, setOriginalUserStatuses] = useState(new Map());
+  const [isTogglingMaintenance, setIsTogglingMaintenance] = useState(false);
   const usersPerPage = 10;
 
   // Show notification function
@@ -23,7 +26,53 @@ const UserManagement = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchAnalytics();
+    checkMaintenanceMode();
   }, []);
+
+  const checkMaintenanceMode = async () => {
+    try {
+      const { data: maintenanceUsers, error } = await supabase
+        .from("users")
+        .select("id")
+        .eq("role", "user")
+        .eq("status", "Maintenance");
+
+      if (error) throw error;
+
+      // If there are any users in maintenance mode, set the switch to ON
+      if (maintenanceUsers && maintenanceUsers.length > 0) {
+        setMaintenanceMode(true);
+      }
+    } catch (error) {
+      console.error("Error checking maintenance mode:", error);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      // Fetch total users (role = 'user')
+      const { data: usersData, error: usersError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("role", "user");
+
+      if (usersError) throw usersError;
+
+      // Fetch total admins (role = 'admin' or 'superadmin')
+      const { data: adminsData, error: adminsError } = await supabase
+        .from("users")
+        .select("id")
+        .in("role", ["admin", "superadmin"]);
+
+      if (adminsError) throw adminsError;
+
+      setTotalUsers(usersData?.length || 0);
+      setTotalAdmins(adminsData?.length || 0);
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+    }
+  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -93,6 +142,95 @@ const UserManagement = () => {
     setEditingUser({ ...editingUser, [field]: value });
   };
 
+  const toggleMaintenanceMode = async () => {
+    setIsTogglingMaintenance(true);
+    
+    try {
+      if (!maintenanceMode) {
+        // Entering maintenance mode - get all regular users and store their current status
+        const { data: regularUsers, error: fetchError } = await supabase
+          .from("users")
+          .select("id, status")
+          .eq("role", "user");
+
+        if (fetchError) throw fetchError;
+
+        // Store original statuses in component state and localStorage
+        const statusMap = new Map();
+        const statusBackup = {};
+        
+        regularUsers.forEach(user => {
+          statusMap.set(user.id, user.status);
+          statusBackup[user.id] = user.status;
+        });
+        
+        setOriginalUserStatuses(statusMap);
+        localStorage.setItem('userStatusBackup', JSON.stringify(statusBackup));
+
+        // Update all regular users to maintenance status
+        for (const user of regularUsers) {
+          const { error } = await supabase
+            .from("users")
+            .update({ status: "Maintenance" })
+            .eq("id", user.id);
+          
+          if (error) throw error;
+        }
+
+        setMaintenanceMode(true);
+        showNotification("Maintenance mode enabled - All users set to maintenance status", 'success');
+
+      } else {
+        // Exiting maintenance mode - restore original statuses
+        let statusesToRestore = originalUserStatuses;
+        
+        // Fallback to localStorage if state is empty
+        if (statusesToRestore.size === 0) {
+          const backup = localStorage.getItem('userStatusBackup');
+          if (backup) {
+            const backupData = JSON.parse(backup);
+            statusesToRestore = new Map(Object.entries(backupData));
+          }
+        }
+
+        // Get current users in maintenance mode
+        const { data: maintenanceUsers, error: fetchError } = await supabase
+          .from("users")
+          .select("id")
+          .eq("role", "user")
+          .eq("status", "Maintenance");
+
+        if (fetchError) throw fetchError;
+
+        // Restore original statuses
+        for (const user of maintenanceUsers) {
+          const originalStatus = statusesToRestore.get(user.id) || "Enabled";
+          const { error } = await supabase
+            .from("users")
+            .update({ status: originalStatus })
+            .eq("id", user.id);
+          
+          if (error) throw error;
+        }
+
+        // Clear stored statuses
+        setOriginalUserStatuses(new Map());
+        localStorage.removeItem('userStatusBackup');
+        setMaintenanceMode(false);
+        showNotification("Maintenance mode disabled - User statuses restored", 'success');
+      }
+
+      // Refresh the users list
+      await fetchUsers();
+
+    } catch (error) {
+      console.error("Error toggling maintenance mode:", error);
+      showNotification("Failed to toggle maintenance mode", 'error');
+    } finally {
+      setIsTogglingMaintenance(false);
+    }
+  };
+
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,6 +286,45 @@ const UserManagement = () => {
       <div className="user-management-content">
         <h1 className="user-management-title">User Management</h1>
 
+        {/* Analytics Cards */}
+        <div className="analytics-cards">
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 4V6C15 7.1 14.1 8 13 8H11C9.9 8 9 7.1 9 6V4L3 7V9H21ZM21 10H3V22H21V10Z"/>
+              </svg>
+            </div>
+            <div className="stat-info">
+              <div className="stat-value">{totalUsers}</div>
+              <div className="stat-label">Total Users</div>
+            </div>
+          </div>
+          
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 4V6C15 7.1 14.1 8 13 8H11C9.9 8 9 7.1 9 6V4L3 7V9H21ZM21 10H3V22H21V10Z"/>
+              </svg>
+            </div>
+            <div className="stat-info">
+              <div className="stat-value">{totalAdmins}</div>
+              <div className="stat-label">Total Admins</div>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 2v20l-5.5-5.5L10 2zM14 2l5.5 14.5L14 22V2z"/>
+              </svg>
+            </div>
+            <div className="stat-info">
+              <div className="stat-value">{users.filter(u => u.status === 'Disabled').length}</div>
+              <div className="stat-label">Disabled Users</div>
+            </div>
+          </div>
+        </div>
+
         <div className="user-management-card">
           <h2 className="user-management-card-title">Manage Users</h2>
 
@@ -181,15 +358,18 @@ const UserManagement = () => {
                       <td>
                         <span
                           className={`role-badge ${
-                            user.status === "Disabled" ? "disabled" : user.role
+                            user.status === "Disabled" ? "disabled" : 
+                            user.status === "Maintenance" ? "maintenance" : user.role
                           }`}
                         >
-                          {user.status === "Disabled" ? "Disabled" : user.role}
+                          {user.status === "Disabled" ? "Disabled" : 
+                           user.status === "Maintenance" ? "Maintenance" : user.role}
                         </span>
                       </td>
                       <td
                         style={{
-                          color: user.status === "Disabled" ? "#c62828" : "green",
+                          color: user.status === "Disabled" ? "#c62828" : 
+                                 user.status === "Maintenance" ? "#f57c00" : "green",
                           fontWeight: "bold",
                         }}
                       >
@@ -235,7 +415,26 @@ const UserManagement = () => {
 
           {/* Users */}
           <div className="users-table-container">
-            <h3 style={{ color: "#222", fontWeight: "bold", letterSpacing: "1px" }}>Users</h3>
+            <div className="users-header">
+              <h3 style={{ color: "#222", fontWeight: "bold", letterSpacing: "1px" }}>Users</h3>
+              
+              {/* Maintenance Mode Switch */}
+              <div className="maintenance-toggle">
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={maintenanceMode}
+                    onChange={toggleMaintenanceMode}
+                    disabled={isTogglingMaintenance}
+                  />
+                  <span className="slider round"></span>
+                </label>
+                <span className="maintenance-label">
+                  {maintenanceMode ? "Maintenance ON" : "Maintenance OFF"}
+                </span>
+                {isTogglingMaintenance && <span className="loading-spinner">⟳</span>}
+              </div>
+            </div>
             <table className="users-table">
               <thead>
                 <tr>
@@ -255,15 +454,18 @@ const UserManagement = () => {
                       <td>
                         <span
                           className={`role-badge ${
-                            user.status === "Disabled" ? "disabled" : user.role
+                            user.status === "Disabled" ? "disabled" : 
+                            user.status === "Maintenance" ? "maintenance" : user.role
                           }`}
                         >
-                          {user.status === "Disabled" ? "Disabled" : user.role}
+                          {user.status === "Disabled" ? "Disabled" : 
+                           user.status === "Maintenance" ? "Maintenance" : user.role}
                         </span>
                       </td>
                       <td
                         style={{
-                          color: user.status === "Disabled" ? "#c62828" : "green",
+                          color: user.status === "Disabled" ? "#c62828" : 
+                                 user.status === "Maintenance" ? "#f57c00" : "green",
                           fontWeight: "bold",
                         }}
                       >
@@ -402,6 +604,7 @@ const UserManagement = () => {
               >
                 <option value="Enabled">Enabled</option>
                 <option value="Disabled">Disabled</option>
+                <option value="Maintenance">Maintenance</option>
               </select>
             </div>
             <div className="modal-actions">

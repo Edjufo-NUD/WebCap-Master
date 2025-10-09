@@ -25,6 +25,10 @@ const DanceUpload = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
 
+  // Get current user role to determine if approval is needed
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+  const userRole = currentUser?.role;
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -219,6 +223,9 @@ const DanceUpload = () => {
       const userId = userData?.user?.id;
       if (!userId) throw new Error("User not authenticated");
 
+      // Set status based on user role - superadmin uploads are auto-approved
+      const danceStatus = userRole === 'superadmin' ? 'approved' : 'pending';
+
       const { data: dance, error: danceError } = await supabase
         .from('dances')
         .insert([{
@@ -232,7 +239,7 @@ const DanceUpload = () => {
           performers: formData.performers,
           music: formData.music,
           costumes: formData.costumes,
-          status: 'pending'
+          status: danceStatus
         }])
         .select()
         .single();
@@ -254,8 +261,14 @@ const DanceUpload = () => {
         position: 0,
       }]);
 
-      showNotification('Upload successful. The dance has been submitted for approval.', 'success');
-      navigate('/dance-request');
+      // Show different message based on user role
+      if (userRole === 'superadmin') {
+        showNotification('Upload successful. The dance has been directly published!', 'success');
+        navigate('/manage-dance');
+      } else {
+        showNotification('Upload successful. The dance has been submitted for approval.', 'success');
+        navigate('/dance-request');
+      }
     } catch (error) {
       console.error('Upload error:', error);
       showNotification('Upload failed. Please try again.', 'error');
@@ -298,7 +311,20 @@ const DanceUpload = () => {
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
 
       <div className="dance-upload-content">
-        <h1 className="dance-upload-title">Upload Dance</h1>
+        <h1 className="dance-upload-title">
+          {userRole === 'superadmin' ? 'Publish Dance' : 'Upload Dance'}
+        </h1>
+        {userRole === 'superadmin' && (
+          <p style={{ 
+            textAlign: 'center', 
+            color: '#2563eb', 
+            fontWeight: '600', 
+            marginTop: '8px',
+            fontSize: '1.1rem'
+          }}>
+            Your dance will be published directly without approval.
+          </p>
+        )}
 
         <form
           className="dance-upload-form"
@@ -751,7 +777,10 @@ const DanceUpload = () => {
           </div>
 
           <button type="submit" className="submit-btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Uploading...' : 'Upload Dance'}
+            {isSubmitting 
+              ? (userRole === 'superadmin' ? 'Publishing...' : 'Uploading...') 
+              : (userRole === 'superadmin' ? 'Publish Dance' : 'Upload Dance')
+            }
           </button>
         </form>
       </div>

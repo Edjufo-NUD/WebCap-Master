@@ -26,6 +26,7 @@ ALTER TABLE dances ADD COLUMN performers VARCHAR;
 ALTER TABLE dances ADD COLUMN music VARCHAR;
 ALTER TABLE dances ADD COLUMN costumes VARCHAR;
 ALTER TABLE dances ADD COLUMN status VARCHAR DEFAULT 'pending'; -- pending, approved, declined
+ALTER TABLE dances ADD COLUMN decline_reason TEXT; -- reason for decline (max 150 chars)
 
 -- DANCE_IMAGES table
 CREATE TABLE dance_images (

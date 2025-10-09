@@ -62,6 +62,10 @@ const DanceRequest = () => {
   const [historyDances, setHistoryDances] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   
+  // Reason modal state
+  const [showReasonModal, setShowReasonModal] = useState(false);
+  const [selectedReasonDance, setSelectedReasonDance] = useState(null);
+  
   // Notification state
   const [notification, setNotification] = useState(null);
   
@@ -165,6 +169,27 @@ const DanceRequest = () => {
     };
     fetchDances();
   }, [userRole, currentUserId]);
+
+  // Handle clicking on declined history items to show reason
+  const handleHistoryClick = async (dance) => {
+    if (dance.status === 'declined') {
+      // Fetch the full dance data including decline reason
+      const { data: danceData, error } = await supabase
+        .from('dances')
+        .select('decline_reason, title')
+        .eq('id', dance.id)
+        .single();
+      
+      if (!error && danceData) {
+        setSelectedReasonDance({
+          ...dance,
+          decline_reason: danceData.decline_reason,
+          title: danceData.title
+        });
+        setShowReasonModal(true);
+      }
+    }
+  };
 
   // Fetch history of approved/declined dances for current user
   useEffect(() => {
@@ -379,7 +404,9 @@ const DanceRequest = () => {
                 {historyDances.map(dance => (
                   <div 
                     key={dance.id} 
-                    className={`history-item ${dance.status}`}
+                    className={`history-item ${dance.status} ${dance.status === 'declined' ? 'clickable' : ''}`}
+                    onClick={dance.status === 'declined' ? () => handleHistoryClick(dance) : undefined}
+                    title={dance.status === 'declined' ? 'Click to view decline reason' : ''}
                   >
                     <div className="history-title">{dance.title}</div>
                     <div className="history-status">
@@ -719,6 +746,32 @@ const DanceRequest = () => {
                   Cancel Request
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Decline Reason Display Modal */}
+      {showReasonModal && selectedReasonDance && (
+        <div className="modal-overlay" onClick={() => setShowReasonModal(false)}>
+          <div className="reason-modal" onClick={e => e.stopPropagation()}>
+            <h3>Decline Reason</h3>
+            <div className="dance-info">
+              <strong>Dance:</strong> {selectedReasonDance.title}
+            </div>
+            <div className="decline-reason-display">
+              <label>Reason for Decline:</label>
+              <div className="reason-text">
+                {selectedReasonDance.decline_reason || 'No reason provided'}
+              </div>
+            </div>
+            <div className="reason-actions">
+              <button 
+                className="close-btn"
+                onClick={() => setShowReasonModal(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
