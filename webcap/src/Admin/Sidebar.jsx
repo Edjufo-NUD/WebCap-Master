@@ -127,14 +127,70 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
   });
 
   const handleItemClick = (item) => {
-    setActiveItem(item.id);
-    navigate(item.path);
-    setMobileMenuOpen(false);
+    console.log('Sidebar item clicked:', item.id);
+    
+    // Check for upload interceptor first
+    if (window.interceptSetActiveItem) {
+      const canProceed = window.interceptSetActiveItem(item.id);
+      if (canProceed === false) {
+        console.log('Navigation intercepted by upload process');
+        return;
+      }
+    }
+    
+    // Emit custom event before navigation for upload interruption handling
+    const navigationEvent = new CustomEvent('sidebarNavigation', {
+      detail: {
+        targetItem: item.id,
+        targetPath: item.path,
+        currentPath: window.location.pathname
+      }
+    });
+    
+    // Dispatch the event and check if it was prevented
+    const wasNotPrevented = window.dispatchEvent(navigationEvent);
+    
+    // Only proceed with navigation if the event wasn't prevented
+    if (wasNotPrevented) {
+      setActiveItem(item.id);
+      navigate(item.path);
+      setMobileMenuOpen(false);
+    } else {
+      console.log('Navigation prevented by event handler');
+    }
   };
 
   const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-    setMobileMenuOpen(false);
+    console.log('Logout clicked');
+    
+    // Check for upload interceptor first
+    if (window.interceptSetActiveItem) {
+      const canProceed = window.interceptSetActiveItem('logout');
+      if (canProceed === false) {
+        console.log('Logout intercepted by upload process');
+        return;
+      }
+    }
+    
+    // Emit custom event before showing logout modal for upload interruption handling
+    const navigationEvent = new CustomEvent('sidebarNavigation', {
+      detail: {
+        targetItem: 'logout',
+        targetPath: '/login',
+        currentPath: window.location.pathname
+      }
+    });
+    
+    // Dispatch the event and check if it was prevented
+    const wasNotPrevented = window.dispatchEvent(navigationEvent);
+    
+    // Only proceed with logout modal if the event wasn't prevented
+    if (wasNotPrevented) {
+      setShowLogoutModal(true);
+      setMobileMenuOpen(false);
+    } else {
+      console.log('Logout prevented by event handler');
+    }
   };
 
   const confirmLogout = () => {

@@ -437,6 +437,30 @@ const Home = () => {
       <div className="bg-shape hexagon" style={{ top: '30%', right: '2%' }}></div>
       <div className="bg-shape octagon" style={{ top: '80%', right: '1%' }}></div>
 
+      {/* Additional visible decorative elements */}
+      <div className="visible-decoration" style={{ 
+        position: 'absolute', 
+        top: '20%', 
+        left: '10%', 
+        width: '100px', 
+        height: '100px', 
+        background: 'linear-gradient(45deg, rgba(160, 133, 91, 0.1), rgba(205, 133, 63, 0.1))', 
+        borderRadius: '50%', 
+        zIndex: 0,
+        animation: 'pulse 4s ease-in-out infinite' 
+      }}></div>
+      <div className="visible-decoration" style={{ 
+        position: 'absolute', 
+        top: '60%', 
+        right: '10%', 
+        width: '80px', 
+        height: '80px', 
+        background: 'linear-gradient(135deg, rgba(160, 133, 91, 0.15), rgba(205, 133, 63, 0.1))', 
+        clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)', 
+        zIndex: 0,
+        animation: 'rotate 10s linear infinite' 
+      }}></div>
+
       <Navbar />
       
       <section className="hero">
@@ -470,18 +494,26 @@ const Home = () => {
       </section>
 
       <section className="featured">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">Featured Folk Dances</h2>
-            <p className="section-subtitle">
-              Discover the most popular and beautiful Filipino folk dances
-            </p>
+        <div className="featured-hero">
+          <div className="featured-hero-content">
+            <span className="featured-badge">✨ FEATURED COLLECTION</span>
+            <h2 className="featured-main-title">Filipino Folk Dances</h2>
+            <p className="featured-hero-desc">Experience the rich cultural tapestry of the Philippines through our curated selection of traditional dances</p>
           </div>
-          
-          <div className="dance-grid">
-            {featuredDances.map((dance) => (
-              <div key={dance.id} className="dance-card" onClick={() => openModal(dance)} style={{ cursor: 'pointer' }}>
-                <div className="dance-image">
+        </div>
+        
+        <div className="container">
+          <div className="dance-showcase">
+            {featuredDances.map((dance, index) => {
+              const hasImage = dance.image && !imageError[dance.id];
+              const hasContent = hasImage || (dance.figureVideos && dance.figureVideos.length > 0) || dance.main_video_url;
+              return (
+              <div 
+                key={dance.id} 
+                className={`dance-showcase-card ${index === 0 ? 'featured-main' : ''} ${hasContent ? 'has-image' : 'coming-soon'}`}
+                onClick={hasContent ? () => openModal(dance) : undefined}
+              >
+                <div className="dance-showcase-image">
                   {dance.image && !imageError[dance.id] ? (
                     <img 
                       src={dance.image} 
@@ -490,52 +522,51 @@ const Home = () => {
                       onLoad={() => handleImageLoad(dance.id, dance.image)}
                     />
                   ) : (
-                    <div style={{
-                      width: '100%',
-                      height: '100%',
-                      background: '#f5f5f5',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '2px dashed #ddd',
-                      color: '#666',
-                      fontSize: '18px',
-                      fontWeight: '500'
-                    }}>
-                      No Preview Available
+                    <div className="image-placeholder-new">
+                      <div className="placeholder-icon">🎭</div>
+                      <span>No Image Available</span>
                     </div>
                   )}
-                </div>
-                <div className="dance-content">
-                  <div className="dance-header">
-                    <h3 className="dance-name">{dance.title || dance.name}</h3>
+                  <div className="dance-overlay">
+                    <div className="dance-badges">
+                      <span className="region-badge-new">{dance.island}</span>
+                      <span className="difficulty-badge-new">{dance.difficulty}</span>
+                    </div>
                   </div>
-                  <p className="dance-region">{dance.region}</p>
-                  <p className="dance-description">{dance.description}</p>
-                  <button 
-                    className="learn-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openModal(dance);
-                    }}
-                  >
-                    Learn More
-                    <ChevronRight size={16} />
-                  </button>
+                </div>
+                
+                <div className="dance-showcase-content">
+                  <div className="dance-meta">
+                    <span className="dance-origin">{dance.region}</span>
+                    <div className="dance-stats">
+                      <span className="stat-item">{dance.duration}</span>
+                      <span className="stat-divider">•</span>
+                      <span className="stat-item">{dance.performers}</span>
+                    </div>
+                  </div>
+                  
+                  <h3 className="dance-showcase-title">{dance.title || dance.name}</h3>
+                  <p className="dance-showcase-desc">{dance.description}</p>
+                  
+                  <div className="dance-action">
+                    <button 
+                      className="explore-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openModal(dance);
+                      }}
+                    >
+                      <span>Explore Dance</span>
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           
-          <div className="featured-footer">
-            <button 
-              className="btn-outline"
-              onClick={() => navigate('/dances')}
-            >
-              View All Dances
-              <ChevronRight size={20} />
-            </button>
-          </div>
+
         </div>
       </section>
 

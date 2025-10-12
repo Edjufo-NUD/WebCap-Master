@@ -527,94 +527,98 @@ const Dances = () => {
       </section>
 
       {/* Search and Filter Section */}
-      <section className="search-filter">
+      <section className="dances-search-filter">
         <div className="container">
-          <div className="search-bar">
-            <Search className="search-icon" size={20} />
-            <input
-              type="text"
-              placeholder="Search dances or provinces..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-            />
-          </div>
-          
-          <div className="filter-tabs">
-            {/* Sort Dropdown */}
-            <div className="sort-dropdown-container" style={{ position: 'relative', marginRight: '16px' }}>
-              <Filter 
-                className="filter-icon" 
-                size={20} 
-                onClick={() => setShowSortDropdown(!showSortDropdown)}
-                style={{ cursor: 'pointer' }}
+          <div className="dances-search-controls">
+            <div className="dances-search-bar">
+              <Search className="search-icon" size={20} />
+              <input
+                type="text"
+                placeholder="Search dances or provinces..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
               />
-              
-              {showSortDropdown && (
-                <div
-                  className="sort-dropdown"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 12px)',
-                    left: 0,
-                    background: 'rgba(210, 180, 140, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    border: '2px solid rgba(160, 133, 91, 0.3)',
-                    borderRadius: '16px',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15)',
-                    minWidth: '220px',
-                    padding: '12px',
-                    zIndex: 1000,
-                    animation: 'fadeIn 0.15s ease-out'
-                  }}
-                >
-                  {['a-z', 'z-a', 'latest', 'oldest'].map((option) => (
-                    <button
-                      key={option}
-                      onClick={() => handleSortChange(option)}
-                      style={{
-                        width: '100%',
-                        padding: '14px 18px',
-                        marginBottom: option === 'oldest' ? '0' : '8px',
-                        background: sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)',
-                        border: 'none',
-                        borderRadius: '12px',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                        fontWeight: '500',
-                        color: '#ffffff',
-                        transition: 'all 0.3s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        boxShadow: sortOption === option ? '0 2px 8px rgba(0, 0, 0, 0.2)' : 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(160, 133, 91, 0.85)';
-                        e.currentTarget.style.transform = 'translateX(4px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)';
-                        e.currentTarget.style.transform = 'translateX(0)';
-                      }}
-                    >
-                      {option === 'a-z' ? 'A-Z' : option === 'z-a' ? 'Z-A' : option === 'latest' ? 'Latest Upload' : 'Oldest Upload'}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
             
-            <div className="region-tabs">
-              {regions.map(region => (
-                <button
-                  key={region}
-                  className={`region-tab ${selectedRegion === region ? 'active' : ''}`}
-                  onClick={() => setSelectedRegion(region)}
+            <div className="dances-mobile-controls-row">
+              {/* Sort Dropdown */}
+              <div className="dances-sort-button-container" style={{ position: 'relative' }}>
+                <div 
+                  className="dances-filter-circle-button"
+                  onClick={() => setShowSortDropdown(!showSortDropdown)}
                 >
-                  {region}
-                </button>
-              ))}
+                  <Filter 
+                    size={20} 
+                  />
+                </div>
+                
+                {showSortDropdown && (
+                  <div
+                    className="sort-dropdown"
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 12px)',
+                      left: 0,
+                      background: 'rgba(210, 180, 140, 0.95)',
+                      backdropFilter: 'blur(10px)',
+                      border: '2px solid rgba(160, 133, 91, 0.3)',
+                      borderRadius: '16px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15)',
+                      minWidth: '220px',
+                      padding: '12px',
+                      zIndex: 1000,
+                      animation: 'fadeIn 0.15s ease-out'
+                    }}
+                  >
+                    {['a-z', 'z-a', 'latest', 'oldest'].map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => handleSortChange(option)}
+                        style={{
+                          width: '100%',
+                          padding: '14px 18px',
+                          marginBottom: option === 'oldest' ? '0' : '8px',
+                          background: sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)',
+                          border: 'none',
+                          borderRadius: '12px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          color: '#ffffff',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          boxShadow: sortOption === option ? '0 2px 8px rgba(0, 0, 0, 0.2)' : 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(160, 133, 91, 0.85)';
+                          e.currentTarget.style.transform = 'translateX(4px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)';
+                          e.currentTarget.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        {option === 'a-z' ? 'A-Z' : option === 'z-a' ? 'Z-A' : option === 'latest' ? 'Latest Upload' : 'Oldest Upload'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              <div className="dances-region-buttons-wrapper">
+                {regions.map(region => (
+                  <button
+                    key={region}
+                    className={`dances-region-btn ${selectedRegion === region ? 'dances-region-active' : ''}`}
+                    onClick={() => setSelectedRegion(region)}
+                  >
+                    {region}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -625,10 +629,9 @@ const Dances = () => {
         <div className="news-ticker-content">
           <span role="img" aria-label="megaphone" style={{ marginRight: 8 }}>📢</span>
           <span>
-            🎉 Exciting news! <strong>FLIPino</strong> is now live on the Play Store and App Store.  
+            🎉 Welcome to <strong>FLIPino</strong> - Your gateway to Filipino cultural heritage!  
             <span style={{ marginLeft: 4 }}>
-              Explore Filipino cultural dances like never before — watch, learn, and even <strong>simulate our featured dances</strong> right from your phone.  
-              Search for <strong>FLIPino</strong> today and start dancing with us! 💃🕺
+              Explore traditional Filipino folk dances like never before — watch detailed tutorials, learn the history, and discover the rich stories behind each dance. Start your cultural journey today! 💃🕺
             </span>
           </span>
         </div>
@@ -667,7 +670,7 @@ const Dances = () => {
                         fontSize: '14px',
                         fontWeight: '500'
                       }}>
-                        {dance.title === 'Sua Ku Sua' ? 'No Preview Available' : (dance.title ? dance.title.charAt(0).toUpperCase() : "?")}
+                        {dance.title === 'Sua Ku Sua' ? 'No Image Available' : (dance.title ? dance.title.charAt(0).toUpperCase() : "?")}
                       </div>
                     )}
                     <div className="dance-overlay">

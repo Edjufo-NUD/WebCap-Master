@@ -3,24 +3,18 @@ import { Users, Heart, Star, Globe, Music, Book, MapPin, ArrowUp } from 'lucide-
 import Navbar from '../Components/Navbar';
 import './About.css';
 import edrian from '../assets/edrian.jpeg';
-import anji from '../assets/anji.jpeg';
-import matthew from '../assets/matthew.jpg';
+import anji from '../assets/anjformal.png';
+import matthew from '../assets/mattformal.png';
 
 const About = () => {
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  // Show scroll-to-top button when scrolled down
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const [showScrollTop, setShowScrollTop] = useState(true);
 
   // Scroll to top handler
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const aboutContent = document.querySelector('.about-content');
+    if (aboutContent) {
+      aboutContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const teamMembers = [
@@ -69,7 +63,7 @@ const About = () => {
         {/* Hero Section with integrated features */}
         <section className="about-hero">
           <div className="about-hero-content">
-            <h1 className="about-title">About FLIPino</h1>
+            <h1 className="about-title">FLIPino</h1>
             <p className="about-subtitle">
               Preserving and celebrating the rich cultural heritage of the Philippines through digital storytelling
             </p>
@@ -158,32 +152,64 @@ const About = () => {
             <h2 className="section-title">Our Values</h2>
             <div className="values-grid">
               <div className="value-card">
-                <div className="value-icon">
-                  <Heart size={32} />
+                <div className="value-card-inner">
+                  <div className="value-card-front">
+                    <div className="value-icon">
+                      <Heart size={32} />
+                    </div>
+                    <h3>Cultural Respect</h3>
+                    <p className="mobile-only">We approach every tradition with deep respect and authenticity, ensuring accurate representation of Filipino culture.</p>
+                  </div>
+                  <div className="value-card-back">
+                    <h3>Cultural Respect</h3>
+                    <p>We approach every tradition with deep respect and authenticity, ensuring accurate representation of Filipino culture.</p>
+                  </div>
                 </div>
-                <h3>Cultural Respect</h3>
-                <p>We approach every tradition with deep respect and authenticity, ensuring accurate representation of Filipino culture.</p>
               </div>
               <div className="value-card">
-                <div className="value-icon">
-                  <Users size={32} />
+                <div className="value-card-inner">
+                  <div className="value-card-front">
+                    <div className="value-icon">
+                      <Users size={32} />
+                    </div>
+                    <h3>Community</h3>
+                    <p className="mobile-only">Building bridges between generations and communities to keep our cultural traditions alive and thriving.</p>
+                  </div>
+                  <div className="value-card-back">
+                    <h3>Community</h3>
+                    <p>Building bridges between generations and communities to keep our cultural traditions alive and thriving.</p>
+                  </div>
                 </div>
-                <h3>Community</h3>
-                <p>Building bridges between generations and communities to keep our cultural traditions alive and thriving.</p>
               </div>
               <div className="value-card">
-                <div className="value-icon">
-                  <Globe size={32} />
+                <div className="value-card-inner">
+                  <div className="value-card-front">
+                    <div className="value-icon">
+                      <Globe size={32} />
+                    </div>
+                    <h3>Accessibility</h3>
+                    <p className="mobile-only">Making Filipino culture accessible to everyone, everywhere, through innovative digital experiences.</p>
+                  </div>
+                  <div className="value-card-back">
+                    <h3>Accessibility</h3>
+                    <p>Making Filipino culture accessible to everyone, everywhere, through innovative digital experiences.</p>
+                  </div>
                 </div>
-                <h3>Accessibility</h3>
-                <p>Making Filipino culture accessible to everyone, everywhere, through innovative digital experiences.</p>
               </div>
               <div className="value-card">
-                <div className="value-icon">
-                  <Star size={32} />
+                <div className="value-card-inner">
+                  <div className="value-card-front">
+                    <div className="value-icon">
+                      <Star size={32} />
+                    </div>
+                    <h3>Excellence</h3>
+                    <p className="mobile-only">Committed to delivering high-quality content and experiences that honor our rich cultural heritage.</p>
+                  </div>
+                  <div className="value-card-back">
+                    <h3>Excellence</h3>
+                    <p>Committed to delivering high-quality content and experiences that honor our rich cultural heritage.</p>
+                  </div>
                 </div>
-                <h3>Excellence</h3>
-                <p>Committed to delivering high-quality content and experiences that honor our rich cultural heritage.</p>
               </div>
             </div>
           </div>

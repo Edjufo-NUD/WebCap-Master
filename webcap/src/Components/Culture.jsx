@@ -76,20 +76,205 @@ const Culture = () => {
 
   // Scroll-to-top button state
   const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  // Navigation and search states
+  const [showNavMenu, setShowNavMenu] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [currentSearchIndex, setCurrentSearchIndex] = useState(0);
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const [activeSection, setActiveSection] = useState('');
 
-  // Show button when scrolled down
+  // Show button when scrolled down and track reading progress
   React.useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 200);
+      const scrolled = window.scrollY > 300;
+      setShowScrollTop(scrolled);
+      
+      // Calculate reading progress
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrollProgress = (window.scrollY / documentHeight) * 100;
+      setReadingProgress(Math.min(scrollProgress, 100));
+      setShowProgressBar(window.scrollY > 200);
+      
+      // Update active section (only for navigation sections)
+      const sections = ['elements', 'regions', 'classifications', 'timeline'];
+      let foundActiveSection = '';
+      for (let section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            foundActiveSection = section;
+            break;
+          }
+        }
+      }
+      setActiveSection(foundActiveSection);
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle click outside navigation
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNavMenu) {
+        const navElement = event.target.closest('.floating-nav');
+        if (!navElement) {
+          setShowNavMenu(false);
+          // Clear search when navigation closes
+          clearSearch();
+        }
+      }
+    };
+
+    if (showNavMenu) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showNavMenu]);
+
+  // Clear search when navigation menu closes
+  React.useEffect(() => {
+    if (!showNavMenu && searchTerm) {
+      setSearchTerm('');
+      setSearchResults([]);
+      setCurrentSearchIndex(0);
+      document.querySelectorAll('.search-highlight').forEach(el => {
+        el.classList.remove('search-highlight', 'search-highlight-active');
+      });
+    }
+  }, [showNavMenu, searchTerm]);
 
   // Scroll to top handler
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  // Navigation functions
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setShowNavMenu(false);
+      // Clear search when navigating to a section
+      clearSearch();
+    }
+  };
+
+  // Search functionality
+  const performSearch = (term) => {
+    if (!term.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const searchTermLower = term.toLowerCase();
+    const results = [];
+    
+    // Create a container that excludes navbar and navigation elements
+    const searchSections = [
+      '.culture-hero',
+      '.cultural-heritage-intro', 
+      '.cultural-elements',
+      '.folk-dance-classifications',
+      '.regional-cultures',
+      '.cultural-timeline'
+    ];
+    
+    // Find all text nodes that contain the search term within the content sections only
+    searchSections.forEach(sectionSelector => {
+      const section = document.querySelector(sectionSelector);
+      if (section) {
+        const walker = document.createTreeWalker(
+          section,
+          NodeFilter.SHOW_TEXT,
+          {
+            acceptNode: function(node) {
+              // Exclude navbar, floating-nav, search-container elements
+              const parent = node.parentElement;
+              if (parent && (
+                parent.closest('.navbar') ||
+                parent.closest('.floating-nav') ||
+                parent.closest('.search-container')
+              )) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          },
+          false
+        );
+
+        let node;
+        while (node = walker.nextNode()) {
+          const text = node.textContent.toLowerCase();
+          if (text.includes(searchTermLower)) {
+            results.push(node.parentElement);
+          }
+        }
+      }
+    });
+
+    setSearchResults(results);
+    setCurrentSearchIndex(0);
+    
+    if (results.length > 0) {
+      results[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      highlightSearchResults(results, searchTermLower);
+    }
+  };
+
+  const highlightSearchResults = (results, term) => {
+    // Remove previous highlights
+    document.querySelectorAll('.search-highlight').forEach(el => {
+      el.classList.remove('search-highlight');
+    });
+
+    // Add new highlights
+    results.forEach((element, index) => {
+      element.classList.add('search-highlight');
+      if (index === currentSearchIndex) {
+        element.classList.add('search-highlight-active');
+      }
+    });
+  };
+
+  const navigateSearchResults = (direction) => {
+    if (searchResults.length === 0) return;
+    
+    document.querySelectorAll('.search-highlight-active').forEach(el => {
+      el.classList.remove('search-highlight-active');
+    });
+
+    let newIndex;
+    if (direction === 'next') {
+      newIndex = (currentSearchIndex + 1) % searchResults.length;
+    } else {
+      newIndex = currentSearchIndex === 0 ? searchResults.length - 1 : currentSearchIndex - 1;
+    }
+
+    setCurrentSearchIndex(newIndex);
+    searchResults[newIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    searchResults[newIndex].classList.add('search-highlight-active');
+  };
+
+  const clearSearch = React.useCallback(() => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setCurrentSearchIndex(0);
+    // Clear all search highlights
+    document.querySelectorAll('.search-highlight').forEach(el => {
+      el.classList.remove('search-highlight', 'search-highlight-active');
+    });
+  }, []);
 
   const folkDanceClassifications = [
     {
@@ -813,10 +998,21 @@ const Culture = () => {
     document.body.style.overflow = 'unset';
   };
 
-  // === Collapsible Timeline state & toggle ===
-  const [openTimeline, setOpenTimeline] = useState(() => new Set(timeline.map((_, i) => i))); // default all open
+  // === Collapsible sections state & toggle ===
+  const [openTimeline, setOpenTimeline] = useState(() => new Set([0, 1, 2, 3])); // default all visible
+  const [openClassifications, setOpenClassifications] = useState(() => new Set()); // default all closed
+  
   const toggleTimeline = (idx) => {
     setOpenTimeline((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  const toggleClassification = (idx) => {
+    setOpenClassifications((prev) => {
       const next = new Set(prev);
       if (next.has(idx)) next.delete(idx);
       else next.add(idx);
@@ -1029,8 +1225,151 @@ const Culture = () => {
     <div className="culture">
       <Navbar />
 
+      {/* Reading Progress Bar */}
+      {showProgressBar && (
+        <div className="reading-progress-container">
+          <div 
+            className="reading-progress-bar" 
+            style={{ width: `${readingProgress}%` }}
+          ></div>
+        </div>
+      )}
+
+      {/* Floating Navigation Menu */}
+      <div className={`floating-nav ${showNavMenu ? 'nav-open' : ''}`}>
+        <button 
+          className="culture-nav-toggle"
+          onClick={(e) => {
+            e.stopPropagation();
+            // If we're closing the menu and there's a search active, clear it
+            if (showNavMenu && searchTerm) {
+              setSearchTerm('');
+              setSearchResults([]);
+              setCurrentSearchIndex(0);
+              document.querySelectorAll('.search-highlight').forEach(el => {
+                el.classList.remove('search-highlight', 'search-highlight-active');
+              });
+            }
+            setShowNavMenu(!showNavMenu);
+          }}
+          title="Navigation Menu"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        
+        <div className="nav-menu" onClick={(e) => e.stopPropagation()}>
+          <div className="nav-header">
+            <h3>Quick Navigation</h3>
+            {activeSection && (
+              <span className={`section-indicator ${activeSection}`}>
+                {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
+              </span>
+            )}
+          </div>
+
+          {/* Search Bar in Navigation */}
+          <div className="nav-search-container">
+            <div className="nav-search-bar">
+              <svg className="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+              </svg>
+              <input
+                type="text"
+                className="nav-search-input"
+                placeholder="Search this page..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  performSearch(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                      navigateSearchResults('prev');
+                    } else {
+                      navigateSearchResults('next');
+                    }
+                  } else if (e.key === 'Escape') {
+                    clearSearch();
+                  }
+                }}
+              />
+              {searchTerm && (
+                <div className="nav-search-controls">
+                  <span className="nav-search-count">
+                    {searchResults.length > 0 ? `${currentSearchIndex + 1}/${searchResults.length}` : '0'}
+                  </span>
+                  <button className="nav-search-btn" onClick={() => navigateSearchResults('prev')} disabled={searchResults.length === 0}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polyline points="15,18 9,12 15,6"/>
+                    </svg>
+                  </button>
+                  <button className="nav-search-btn" onClick={() => navigateSearchResults('next')} disabled={searchResults.length === 0}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polyline points="9,18 15,12 9,6"/>
+                    </svg>
+                  </button>
+                  <button className="nav-search-btn" onClick={clearSearch}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="nav-links">
+            <button onClick={() => { scrollToSection('heritage'); setShowNavMenu(false); }} className={activeSection === 'heritage' ? 'active' : ''}>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Living Heritage
+            </button>
+            <button onClick={() => { scrollToSection('elements'); setShowNavMenu(false); }} className={activeSection === 'elements' ? 'active' : ''}>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l2 7h7l-5.5 4 2 7L12 15.5 6.5 20l2-7L3 9h7l2-7z"/>
+              </svg>
+              Cultural Elements
+            </button>
+            <button onClick={() => { scrollToSection('classifications'); setShowNavMenu(false); }} className={activeSection === 'classifications' ? 'active' : ''}>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              Dance Classifications
+            </button>
+            <button onClick={() => { scrollToSection('regions'); setShowNavMenu(false); }} className={activeSection === 'regions' ? 'active' : ''}>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Regional Cultures
+            </button>
+            <button onClick={() => { scrollToSection('timeline'); setShowNavMenu(false); }} className={activeSection === 'timeline' ? 'active' : ''}>
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+              Cultural Timeline
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+
       {/* Hero Section */}
-      <section className="culture-hero">
+      <section id="hero" className="culture-hero">
         <div className="culture-hero-background">
           <div className="culture-hero-overlay"></div>
         </div>
@@ -1054,12 +1393,129 @@ const Culture = () => {
         </div>
       </section>
 
-      {/* Cultural Elements */}
-      <section className="cultural-elements">
+      {/* Heritage Introduction */}
+      <section 
+        id="heritage" 
+        className="cultural-heritage-intro"
+        style={{
+          background: '#c4a678',
+          color: 'white',
+          padding: '4rem 0'
+        }}
+      >
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Elements of Filipino Culture</h2>
-            <p className="section-subtitle">
+            <h2 
+              className="section-title"
+              style={{
+                color: '#FFD700',
+                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                fontWeight: '800',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                background: 'rgba(0,0,0,0.1)',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: '3px solid #FFD700',
+                boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              Living Cultural Heritage
+            </h2>
+            <p 
+              className="section-subtitle"
+              style={{
+                color: '#000000',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                maxWidth: '600px',
+                margin: '0 auto',
+                textAlign: 'center',
+                fontWeight: '600',
+                background: 'rgba(255,255,255,0.9)',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px'
+              }}
+            >
+              Filipino folk dances are more than entertainment—they are living repositories of cultural knowledge, 
+              spiritual beliefs, and community values passed down through generations of movement and music.
+            </p>
+          </div>
+          <div className="heritage-content">
+          <div className="heritage-highlights">
+            <div className="heritage-highlight">
+              <div className="heritage-highlight-icon">
+                <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <h3>Ancestral Wisdom</h3>
+              <p>Each dance movement encodes traditional knowledge about agriculture, nature, and social values</p>
+            </div>
+            <div className="heritage-highlight">
+              <div className="heritage-highlight-icon">
+                <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <h3>Community Identity</h3>
+              <p>Dances strengthen social bonds and preserve unique regional cultural characteristics</p>
+            </div>
+            <div className="heritage-highlight">
+              <div className="heritage-highlight-icon">
+                <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l2 7h7l-5.5 4 2 7L12 15.5 6.5 20l2-7L3 9h7l2-7z"/>
+                </svg>
+              </div>
+              <h3>Cultural Continuity</h3>
+              <p>Traditional forms adapt to modern contexts while maintaining their essential meaning and spirit</p>
+            </div>
+          </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cultural Elements */}
+      <section 
+        id="elements" 
+        className="cultural-elements"
+        style={{
+          background: 'white',
+          color: '#333',
+          padding: '4rem 0'
+        }}
+      >
+        <div className="container">
+          <div className="section-header">
+            <h2 
+              className="section-title"
+              style={{
+                color: '#FFD700',
+                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                fontWeight: '800',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                background: 'rgba(196, 166, 120, 0.1)',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: '3px solid #c4a678',
+                boxShadow: '0 4px 12px rgba(196, 166, 120, 0.4)'
+              }}
+            >
+              Elements of Filipino Culture
+            </h2>
+            <p 
+              className="section-subtitle"
+              style={{
+                color: '#000000',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                maxWidth: '600px',
+                margin: '0 auto',
+                textAlign: 'center',
+                fontWeight: '600'
+              }}
+            >
               The fundamental components that make Filipino folk dances unique and meaningful
             </p>
           </div>
@@ -1092,36 +1548,101 @@ const Culture = () => {
       
 
       {/* Folk Dance Classifications */}
-      <section className="folk-dance-classifications">
+      <section 
+        id="classifications" 
+        className="folk-dance-classifications"
+        style={{
+          background: '#c4a678',
+          color: 'white',
+          padding: '4rem 0'
+        }}
+      >
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Filipino Folk Dance Classifications</h2>
-            <p className="section-subtitle">
+            <h2 
+              className="section-title"
+              style={{
+                color: '#FFD700',
+                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                fontWeight: '800',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                background: 'rgba(0,0,0,0.1)',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: '3px solid #FFD700',
+                boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              Filipino Folk Dance Classifications
+            </h2>
+            <p 
+              className="section-subtitle"
+              style={{
+                color: '#000000',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                maxWidth: '600px',
+                margin: '0 auto',
+                textAlign: 'center',
+                fontWeight: '600',
+                background: 'rgba(255,255,255,0.9)',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px'
+              }}
+            >
               Understanding the rich diversity of Filipino folk dances through their traditional categories and cultural origins
             </p>
+            <div className="classification-controls">
+
+            </div>
           </div>
 
           <div className="classifications-grid">
-            {folkDanceClassifications.map((classification, index) => (
-              <div key={index} className="classification-card">
-                <div className="classification-image">
-                  <img src={classification.image} alt={classification.category} />
-                  <div className="classification-overlay">
-                    <div className="classification-icon">
-                      <Users2 size={32} />
+            {folkDanceClassifications.map((classification, index) => {
+              const isOpen = openClassifications.has(index);
+              return (
+                <div key={index} className="classification-card">
+                  <div 
+                    className="classification-header-clickable"
+                    onClick={() => toggleClassification(index)}
+                  >
+                    <div className="classification-image">
+                      <img src={classification.image} alt={classification.category} />
+                      <div className="classification-overlay">
+                        <div className="classification-icon">
+                          <Users2 size={32} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="classification-content">
+                      <div className="classification-header">
+                        <div className="classification-title-section">
+                          <h3 className="classification-title">
+                            {classification.category}
+                            <button className="collapse-indicator">
+                              <svg 
+                                width="20" 
+                                height="20" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor"
+                                style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                              >
+                                <polyline points="6,9 12,15 18,9"/>
+                              </svg>
+                            </button>
+                          </h3>
+                          <p className="classification-description">{classification.description}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="classification-content">
-                  <div className="classification-header">
-                    <div className="classification-title-section">
-                      <h3 className="classification-title">{classification.category}</h3>
-                      <p className="classification-description">{classification.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="classification-characteristics">
+                  {isOpen && (
+                    <div className="classification-expandable-content">
+                      <div className="classification-characteristics">
                     <h4>Key Characteristics:</h4>
                     <div className="characteristics-list-grid">
                       {classification.characteristics.map((characteristic, charIndex) => (
@@ -1160,20 +1681,56 @@ const Culture = () => {
                       ))}
                     </div>
                   </div>
-
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Regional Cultures */}
-      <section className="regional-cultures">
+      <section 
+        id="regions" 
+        className="regional-cultures"
+        style={{
+          background: 'white',
+          color: '#333',
+          padding: '4rem 0'
+        }}
+      >
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Regional Cultural Diversity</h2>
-            <p className="section-subtitle">
+            <h2 
+              className="section-title"
+              style={{
+                color: '#FFD700',
+                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                fontWeight: '800',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                background: 'rgba(196, 166, 120, 0.1)',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: '3px solid #c4a678',
+                boxShadow: '0 4px 12px rgba(196, 166, 120, 0.4)'
+              }}
+            >
+              Regional Cultural Diversity
+            </h2>
+            <p 
+              className="section-subtitle"
+              style={{
+                color: '#000000',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                maxWidth: '600px',
+                margin: '0 auto',
+                textAlign: 'center',
+                fontWeight: '600'
+              }}
+            >
               Each region of the Philippines offers distinct cultural traditions and dance forms
             </p>
           </div>
@@ -1203,29 +1760,14 @@ const Culture = () => {
                   <p className="region-description">{region.description}</p>
 
                   <div className="region-dances">
-                    <h4>Traditional Dances & Their Cultural Meaning:</h4>
-                    <div className="enhanced-dance-list">
-                      {region.dances.map((dance, index) => (
-                        <div key={index} className="enhanced-dance-card">
-                          <div className="dance-name-row">
-                            <span className="dance-name">{dance.name}</span>
-                            <div className="dance-cultural-icon">
-                              <Palette size={14} />
-                            </div>
-                          </div>
-                          <p className="dance-meaning">{dance.culturalMeaning}</p>
-                          <div className="dance-details">
-                            <div className="dance-detail">
-                              <Music size={12} />
-                              <span>{dance.musicalConnection}</span>
-                            </div>
-                            <div className="dance-detail">
-                              <Users size={12} />
-                              <span>{dance.communityRole}</span>
-                            </div>
-                          </div>
-                        </div>
+                    <h4>Featured Traditional Dances:</h4>
+                    <div className="dance-tags">
+                      {region.dances.slice(0, 3).map((dance, index) => (
+                        <span key={index} className="dance-tag">{dance.name}</span>
                       ))}
+                      {region.dances.length > 3 && (
+                        <span className="dance-tag-more">+{region.dances.length - 3} more</span>
+                      )}
                     </div>
                   </div>
 
@@ -1245,25 +1787,92 @@ const Culture = () => {
       </section>
 
       {/* Cultural Timeline */}
-      <section className="cultural-timeline">
+      <section 
+        id="timeline" 
+        className="cultural-timeline"
+        style={{ 
+          background: '#c4a678', 
+          color: 'white',
+          padding: '4rem 0'
+        }}
+      >
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Cultural Evolution Timeline</h2>
-            <p className="section-subtitle">
+            <h2 
+              className="section-title" 
+              style={{ 
+                color: '#FFD700',
+                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                fontWeight: '800',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                background: 'rgba(0,0,0,0.1)',
+                padding: '1rem',
+                borderRadius: '10px',
+                border: '3px solid #FFD700',
+                boxShadow: '0 4px 12px rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              Cultural Evolution Timeline
+            </h2>
+            <p 
+              className="section-subtitle" 
+              style={{ 
+                color: '#000000',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
+                maxWidth: '600px',
+                margin: '0 auto',
+                fontWeight: '600',
+                background: 'rgba(255,255,255,0.9)',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px'
+              }}
+            >
               Journey through the historical development of Filipino folk dance traditions
             </p>
           </div>
 
-          <div className="timeline">
+          <div 
+            className="timeline"
+            style={{
+              position: 'relative',
+              maxWidth: '1000px',
+              margin: '0 auto',
+              padding: '2rem 0'
+            }}
+          >
+            {/* Enhanced Timeline Central Line */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: 0,
+                bottom: 0,
+                width: '4px',
+                background: 'linear-gradient(to bottom, #ffffff, #f0f0f0, #ffffff)',
+                transform: 'translateX(-50%)',
+                boxShadow: '0 0 10px rgba(255,255,255,0.5)',
+                zIndex: 1
+              }}
+            />
             {timeline.map((period, index) => {
               const isOpen = openTimeline.has(index);
               return (
-                <div key={index} className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}>
+                <div 
+                  key={index} 
+                  className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'} ${isOpen ? 'expanded' : 'collapsed'}`}
+                >
                   <div className="timeline-content">
                     <div className="timeline-period-row">
                       <div className="timeline-period">
-                        <h3>{period.period}</h3>
-                        <span className="timeline-year">{period.year}</span>
+                        <h3 style={{ color: '#c4a678', marginBottom: '0.5rem' }}>{period.period}</h3>
+                        <span 
+                          className="timeline-year"
+                          style={{ color: '#4a5568', fontWeight: '600' }}
+                        >
+                          {period.year}
+                        </span>
                       </div>
 
                       {/* Arrow beside the clock */}
@@ -1274,6 +1883,7 @@ const Culture = () => {
                         aria-expanded={isOpen}
                         aria-controls={`timeline-panel-${index}`}
                         title={isOpen ? 'Collapse' : 'Expand'}
+                        style={{ color: '#c4a678' }}
                       >
                         {isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                       </button>
@@ -1282,35 +1892,118 @@ const Culture = () => {
                     {/* Collapsible content */}
                     {isOpen && (
                       <div id={`timeline-panel-${index}`} className="timeline-panel">
-                        <p className="timeline-description">{period.description}</p>
+                        <p 
+                          className="timeline-description"
+                          style={{ 
+                            color: '#4a5568', 
+                            margin: '1rem 0', 
+                            lineHeight: 1.6 
+                          }}
+                        >
+                          {period.description}
+                        </p>
 
-                        <div className="timeline-cultural-context">
-                          <h4>Cultural-Dance Context:</h4>
+                        <div 
+                          className="timeline-cultural-context"
+                          style={{
+                            background: 'rgba(196, 166, 120, 0.05)',
+                            padding: '1.5rem',
+                            borderRadius: '10px',
+                            margin: '1.5rem 0',
+                            border: '1px solid rgba(196, 166, 120, 0.2)'
+                          }}
+                        >
+                          <h4 
+                            style={{ 
+                              color: '#c4a678',
+                              fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
+                              marginBottom: '1rem'
+                            }}
+                          >
+                            Cultural-Dance Context:
+                          </h4>
                           <div className="context-grid">
-                            <div className="context-item">
-                              <strong>Purpose:</strong> {period.culturalDanceContext?.purpose}
+                            <div 
+                              className="context-item" 
+                              style={{ 
+                                color: '#4a5568',
+                                fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+                                marginBottom: '0.75rem',
+                                background: 'rgba(196, 166, 120, 0.1)',
+                                padding: '1rem',
+                                borderRadius: '8px',
+                                borderLeft: '3px solid #c4a678'
+                              }}
+                            >
+                              <strong style={{ color: '#2d3748' }}>Purpose:</strong> {period.culturalDanceContext?.purpose}
                             </div>
-                            <div className="context-item">
-                              <strong>Community Role:</strong> {period.culturalDanceContext?.community}
+                            <div 
+                              className="context-item" 
+                              style={{ 
+                                color: '#4a5568',
+                                fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+                                marginBottom: '0.75rem',
+                                background: 'rgba(196, 166, 120, 0.1)',
+                                padding: '1rem',
+                                borderRadius: '8px',
+                                borderLeft: '3px solid #c4a678'
+                              }}
+                            >
+                              <strong style={{ color: '#2d3748' }}>Community Role:</strong> {period.culturalDanceContext?.community}
                             </div>
-                            <div className="context-item">
-                              <strong>Cultural Meaning:</strong> {period.culturalDanceContext?.meaning}
+                            <div 
+                              className="context-item" 
+                              style={{ 
+                                color: '#4a5568',
+                                fontSize: 'clamp(0.8rem, 2vw, 0.95rem)',
+                                marginBottom: '0.75rem',
+                                background: 'rgba(196, 166, 120, 0.1)',
+                                padding: '1rem',
+                                borderRadius: '8px',
+                                borderLeft: '3px solid #c4a678'
+                              }}
+                            >
+                              <strong style={{ color: '#2d3748' }}>Cultural Meaning:</strong> {period.culturalDanceContext?.meaning}
                             </div>
                           </div>
                         </div>
 
                         <div className="timeline-dances">
-                          <strong>Notable Dances:</strong>
-                          <div className="timeline-dance-list">
+                          <strong style={{ color: '#2d3748', fontSize: '1rem' }}>Notable Dances:</strong>
+                          <div className="timeline-dance-list" style={{ marginTop: '0.5rem' }}>
                             {period.dances.map((dance, danceIndex) => (
-                              <span key={danceIndex} className="timeline-dance">{dance}</span>
+                              <span 
+                                key={danceIndex} 
+                                className="timeline-dance"
+                                style={{
+                                  background: '#c4a678',
+                                  color: 'white',
+                                  padding: '0.25rem 0.75rem',
+                                  borderRadius: '16px',
+                                  fontSize: '0.9rem',
+                                  fontWeight: '500',
+                                  display: 'inline-block',
+                                  margin: '0.25rem'
+                                }}
+                              >
+                                {dance}
+                              </span>
                             ))}
                           </div>
                         </div>
 
-                        <div className="timeline-relevance">
-                          <strong>Modern Relevance:</strong>
-                          <p className="relevance-note">{period.modernRelevance}</p>
+                        <div className="timeline-relevance" style={{ marginTop: '1.5rem' }}>
+                          <strong style={{ color: '#2d3748', fontSize: '1rem' }}>Modern Relevance:</strong>
+                          <p 
+                            className="relevance-note"
+                            style={{ 
+                              color: '#4a5568', 
+                              marginTop: '0.5rem',
+                              lineHeight: 1.6 
+                            }}
+                          >
+                            {period.modernRelevance}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -1420,11 +2113,32 @@ const Culture = () => {
                 </div>
               </div>
 
-              <div className="modal-section">
-                <h3>Traditional Dances</h3>
-                <div className="modal-tags">
+              <div className="modal-section traditional-dances-section">
+                <h3>
+                  <Music size={20} />
+                  Traditional Dances & Cultural Meaning
+                </h3>
+                <div className="modal-dances-grid">
                   {selectedRegion.dances.map((dance, index) => (
-                    <span key={index} className="modal-tag dance-tag">{dance.name}</span>
+                    <div key={index} className="modal-dance-card">
+                      <div className="modal-dance-header">
+                        <h4 className="modal-dance-name">{dance.name}</h4>
+                        <div className="modal-dance-icon">
+                          <Palette size={16} />
+                        </div>
+                      </div>
+                      <p className="modal-dance-meaning">{dance.culturalMeaning}</p>
+                      <div className="modal-dance-details">
+                        <div className="modal-dance-detail">
+                          <Music size={14} />
+                          <span><strong>Musical Connection:</strong> {dance.musicalConnection}</span>
+                        </div>
+                        <div className="modal-dance-detail">
+                          <Users size={14} />
+                          <span><strong>Community Role:</strong> {dance.communityRole}</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -1649,31 +2363,31 @@ const Culture = () => {
         </div>
       )}
 
-      {/* Scroll to Top Button - always on right, responsive */}
+      {/* Enhanced Scroll to Top Button with Progress Ring */}
       {showScrollTop && !selectedRegion && !selectedElement && (
         <button
-          className="scroll-to-top-btn"
+          className="scroll-to-top-enhanced"
           onClick={scrollToTop}
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 9999,
-            background: '#a0855b',
-            border: '1.5px solid #a0855b',
-            borderRadius: '50%',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
-            height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'opacity 0.2s, width 0.2s, height 0.2s',
-          }}
           aria-label="Scroll to top"
         >
-          <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
+          <svg className="progress-ring" width="60" height="60" viewBox="0 0 60 60">
+            <circle
+              className="progress-ring-circle"
+              stroke="currentColor"
+              strokeWidth="3"
+              fill="transparent"
+              r="26"
+              cx="30"
+              cy="30"
+              style={{
+                strokeDasharray: `${2 * Math.PI * 26}`,
+                strokeDashoffset: `${2 * Math.PI * 26 * (1 - readingProgress / 100)}`,
+              }}
+            />
+          </svg>
+          <div className="scroll-icon">
+            <ArrowUp size={20} />
+          </div>
         </button>
       )}
     </div>

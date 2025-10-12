@@ -66,6 +66,10 @@ const DanceRequest = () => {
   const [showReasonModal, setShowReasonModal] = useState(false);
   const [selectedReasonDance, setSelectedReasonDance] = useState(null);
   
+  // Cancel confirmation modal state
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [danceToCancel, setDanceToCancel] = useState(null);
+  
   // Notification state
   const [notification, setNotification] = useState(null);
   
@@ -350,26 +354,42 @@ const DanceRequest = () => {
     setImages([]);
   };
 
-  // Cancel Request
-  const handleCancel = async (danceId) => {
+  // Show cancel confirmation modal
+  const handleCancelClick = (danceId) => {
+    setDanceToCancel(danceId);
+    setShowCancelModal(true);
+  };
+
+  // Cancel Request (confirmed)
+  const handleCancel = async () => {
+    if (!danceToCancel) return;
+    
     try {
       // Update database dance status to cancelled
       const { error } = await supabase
         .from('dances')
         .update({ status: 'cancelled' })
-        .eq('id', danceId);
+        .eq('id', danceToCancel);
       
       if (!error) {
         showNotification('Dance request cancelled successfully.', 'warning');
-        setDances(prev => prev.filter(d => d.id !== danceId));
+        setDances(prev => prev.filter(d => d.id !== danceToCancel));
+        setShowCancelModal(false);
+        setDanceToCancel(null);
+        closePreview();
       } else {
         showNotification('Error cancelling request: ' + error.message, 'error');
       }
-      closePreview();
     } catch (e) {
       console.error('Cancel request error:', e);
       showNotification('Error cancelling request', 'error');
     }
+  };
+
+  // Cancel the cancel confirmation
+  const handleCancelModalClose = () => {
+    setShowCancelModal(false);
+    setDanceToCancel(null);
   };
 
   return (
@@ -699,11 +719,13 @@ const DanceRequest = () => {
                     style={{
                       width: '100%',
                       maxWidth: 520,
-                      height: 320,
+                      height: 'auto',
+                      maxHeight: 400,
                       borderRadius: 12,
                       background: '#000',
-                      objectFit: 'cover',
-                      boxShadow: '0 4px 24px #0002'
+                      objectFit: 'contain',
+                      boxShadow: '0 4px 24px #0002',
+                      display: 'block'
                     }}
                   >
                     Your browser does not support the video tag.
@@ -726,10 +748,13 @@ const DanceRequest = () => {
                         controls
                         style={{
                           width: '100%',
-                          height: 200,
+                          height: 'auto',
+                          minHeight: 150,
+                          maxHeight: 200,
                           borderRadius: 6,
                           background: '#000',
-                          objectFit: 'cover'
+                          objectFit: 'contain',
+                          display: 'block'
                         }}
                       />
                     </div>
@@ -741,7 +766,7 @@ const DanceRequest = () => {
 
               {/* Action */}
               <div className="approval-actions">
-                <button className="cancel-button" onClick={() => handleCancel(selectedDance.id)}>
+                <button className="cancel-button" onClick={() => handleCancelClick(selectedDance.id)}>
                   <XCircle size={20} />
                   Cancel Request
                 </button>
@@ -771,6 +796,46 @@ const DanceRequest = () => {
                 onClick={() => setShowReasonModal(false)}
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="navigation-modal-overlay">
+          <div className="navigation-modal-content">
+            <div className="navigation-modal-header">
+              <div className="navigation-modal-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 className="navigation-modal-title">
+                Cancel Dance Request?
+              </h3>
+            </div>
+            <div className="navigation-modal-body">
+              <p className="navigation-modal-message">
+                Are you sure you want to cancel this dance request? Once cancelled, your dance submission will be removed from the approval queue.
+              </p>
+              <p className="navigation-modal-submessage">
+                This action cannot be undone.
+              </p>
+            </div>
+            <div className="navigation-modal-actions">
+              <button 
+                className="logout-modal-confirm"
+                onClick={handleCancel}
+              >
+                Cancel Request
+              </button>
+              <button 
+                className="logout-modal-cancel"
+                onClick={handleCancelModalClose}
+              >
+                Keep Request
               </button>
             </div>
           </div>

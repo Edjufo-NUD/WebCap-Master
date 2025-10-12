@@ -29,8 +29,15 @@ const Navbar = () => {
       
       setIsAuthenticated(!!accessToken);
       
+      // always get cached username first
+      const cachedUsername = localStorage.getItem("username");
+      if (cachedUsername && accessToken) {
+        setUsername(cachedUsername);
+        return;
+      }
+      
       // only fetch if we have email and no cached username
-      if (accessToken && email && !username) {
+      if (accessToken && email && !cachedUsername) {
         const { data: userData, error } = await supabase
           .from('users')
           .select('username')
@@ -58,12 +65,22 @@ const Navbar = () => {
       checkAuthStatus();
     };
 
+    // Listen for direct username changes
+    const handleUsernameChange = (event) => {
+      const newUsername = event.detail?.newUsername || localStorage.getItem("username");
+      if (newUsername) {
+        setUsername(newUsername);
+      }
+    };
+
     window.addEventListener('authChange', handleAuthChange);
+    window.addEventListener('usernameChanged', handleUsernameChange);
 
     return () => {
       window.removeEventListener('authChange', handleAuthChange);
+      window.removeEventListener('usernameChanged', handleUsernameChange);
     };
-  }, [location.pathname, email, username]); // Re-check when route changes
+  }, [location.pathname, email]); // Removed username from dependencies to avoid infinite loop
 
   const navItems = [
     { path: '/home', label: 'Home' },
