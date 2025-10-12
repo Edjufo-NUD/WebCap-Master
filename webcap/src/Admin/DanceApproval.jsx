@@ -789,11 +789,13 @@ const DanceApproval = () => {
                     style={{
                       width: '100%',
                       maxWidth: 520,
-                      height: 320,
+                      height: 'auto',
+                      maxHeight: 400,
                       borderRadius: 12,
                       background: '#000',
-                      objectFit: 'cover',
-                      boxShadow: '0 4px 24px #0002'
+                      objectFit: 'contain',
+                      boxShadow: '0 4px 24px #0002',
+                      display: 'block'
                     }}
                   >
                     Your browser does not support the video tag.
@@ -816,10 +818,13 @@ const DanceApproval = () => {
                         controls
                         style={{
                           width: '100%',
-                          height: 200,
+                          height: 'auto',
+                          minHeight: 150,
+                          maxHeight: 200,
                           borderRadius: 6,
                           background: '#000',
-                          objectFit: 'cover'
+                          objectFit: 'contain',
+                          display: 'block'
                         }}
                       />
                     </div>

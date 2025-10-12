@@ -162,22 +162,67 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
         </div>
       </div>
 
-      {/* Collapsed Summary */}
+      {/* Progress Bar - Always Visible */}
+      <div style={{
+        background: '#f3f4f6',
+        borderRadius: '8px',
+        height: '12px',
+        marginTop: '1rem',
+        marginBottom: '0.75rem',
+        overflow: 'hidden',
+        position: 'relative'
+      }}>
+        <div style={{
+          background: `linear-gradient(90deg, ${completionRate === 100 ? '#10b981' : completionRate > 50 ? '#f59e0b' : '#ef4444'}, ${completionRate === 100 ? '#059669' : completionRate > 50 ? '#d97706' : '#dc2626'})`,
+          height: '100%',
+          width: `${completionRate}%`,
+          transition: 'width 0.3s ease',
+          borderRadius: '8px'
+        }} />
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: '0.75rem',
+          fontWeight: '600',
+          color: completionRate > 30 ? 'white' : '#374151',
+          textShadow: completionRate > 30 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+        }}>
+          {completedFigures}/{totalFigures} figures ({completionRate}%)
+        </div>
+      </div>
+
+      {/* Score Summary - Always Visible */}
       {!isExpanded && (
         <div style={{
-          marginTop: '1rem',
-          padding: '1rem',
+          padding: '0.75rem 1rem',
           background: '#f9fafb',
           borderRadius: '8px',
-          border: '1px solid #e5e7eb'
+          border: '1px solid #e5e7eb',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.5rem'
         }}>
           <div style={{
-            fontSize: '0.875rem',
+            fontSize: '0.8rem',
             color: '#374151',
-            fontWeight: '600',
-            textAlign: 'center'
+            fontWeight: '600'
           }}>
             Final Score = (Sum of all figure scores) ÷ {totalFigures} figures
+          </div>
+          <div style={{
+            fontSize: '1rem',
+            fontWeight: '700',
+            color: getScoreColor(finalScore),
+            padding: '0.25rem 0.75rem',
+            background: getScoreBackground(finalScore),
+            borderRadius: '6px',
+            border: `2px solid ${getScoreColor(finalScore)}`
+          }}>
+            {finalScore}%
           </div>
         </div>
       )}
@@ -426,6 +471,15 @@ const Profile = () => {
   const [recentActivities, setRecentActivities] = useState([]);
   const [averageScore, setAverageScore] = useState(null);
   const [danceProgressData, setDanceProgressData] = useState({});
+  const [analyticsData, setAnalyticsData] = useState({
+    totalAttempts: 0,
+    totalFiguresCompleted: 0,
+    bestDance: null,
+    improvementTrend: null,
+    streakCount: 0,
+    totalDances: Object.keys(DANCE_DATA).length,
+    completedDances: 0
+  });
 
   const togglePasswordVisibility = (field) => {
     setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
@@ -478,8 +532,22 @@ const Profile = () => {
       showSnackbar('Failed to update username. It may already be taken.', 'error');
       return;
     }
+    
+    // Update local profile data
     setProfileData(prev => ({ ...prev, name: username }));
     setIsEditing(false);
+    
+    // Update cached username in localStorage and trigger navbar refresh
+    localStorage.setItem("username", username);
+    
+    // Force a more direct navbar update by dispatching a custom event with data
+    window.dispatchEvent(new CustomEvent('usernameChanged', { 
+      detail: { newUsername: username } 
+    }));
+    
+    // Also trigger the general auth change event as backup
+    window.dispatchEvent(new Event('authChange'));
+    
     showSnackbar('Profile updated successfully!', 'success');
   };
 
@@ -701,9 +769,83 @@ const Profile = () => {
           date: getRelativeDate(item.attempted_at),
           icon: '🎵'
         })));
+
+        // Calculate analytics data
+        let totalFiguresCompleted = 0;
+        let completedDances = 0;
+        let bestDance = null;
+        let bestScore = 0;
+
+        Object.keys(progressData).forEach(danceName => {
+          const figureScores = progressData[danceName];
+          const completed = figureScores.filter(score => score > 0).length;
+          totalFiguresCompleted += completed;
+          
+          // Check if dance is completed (all figures have scores)
+          if (completed === DANCE_DATA[danceName].totalFigures) {
+            completedDances++;
+          }
+          
+          // Find best dance
+          const avgScore = figureScores.length > 0 ? 
+            Math.round(figureScores.reduce((sum, score) => sum + score, 0) / DANCE_DATA[danceName].totalFigures) : 0;
+          if (avgScore > bestScore) {
+            bestScore = avgScore;
+            bestDance = { name: danceName, score: avgScore };
+          }
+        });
+
+        // Calculate improvement trend (compare recent vs older scores)
+        const recentScores = sorted.slice(0, Math.min(10, sorted.length)).map(item => item.score);
+        const olderScores = sorted.slice(Math.min(10, sorted.length), Math.min(20, sorted.length)).map(item => item.score);
+        
+        let improvementTrend = null;
+        if (recentScores.length > 0 && olderScores.length > 0) {
+          const recentAvg = recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length;
+          const olderAvg = olderScores.reduce((sum, score) => sum + score, 0) / olderScores.length;
+          const improvement = recentAvg - olderAvg;
+          improvementTrend = { value: Math.round(improvement), direction: improvement > 0 ? 'up' : improvement < 0 ? 'down' : 'stable' };
+        }
+
+        // Calculate streak (consecutive days with activity)
+        let streakCount = 0;
+        if (sorted.length > 0) {
+          const today = new Date();
+          let currentDate = new Date(sorted[0].attempted_at);
+          
+          for (let i = 0; i < sorted.length; i++) {
+            const itemDate = new Date(sorted[i].attempted_at);
+            const diffDays = Math.floor((today - itemDate) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === streakCount) {
+              streakCount++;
+            } else {
+              break;
+            }
+          }
+        }
+
+        setAnalyticsData({
+          totalAttempts,
+          totalFiguresCompleted,
+          bestDance,
+          improvementTrend,
+          streakCount,
+          totalDances: Object.keys(DANCE_DATA).length,
+          completedDances
+        });
       } else {
         setAverageScore(null);
         setRecentActivities([]);
+        setAnalyticsData({
+          totalAttempts: 0,
+          totalFiguresCompleted: 0,
+          bestDance: null,
+          improvementTrend: null,
+          streakCount: 0,
+          totalDances: Object.keys(DANCE_DATA).length,
+          completedDances: 0
+        });
       }
 
       // Set all data
@@ -798,43 +940,8 @@ const Profile = () => {
               </div>
             )}
 
-            <div className="profile-avatar">
-              <img 
-                src={logo} 
-                alt="FLIPino" 
-                style={{
-                  width: '120px',
-                  height: '120px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: 'none',
-                  boxShadow: '0 8px 32px rgba(160, 133, 91, 0.3)'
-                }}
-              />
-            </div>
-
             <div className="profile-header">
               <h2 className="profile-title" style={{ fontSize: '1.5rem' }}>My Profile</h2>
-            </div>
-
-            <div className="profile-actions">
-              {!isEditing ? (
-                <button className="btn-edit" onClick={handleEdit}>
-                  <Edit3 size={16} />
-                  Edit Username
-                </button>
-              ) : (
-                <div className="edit-actions">
-                  <button className="btn-save" onClick={handleSave}>
-                    <Save size={16} />
-                    Save
-                  </button>
-                  <button className="btn-cancel" onClick={handleCancel}>
-                    <X size={16} />
-                    Cancel
-                  </button>
-                </div>
-              )}
             </div>
 
             {/* Profile Fields */}
@@ -845,17 +952,42 @@ const Profile = () => {
                   Username
                 </label>
                 {isEditing ? (
-                  <input
-                    className="field-input"
-                    type="text"
-                    value={editData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Enter your username"
-                    minLength={6}
-                    maxLength={16}
-                  />
+                  <>
+                    <input
+                      className="field-input"
+                      type="text"
+                      value={editData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="Enter your username"
+                      minLength={6}
+                      maxLength={16}
+                    />
+                    <div className="password-actions">
+                      <button className="btn-save" onClick={handleSave}>
+                        <Save size={16} />
+                        Save
+                      </button>
+                      <button className="btn-cancel" onClick={handleCancel}>
+                        <X size={16} />
+                        Cancel
+                      </button>
+                    </div>
+                  </>
                 ) : (
-                  <div className="field-value">{profileData.name}</div>
+                  <div className="field-value" style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <span>{profileData.name}</span>
+                    <button
+                      className="btn-edit-password"
+                      onClick={handleEdit}
+                    >
+                      <Edit3 size={12} />
+                      Edit
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -1000,6 +1132,8 @@ const Profile = () => {
             </div>
           </div>
 
+
+
           {/* Recent Activity */}
           <div style={{
             background: 'white',
@@ -1050,6 +1184,128 @@ const Profile = () => {
 
         {/* Right Column - Charts and Progress */}
         <div>
+          {/* Analytics Overview */}
+          <div style={{
+            background: 'white',
+            borderRadius: '24px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            padding: '2rem',
+            marginBottom: '2rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <BarChart3 size={24} style={{ color: '#a0855b' }} />
+              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', margin: 0 }}>
+                Learning Analytics
+              </h3>
+            </div>
+            
+            {/* Analytics Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: '1rem',
+              marginBottom: '1.5rem'
+            }}>
+              {/* Total Attempts */}
+              <div style={{
+                background: '#f8fafc',
+                borderRadius: '12px',
+                padding: '1rem',
+                textAlign: 'center',
+                border: '1px solid #e5e7eb'
+              }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#3b82f6', marginBottom: '0.25rem' }}>
+                  {analyticsData.totalAttempts}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600', textTransform: 'uppercase' }}>
+                  Total Attempts
+                </div>
+              </div>
+
+              {/* Completed Dances */}
+              <div style={{
+                background: '#f8fafc',
+                borderRadius: '12px',
+                padding: '1rem',
+                textAlign: 'center',
+                border: '1px solid #e5e7eb'
+              }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#10b981', marginBottom: '0.25rem' }}>
+                  {analyticsData.completedDances}/{analyticsData.totalDances}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600', textTransform: 'uppercase' }}>
+                  Dances Mastered
+                </div>
+              </div>
+
+              {/* Figures Completed */}
+              <div style={{
+                background: '#f8fafc',
+                borderRadius: '12px',
+                padding: '1rem',
+                textAlign: 'center',
+                border: '1px solid #e5e7eb'
+              }}>
+                <div style={{ fontSize: '1.75rem', fontWeight: '700', color: '#f59e0b', marginBottom: '0.25rem' }}>
+                  {analyticsData.totalFiguresCompleted}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600', textTransform: 'uppercase' }}>
+                  Figures Learned
+                </div>
+              </div>
+
+              {/* Average Score */}
+              {averageScore !== null && (
+                <div style={{
+                  background: '#f8fafc',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  textAlign: 'center',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <div style={{ 
+                    fontSize: '1.75rem', 
+                    fontWeight: '700', 
+                    color: averageScore >= 80 ? '#10b981' : averageScore >= 60 ? '#f59e0b' : '#ef4444',
+                    marginBottom: '0.25rem' 
+                  }}>
+                    {averageScore}%
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600', textTransform: 'uppercase' }}>
+                    Avg Score
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Additional Analytics */}
+            {analyticsData.improvementTrend && (
+              <div style={{
+                background: analyticsData.improvementTrend.direction === 'up' ? 
+                  'linear-gradient(135deg, #10b981, #059669)' : 
+                  analyticsData.improvementTrend.direction === 'down' ?
+                  'linear-gradient(135deg, #ef4444, #dc2626)' :
+                  'linear-gradient(135deg, #6b7280, #4b5563)',
+                borderRadius: '12px',
+                padding: '1rem',
+                color: 'white',
+                maxWidth: '300px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <TrendingUp size={16} />
+                  <span style={{ fontSize: '0.875rem', fontWeight: '600' }}>Progress Trend</span>
+                </div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+                  {analyticsData.improvementTrend.direction === 'up' ? '📈 Improving' : 
+                   analyticsData.improvementTrend.direction === 'down' ? '📉 Declining' : '➡️ Stable'}
+                </div>
+                <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
+                  {analyticsData.improvementTrend.value > 0 ? '+' : ''}{analyticsData.improvementTrend.value}%
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Dance Progress Section */}
           <div style={{
             display: 'flex',
@@ -1109,7 +1365,7 @@ const Profile = () => {
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
           .profile-container {
-            padding: 6rem 1rem 2rem 1rem !important;
+            padding: 2rem 1rem 2rem 1rem !important;
             grid-template-columns: 1fr !important;
             gap: 1.5rem !important;
           }
@@ -1210,7 +1466,7 @@ const Profile = () => {
 
         @media (max-width: 480px) {
           .profile-container {
-            padding: 5rem 0.5rem 1rem 0.5rem !important;
+            padding: 1.5rem 0.5rem 1rem 0.5rem !important;
             gap: 1rem !important;
           }
           
@@ -1302,7 +1558,7 @@ const Profile = () => {
         /* Extra small devices */
         @media (max-width: 320px) {
           .profile-container {
-            padding: 4rem 0.25rem 0.5rem 0.25rem !important;
+            padding: 1rem 0.25rem 0.5rem 0.25rem !important;
           }
           
           .profile-card {
@@ -1341,7 +1597,7 @@ const Profile = () => {
         /* Landscape orientation for tablets */
         @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
           .profile-container {
-            padding: 5rem 2rem 2rem 2rem !important;
+            padding: 2rem 2rem 2rem 2rem !important;
             grid-template-columns: 45% 55% !important;
             gap: 2rem !important;
           }

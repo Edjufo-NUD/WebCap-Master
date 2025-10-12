@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Admin/Sidebar";
 import "./DanceUpload.css";
@@ -24,10 +24,57 @@ const DanceUpload = () => {
   const [danceImage, setDanceImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [showNavigationModal, setShowNavigationModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
 
   // Get current user role to determine if approval is needed
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
   const userRole = currentUser?.role;
+
+  // Block navigation if uploading or form is dirty, show correct modal
+  useEffect(() => {
+    // Helper: is form dirty (any field filled or file selected)?
+    const isFormDirty = () => {
+      return Object.values(formData).some(v => v) || previewVideo || figureVideos.length > 0 || danceImage;
+    };
+
+    const handleBeforeUnload = (e) => {
+      if (isSubmitting || isFormDirty()) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.interceptSetActiveItem = (itemId) => {
+      if ((isSubmitting || isFormDirty()) && itemId !== 'dance-upload') {
+        setPendingNavigation({ targetItem: itemId, targetPath: getPathFromItem(itemId) });
+        setShowNavigationModal(true);
+        return false;
+      }
+      return true;
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      delete window.interceptSetActiveItem;
+    };
+  }, [isSubmitting, formData, previewVideo, figureVideos, danceImage]);
+
+  // Helper function to get path from item ID
+  const getPathFromItem = (itemId) => {
+    const pathMap = {
+      'manage-dance': '/manage-dance',
+      'dance-upload': '/dance-upload',
+      'dance-request': '/dance-request',
+      'dance-approval': '/dance-approval',
+      'analytics': '/analytics',
+      'user-ratings': '/user-ratings',
+      'user-management': '/user-management'
+    };
+    return pathMap[itemId] || '/';
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,29 +85,94 @@ const DanceUpload = () => {
   };
 
   const handleFileUpload = (file, type) => {
-    const fileUrl = URL.createObjectURL(file);
+    // File validation constants
+    const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_FIGURE_VIDEOS = 10; // Maximum number of figure videos
+    
+    // Validate file type
+    if (type === 'preview' || type === 'figures') {
+      if (!file.type.startsWith('video/')) {
+        showNotification('Please select a valid video file. Supported formats: MP4, WebM, AVI, MOV', 'error');
+        return;
+      }
+    } else if (type === 'image') {
+      if (!file.type.startsWith('image/')) {
+        showNotification('Please select a valid image file. Supported formats: JPG, PNG, GIF, WebP', 'error');
+        return;
+      }
+    }
+    
+    // Validate file size
+    if ((type === 'preview' || type === 'figures') && file.size > MAX_VIDEO_SIZE) {
+      showNotification(`Video file is too large. Maximum size allowed is ${Math.round(MAX_VIDEO_SIZE / (1024 * 1024))}MB`, 'error');
+      return;
+    }
+    
+    if (type === 'image' && file.size > MAX_IMAGE_SIZE) {
+      showNotification(`Image file is too large. Maximum size allowed is ${Math.round(MAX_IMAGE_SIZE / (1024 * 1024))}MB`, 'error');
+      return;
+    }
+    
+    // Check if file is too small (likely corrupted)
+    if (file.size < 1024) { // 1KB minimum
+      showNotification('File appears to be corrupted or too small. Please select a different file.', 'error');
+      return;
+    }
+    
+    // Additional validation for figure videos limit
+    if (type === 'figures' && figureVideos.length >= MAX_FIGURE_VIDEOS) {
+      showNotification(`Maximum ${MAX_FIGURE_VIDEOS} figure videos allowed. Please remove some videos before adding new ones.`, 'error');
+      return;
+    }
+    
+    // Check for duplicate files (same name and size)
+    if (type === 'figures') {
+      const isDuplicate = figureVideos.some(video => 
+        video.name === file.name && video.file.size === file.size
+      );
+      if (isDuplicate) {
+        showNotification('This video has already been uploaded. Please select a different file.', 'error');
+        return;
+      }
+    }
+    
+    try {
+      const fileUrl = URL.createObjectURL(file);
 
-    switch (type) {
-      case 'preview':
-        setPreviewVideo({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
-        break;
-      case 'figures':
-        // Only allow one file at a time
-        const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const newFigure = {
-          id: uniqueId,
-          file,
-          url: fileUrl,
-          name: file.name,
-          size: formatFileSize(file.size)
-        };
-        setFigureVideos(prev => [...prev, newFigure]);
-        break;
-      case 'image':
-        setDanceImage({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
-        break;
-      default:
-        break;
+      switch (type) {
+        case 'preview':
+          // Remove previous video URL to prevent memory leaks
+          if (previewVideo) {
+            URL.revokeObjectURL(previewVideo.url);
+          }
+          setPreviewVideo({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+          break;
+        case 'figures':
+          const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          const newFigure = {
+            id: uniqueId,
+            file,
+            url: fileUrl,
+            name: file.name,
+            size: formatFileSize(file.size)
+          };
+          setFigureVideos(prev => [...prev, newFigure]);
+          break;
+        case 'image':
+          // Remove previous image URL to prevent memory leaks
+          if (danceImage) {
+            URL.revokeObjectURL(danceImage.url);
+          }
+          setDanceImage({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+          break;
+        default:
+          showNotification('Unknown file type. Please try again.', 'error');
+          break;
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      showNotification('Failed to process the file. Please try again with a different file.', 'error');
     }
   };
 
@@ -73,7 +185,12 @@ const DanceUpload = () => {
   };
 
   const removeFigureVideo = (id) => {
-    setFigureVideos(prev => prev.filter(video => video.id !== id));
+    const videoToRemove = figureVideos.find(video => video.id === id);
+    if (videoToRemove) {
+      // Revoke the object URL to free up memory
+      URL.revokeObjectURL(videoToRemove.url);
+      setFigureVideos(prev => prev.filter(video => video.id !== id));
+    }
     // Clear the file input to allow re-uploading the same file
     const figuresInput = document.getElementById('figures-input');
     if (figuresInput) figuresInput.value = '';
@@ -115,22 +232,35 @@ const DanceUpload = () => {
 
     const files = Array.from(e.dataTransfer.files);
 
-    if (type === 'figures') {
-      // Only allow one file at a time for figures
-      const file = files[0];
-      if (file && file.type.startsWith('video/')) {
-        handleFileUpload(file, type);
+    // Check if any files were dropped
+    if (files.length === 0) {
+      showNotification('No files were detected. Please try dropping the file again.', 'error');
+      return;
+    }
+
+    // Check if multiple files were dropped
+    if (files.length > 1) {
+      showNotification('Please drop only one file at a time.', 'error');
+      return;
+    }
+
+    const file = files[0];
+    
+    // Validate file type before passing to handleFileUpload
+    if (type === 'figures' || type === 'preview') {
+      if (!file.type.startsWith('video/')) {
+        showNotification('Invalid file type. Please drop a video file (MP4, WebM, AVI, MOV).', 'error');
+        return;
       }
-    } else {
-      const file = files[0];
-      if (file) {
-        if (type === 'preview' && file.type.startsWith('video/')) {
-          handleFileUpload(file, type);
-        } else if (type === 'image' && file.type.startsWith('image/')) {
-          handleFileUpload(file, type);
-        }
+    } else if (type === 'image') {
+      if (!file.type.startsWith('image/')) {
+        showNotification('Invalid file type. Please drop an image file (JPG, PNG, GIF, WebP).', 'error');
+        return;
       }
     }
+
+    // File passed basic validation, now handle the upload
+    handleFileUpload(file, type);
   };
 
   const handleSubmit = async (e) => {
@@ -139,34 +269,81 @@ const DanceUpload = () => {
     showNotification('Uploading dance...', 'warning');
 
     try {
-      // Validate required fields
-      if (!formData.title || !formData.references || !formData.region || !formData.durationMinutes || !formData.performers || !formData.music || !formData.costumes) {
-        alert('Please fill in all required fields');
+      // Validate required text fields
+      const requiredFields = [
+        { field: 'title', name: 'Dance Title' },
+        { field: 'references', name: 'References' },
+        { field: 'region', name: 'Island' },
+        { field: 'durationMinutes', name: 'Duration (Minutes)' },
+        { field: 'performers', name: 'Number of Performers' },
+        { field: 'music', name: 'Music & Instruments' },
+        { field: 'costumes', name: 'Traditional Costumes' }
+      ];
+
+      for (const { field, name } of requiredFields) {
+        if (!formData[field] || formData[field].toString().trim() === '') {
+          showNotification(`${name} is required. Please fill in this field.`, 'error');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Validate history field (separate check since it's often forgotten)
+      if (!formData.history || formData.history.trim() === '') {
+        showNotification('History is required. Please provide information about the dance origins.', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate duration values
+      const hours = parseInt(formData.durationHours) || 0;
+      const minutes = parseInt(formData.durationMinutes) || 0;
+      const seconds = parseInt(formData.durationSeconds) || 0;
+
+      if (minutes === 0 && seconds === 0) {
+        showNotification('Please specify a valid duration. At least minutes or seconds must be greater than 0.', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (minutes > 59 || seconds > 59) {
+        showNotification('Invalid duration format. Minutes and seconds cannot exceed 59.', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate performers count
+      const performersCount = parseInt(formData.performers);
+      if (!performersCount || performersCount < 1 || performersCount > 50) {
+        showNotification('Number of performers must be between 1 and 50.', 'error');
         setIsSubmitting(false);
         return;
       }
       
       // Format duration
-      const hours = parseInt(formData.durationHours) || 0;
-      const minutes = parseInt(formData.durationMinutes) || 0;
-      const seconds = parseInt(formData.durationSeconds) || 0;
       const formattedDuration = hours > 0 
         ? `${hours}h ${minutes}m ${seconds}s` 
         : minutes > 0 
           ? `${minutes}m ${seconds}s`
           : `${seconds}s`;
+
+      // Validate preview video
       if (!previewVideo) {
-        alert('Preview video is required.');
+        showNotification('Preview video is required. Please upload a video file.', 'error');
         setIsSubmitting(false);
         return;
       }
+
+      // Validate figure videos
       if (figureVideos.length < 1) {
-        alert('At least 1 figure video is required.');
+        showNotification('At least one figure video is required. Please upload figure videos.', 'error');
         setIsSubmitting(false);
         return;
       }
+
+      // Validate dance image
       if (!danceImage) {
-        alert('Dance image is required.');
+        showNotification('Dance image is required. Please upload an image file.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -271,7 +448,27 @@ const DanceUpload = () => {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      showNotification('Upload failed. Please try again.', 'error');
+      
+      // Provide more specific error messages based on error type
+      let errorMessage = 'Upload failed. Please try again.';
+      
+      if (error.message) {
+        if (error.message.includes('413') || error.message.includes('file too large') || error.message.includes('size')) {
+          errorMessage = 'One or more files are too large. Please reduce file size and try again.';
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'Network error occurred. Please check your connection and try again.';
+        } else if (error.message.includes('authentication') || error.message.includes('auth')) {
+          errorMessage = 'Authentication error. Please log in again and try uploading.';
+        } else if (error.message.includes('storage') || error.message.includes('upload')) {
+          errorMessage = 'File upload failed. Please check your files and try again.';
+        } else if (error.message.includes('database') || error.message.includes('insert')) {
+          errorMessage = 'Database error occurred. Your files were uploaded but dance info could not be saved. Please contact support.';
+        } else if (error.message.includes('title already exists')) {
+          errorMessage = 'A dance with this title already exists. Please choose a different title.';
+        }
+      }
+      
+      showNotification(errorMessage, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -287,6 +484,55 @@ const DanceUpload = () => {
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const handleConfirmNavigation = () => {
+    // Reset form and files if discarding changes
+    if (!isSubmitting) {
+      setFormData({
+        title: "",
+        history: "",
+        references: "",
+        region: "",
+        durationHours: "",
+        durationMinutes: "",
+        durationSeconds: "",
+        performers: "",
+        music: "",
+        costumes: ""
+      });
+      setPreviewVideo(null);
+      setFigureVideos([]);
+      setDanceImage(null);
+      showNotification('Upload discarded', 'warning');
+    } else {
+      // Cancel upload
+      setIsSubmitting(false);
+      showNotification('Upload cancelled', 'warning');
+    }
+    
+    setShowNavigationModal(false);
+    
+    // Navigate to the intended destination
+    if (pendingNavigation) {
+      if (pendingNavigation.targetItem === 'logout') {
+        // Handle logout specifically
+        localStorage.clear();
+        window.dispatchEvent(new Event('authChange'));
+        navigate("/login");
+      } else {
+        setActiveItem(pendingNavigation.targetItem);
+        navigate(pendingNavigation.targetPath);
+      }
+    }
+    
+    setPendingNavigation(null);
+  };
+
+  const handleCancelNavigation = () => {
+    setShowNavigationModal(false);
+    setPendingNavigation(null);
+    // Upload continues
   };
 
   const handleKeyDown = (e) => {
@@ -559,7 +805,13 @@ const DanceUpload = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'preview')}
-              onClick={() => !isSubmitting && document.getElementById('preview-video-input').click()}
+              onClick={() => {
+                if (isSubmitting) {
+                  showNotification('Please wait, upload in progress. Cannot add files during upload.', 'warning');
+                } else {
+                  document.getElementById('preview-video-input').click();
+                }
+              }}
             >
               <div className="upload-icon">Video</div>
               <div className="upload-text">Upload Preview Video</div>
@@ -571,7 +823,14 @@ const DanceUpload = () => {
               id="preview-video-input"
               className="file-input"
               accept="video/*"
-              onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0], 'preview')}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  handleFileUpload(file, 'preview');
+                } else {
+                  showNotification('No file selected. Please try again.', 'error');
+                }
+              }}
               disabled={isSubmitting}
             />
 
@@ -594,8 +853,7 @@ const DanceUpload = () => {
                 <div style={{ 
                   width: '100%', 
                   maxWidth: '600px', 
-                  height: 'auto', 
-                  minHeight: '300px',
+                  height: 'auto',
                   backgroundColor: '#f0f0f0', 
                   borderRadius: '16px',
                   overflow: 'hidden',
@@ -607,10 +865,11 @@ const DanceUpload = () => {
                     preload="metadata"
                     style={{
                       width: '100%',
-                      height: '100%',
-                      minHeight: '300px',
+                      height: 'auto',
+                      maxHeight: '400px',
                       objectFit: 'contain',
-                      backgroundColor: '#000'
+                      backgroundColor: '#000',
+                      display: 'block'
                     }}
                   >
                     <source src={previewVideo.url} type={previewVideo.file.type} />
@@ -632,7 +891,13 @@ const DanceUpload = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'figures')}
-              onClick={() => !isSubmitting && document.getElementById('figures-input').click()}
+              onClick={() => {
+                if (isSubmitting) {
+                  showNotification('Please wait, upload in progress. Cannot add files during upload.', 'warning');
+                } else {
+                  document.getElementById('figures-input').click();
+                }
+              }}
             >
               <div className="upload-icon">Videos</div>
               <div className="upload-text">Upload Figure Video</div>
@@ -646,7 +911,12 @@ const DanceUpload = () => {
               accept="video/*"
               // No 'multiple'
               onChange={(e) => {
-                if (e.target.files[0]) handleFileUpload(e.target.files[0], 'figures');
+                const file = e.target.files[0];
+                if (file) {
+                  handleFileUpload(file, 'figures');
+                } else {
+                  showNotification('No file selected. Please try again.', 'error');
+                }
               }}
               disabled={isSubmitting}
             />
@@ -694,15 +964,16 @@ const DanceUpload = () => {
                     
                     <video 
                       controls
-                      width="100%"
-                      height="200"
                       style={{
                         width: '100%',
-                        height: '200px',
-                        objectFit: 'cover',
+                        height: 'auto',
+                        minHeight: '180px',
+                        maxHeight: '250px',
+                        objectFit: 'contain',
                         borderRadius: '8px',
                         backgroundColor: '#000',
-                        border: '2px solid #000'
+                        border: '2px solid #000',
+                        display: 'block'
                       }}
                       onError={(e) => console.error('Video error:', e)}
                       onLoadStart={() => console.log('Video loading started')}
@@ -739,7 +1010,13 @@ const DanceUpload = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, 'image')}
-              onClick={() => !isSubmitting && document.getElementById('image-input').click()}
+              onClick={() => {
+                if (isSubmitting) {
+                  showNotification('Please wait, upload in progress. Cannot add files during upload.', 'warning');
+                } else {
+                  document.getElementById('image-input').click();
+                }
+              }}
             >
               <div className="upload-icon">Image</div>
               <div className="upload-text">Upload Dance Image</div>
@@ -751,7 +1028,14 @@ const DanceUpload = () => {
               id="image-input"
               className="file-input"
               accept="image/*"
-              onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0], 'image')}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  handleFileUpload(file, 'image');
+                } else {
+                  showNotification('No file selected. Please try again.', 'error');
+                }
+              }}
               disabled={isSubmitting}
             />
 
@@ -784,6 +1068,48 @@ const DanceUpload = () => {
           </button>
         </form>
       </div>
+
+      {/* Navigation Warning Modal */}
+      {showNavigationModal && (
+        <div className="navigation-modal-overlay">
+          <div className="navigation-modal-content">
+            <div className="navigation-modal-header">
+              <div className="navigation-modal-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 className="navigation-modal-title">
+                {isSubmitting ? 'Cancel Upload?' : 'Discard Upload?'}
+              </h3>
+            </div>
+            <div className="navigation-modal-body">
+              <p className="navigation-modal-message">
+                {isSubmitting
+                  ? "A video is currently uploading. Are you sure you want to cancel the upload and leave this page?"
+                  : "You have unsaved changes. Are you sure you want to discard your upload and leave this page?"}
+              </p>
+              <p className="navigation-modal-submessage">
+                This action cannot be undone.
+              </p>
+            </div>
+            <div className="navigation-modal-actions">
+              <button 
+                className="logout-modal-confirm"
+                onClick={handleConfirmNavigation}
+              >
+                {isSubmitting ? 'Cancel Upload' : 'Discard Upload'}
+              </button>
+              <button 
+                className="logout-modal-cancel"
+                onClick={handleCancelNavigation}
+              >
+                Stay Here
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

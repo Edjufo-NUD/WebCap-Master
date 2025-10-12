@@ -22,7 +22,7 @@ body, html {
 .profile-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 8rem 1rem 4rem 1rem; /* Top padding for navbar space */
+  padding: 2rem 1rem 4rem 1rem; /* Reduced top padding for navbar space */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -337,7 +337,7 @@ body, html {
 /* Responsive Design */
 @media (max-width: 768px) {
   .profile-container {
-    padding: 6rem 1rem 2rem 1rem;
+    padding: 2rem 1rem 2rem 1rem;
     min-height: 100vh;
   }
   .profile-card {
@@ -371,7 +371,7 @@ body, html {
 
 @media (max-width: 480px) {
   .profile-container {
-    padding: 5rem 0.5rem 1rem 0.5rem;
+    padding: 1.5rem 0.5rem 1rem 0.5rem;
     min-height: 100vh;
   }
   .profile-header {

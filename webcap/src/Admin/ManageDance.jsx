@@ -16,7 +16,9 @@ import {
   Upload,
   Check,
   X,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import Sidebar from "../Admin/Sidebar";
 import { supabase } from "../supabasebaseClient";
@@ -37,6 +39,8 @@ const ManageDance = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [danceToDelete, setDanceToDelete] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [notification, setNotification] = useState(null);
   
   // Video/Image editing states
@@ -474,6 +478,30 @@ const ManageDance = () => {
   // --- DELETE FUNCTION ---
   const handleDeleteDance = async (danceId) => {
     if (!danceId) return;
+    
+    // Verify password before proceeding
+    try {
+      const currentUserEmail = currentUser?.email;
+      if (!currentUserEmail || !deletePassword) {
+        showNotification('Please enter your password to confirm deletion', 'error');
+        return;
+      }
+
+      // Verify password by attempting to sign in
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: currentUserEmail,
+        password: deletePassword
+      });
+
+      if (authError) {
+        showNotification('Incorrect password. Please try again.', 'error');
+        return;
+      }
+    } catch (error) {
+      showNotification('Password verification failed. Please try again.', 'error');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -1063,7 +1091,11 @@ const ManageDance = () => {
 
   // Reset delete input when modal opens/closes
   useEffect(() => {
-    if (!showDeleteModal) setDeleteInput("");
+    if (!showDeleteModal) {
+      setDeleteInput("");
+      setDeletePassword("");
+      setShowPassword(false);
+    }
   }, [showDeleteModal]);
 
   // Helper function to normalize strings for comparison
@@ -2001,12 +2033,54 @@ const ManageDance = () => {
                         : "2px solid #28a745"
                 }}
               />
+              
+              <div style={{ position: 'relative', marginBottom: 16 }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-input"
+                  placeholder="Enter your current password"
+                  value={deletePassword}
+                  onChange={e => setDeletePassword(e.target.value)}
+                  style={{
+                    paddingRight: '45px',
+                    borderColor: deletePassword.length === 0 ? "#ccc" : "#28a745",
+                    outline: deletePassword.length === 0 ? "" : "2px solid #28a745"
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#718096',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '4px'
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              
               <div className="modal-actions">
                 <button 
                   className="btn btn-danger"
                   onClick={() => handleDeleteDance(danceToDelete.id)}
-                  disabled={normalizeString(deleteInput) !== normalizeString(danceToDelete.title)}
-                  title={normalizeString(deleteInput) !== normalizeString(danceToDelete.title) ? "Type the exact title to enable" : ""}
+                  disabled={normalizeString(deleteInput) !== normalizeString(danceToDelete.title) || !deletePassword.trim()}
+                  title={
+                    normalizeString(deleteInput) !== normalizeString(danceToDelete.title) 
+                      ? "Type the exact title to enable" 
+                      : !deletePassword.trim() 
+                      ? "Enter your password to enable deletion"
+                      : ""
+                  }
                 >
                   Delete
                 </button>

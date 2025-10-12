@@ -708,7 +708,38 @@
   
   /* Figures grid */
   .figures-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  @media (max-width: 768px) { .figures-grid { grid-template-columns: 1fr; } }
+  
+  /* Mobile video responsiveness */
+  @media (max-width: 768px) { 
+    .figures-grid { grid-template-columns: 1fr; }
+    
+    /* Ensure videos are fully responsive on mobile */
+    .modal-section video {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 300px !important;
+      object-fit: contain !important;
+    }
+    
+    .figure-box video {
+      width: 100% !important;
+      height: auto !important;
+      min-height: 120px !important;
+      max-height: 180px !important;
+      object-fit: contain !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .modal-section video {
+      max-height: 250px !important;
+    }
+    
+    .figure-box video {
+      min-height: 100px !important;
+      max-height: 150px !important;
+    }
+  }
   
   /* Actions */
   .approval-actions {
@@ -1197,6 +1228,175 @@
   .close-btn {
     width: 100%;
     padding: 12px;
+  }
+}
+
+/* Navigation/Cancel Confirmation Modal Styles */
+.navigation-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.navigation-modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideInScale 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes slideInScale {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.navigation-modal-header {
+  padding: 2rem 2rem 1rem 2rem;
+  text-align: center;
+}
+
+.navigation-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #fef3c7, #fbbf24);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  color: #d97706;
+}
+
+.navigation-modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.navigation-modal-body {
+  padding: 0 2rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.navigation-modal-message {
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.navigation-modal-submessage {
+  font-size: 0.95rem;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 600;
+}
+
+.navigation-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem 2rem 2rem;
+}
+
+.logout-modal-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logout-modal-cancel:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.logout-modal-confirm {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  border: none;
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logout-modal-confirm:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.logout-modal-confirm:active {
+  transform: translateY(0);
+}
+
+/* Responsive Cancel Confirmation Modal */
+@media (max-width: 640px) {
+  .navigation-modal-content {
+    max-width: 95vw;
+    margin: 20px;
+  }
+  
+  .navigation-modal-header {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .navigation-modal-body {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .navigation-modal-actions {
+    flex-direction: column-reverse;
+    padding: 16px 20px;
+  }
+  
+  .logout-modal-cancel,
+  .logout-modal-confirm {
+    width: 100%;
+    justify-content: center;
   }
 }
   

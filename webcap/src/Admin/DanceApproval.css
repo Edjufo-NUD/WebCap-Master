@@ -1424,6 +1424,33 @@ body, html {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+  
+  /* Ensure videos are fully responsive on mobile */
+  .modal-section video {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 300px !important;
+    object-fit: contain !important;
+  }
+  
+  .figure-box video {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 120px !important;
+    max-height: 180px !important;
+    object-fit: contain !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-section video {
+    max-height: 250px !important;
+  }
+  
+  .figure-box video {
+    min-height: 100px !important;
+    max-height: 150px !important;
+  }
 }
 @media (max-width: 1024px) {
   .dance-approval-page {
