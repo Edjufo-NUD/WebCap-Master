@@ -759,7 +759,7 @@ const Analytics = () => {
 
             {/* Tiklos: Step-by-Step Chart */}
             <div className="mini-chart-wrapper">
-              <h4 className="chart-subtitle">👣 Tiklos: Step-by-Step</h4>
+              <h4 className="chart-subtitle">Tiklos: Step-by-Step</h4>
               <div className="mobile-chart-scroll">
                 <ResponsiveContainer width="100%" height={450} minWidth={750}>
                 <BarChart

@@ -174,10 +174,33 @@ const UserRatings = () => {
     setCurrentPage(1);
   }, [selectedDance, selectedFigure, debouncedSearchTerm, sortBy, sortOrder]);
 
-  // Chart data for trends
-  const chartData = useMemo(() => {
+  // Independent date range states for each chart
+  const [trendDateRange, setTrendDateRange] = useState("30"); // "7", "30", "90", "all"
+  const [countDateRange, setCountDateRange] = useState("30"); // "7", "30", "90", "all"
+
+  // Helper function to filter data by date range
+  const filterByDateRange = (data, dateRange) => {
+    if (dateRange === "all") {
+      return data;
+    }
+    
+    const days = parseInt(dateRange);
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    return data.filter(fb => {
+      const fbDate = new Date(fb.submitted_at);
+      return fbDate >= cutoffDate;
+    });
+  };
+
+  // Chart data for Rating Trends
+  const trendChartData = useMemo(() => {
+    // First filter by date range, then group
+    const dateFilteredData = filterByDateRange(filteredData, trendDateRange);
+    
     const groupedByDate = {};
-    filteredData.forEach(fb => {
+    dateFilteredData.forEach(fb => {
       const date = new Date(fb.submitted_at).toLocaleDateString();
       if (!groupedByDate[date]) {
         groupedByDate[date] = { date, ratings: [], count: 0 };
@@ -191,9 +214,31 @@ const UserRatings = () => {
         ...day,
         avgRating: day.ratings.reduce((sum, rating) => sum + rating, 0) / day.ratings.length
       }))
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
-      .slice(-30); // Last 30 days
-  }, [filteredData]);
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [filteredData, trendDateRange]);
+
+  // Chart data for Daily Count
+  const countChartData = useMemo(() => {
+    // First filter by date range, then group
+    const dateFilteredData = filterByDateRange(filteredData, countDateRange);
+    
+    const groupedByDate = {};
+    dateFilteredData.forEach(fb => {
+      const date = new Date(fb.submitted_at).toLocaleDateString();
+      if (!groupedByDate[date]) {
+        groupedByDate[date] = { date, ratings: [], count: 0 };
+      }
+      groupedByDate[date].ratings.push(fb.rating);
+      groupedByDate[date].count++;
+    });
+
+    return Object.values(groupedByDate)
+      .map(day => ({
+        ...day,
+        avgRating: day.ratings.reduce((sum, rating) => sum + rating, 0) / day.ratings.length
+      }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [filteredData, countDateRange]);
 
   const openModal = (fb) => {
     setSelectedFeedback(fb);
@@ -336,6 +381,111 @@ const UserRatings = () => {
           </div>
         </div>
 
+        {/* Charts Section - Always Visible */}
+        {(trendChartData.length > 0 || countChartData.length > 0) && (
+          <div className="charts-section">
+            <div className="chart-container">
+              <div className="chart-header">
+                <h3 className="chart-title">
+                  Rating Trends {trendDateRange === "all" ? "(All Time)" : `(Last ${trendDateRange} Days)`}
+                </h3>
+                <div className="chart-date-selector">
+                  <select 
+                    value={trendDateRange} 
+                    onChange={(e) => setTrendDateRange(e.target.value)}
+                    className="date-range-select"
+                  >
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="all">All Time</option>
+                  </select>
+                </div>
+              </div>
+              <div className="chart-wrapper">
+                <ResponsiveContainer width="100%" height={200}>
+                  <LineChart data={trendChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#666"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      domain={[1, 5]} 
+                      stroke="#666"
+                      fontSize={12}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        background: 'white',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      }}
+                      formatter={(value) => [`${value.toFixed(1)}⭐`, 'Avg Rating']}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="avgRating" 
+                      stroke="#a0855b" 
+                      strokeWidth={3}
+                      dot={{ fill: '#a0855b', r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="chart-container">
+              <div className="chart-header">
+                <h3 className="chart-title">
+                  Daily Rating Count {countDateRange === "all" ? "(All Time)" : `(Last ${countDateRange} Days)`}
+                </h3>
+                <div className="chart-date-selector">
+                  <select 
+                    value={countDateRange} 
+                    onChange={(e) => setCountDateRange(e.target.value)}
+                    className="date-range-select"
+                  >
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="all">All Time</option>
+                  </select>
+                </div>
+              </div>
+              <div className="chart-wrapper">
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={countChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#666"
+                      fontSize={12}
+                    />
+                    <YAxis stroke="#666" fontSize={12} />
+                    <Tooltip 
+                      contentStyle={{
+                        background: 'white',
+                        border: '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      }}
+                      formatter={(value) => [value, 'Rating Count']}
+                    />
+                    <Bar 
+                      dataKey="count" 
+                      fill="#a0855b"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Filters and Controls */}
         <div className="controls-section">
           <div className="filter-row">
@@ -387,51 +537,30 @@ const UserRatings = () => {
               </div>
             </div>
 
-            <div 
-              className="secondary-filters"
-              style={{
-                display: 'flex',
-                flexDirection: windowWidth > 1366 ? 'row' : 'column',
-                alignItems: windowWidth > 1366 ? 'center' : 'stretch',
-                gap: windowWidth > 1366 ? '20px' : '1rem'
-              }}
-            >
-              {selectedDance !== "All" && availableFigures.length > 1 && (
-                <>
-                  <label>Figure:</label>
-                  <select 
-                    value={selectedFigure} 
-                    onChange={(e) => setSelectedFigure(e.target.value)}
-                    className="figure-select"
-                  >
-                    {availableFigures.map(figure => (
-                      <option key={figure} value={figure}>
-                        {figure === "All" ? "All Figures" : getDisplayFigureName(figure)}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              )}
-
+            <div className="secondary-filters user-ratings-two-row-layout">
+              {/* Row 1: Search bar (takes full width) */}
               <div 
-                className="search-container"
-                style={{
-                  flex: windowWidth > 1366 ? '8' : 'none',
-                  width: windowWidth <= 1366 ? '100%' : 'auto'
-                }}
+                className="ratings-search-bar"
+                style={windowWidth <= 480 ? {
+                  fontSize: '16px'
+                } : {}}
               >
-                <Search size={16} />
+                <Search size={16} className="ratings-search-icon" />
                 <input
                   type="text"
-                  placeholder="Search by figure, user, or dance name..."
+                  placeholder="Search by figure, username, or dance name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
+                  className="ratings-search-input"
+                  style={windowWidth <= 480 ? {
+                    fontSize: '16px',
+                    padding: '12px 40px 12px 45px'
+                  } : {}}
                 />
                 {searchTerm && (
                   <button 
                     onClick={() => setSearchTerm("")}
-                    className="search-clear-btn"
+                    className="ratings-search-clear"
                     title="Clear search"
                   >
                     ×
@@ -439,111 +568,114 @@ const UserRatings = () => {
                 )}
               </div>
 
+              {/* Row 2: Figure dropdown and Sort controls side by side */}
               <div 
-                className="sort-controls"
-                style={{
-                  flex: windowWidth > 1366 ? '0.3' : 'none',
-                  width: windowWidth <= 1366 ? '100%' : 'auto',
-                  maxWidth: windowWidth > 1366 ? '200px' : 'none'
-                }}
+                className="user-ratings-row-two"
+                style={windowWidth <= 480 ? {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  alignItems: 'stretch',
+                  width: '100%'
+                } : {}}
               >
-                <select 
-                  value={sortBy} 
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="sort-select"
+                {/* Always show Figure dropdown */}
+                <div 
+                  className="figure-filter"
+                  style={windowWidth <= 480 ? {
+                    width: '100%',
+                    margin: '0',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  } : {}}
                 >
-                  <option value="date">Sort by Date</option>
-                  <option value="rating">Sort by Rating</option>
-                  <option value="user">Sort by User</option>
-                  <option value="dance">Sort by Dance</option>
-                  <option value="figure">Sort by Figure</option>
-                </select>
-                
-                <button 
-                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="sort-order-btn"
-                  title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+                  {windowWidth > 480 && <label>Figure:</label>}
+                  <select 
+                    value={selectedFigure} 
+                    onChange={(e) => setSelectedFigure(e.target.value)}
+                    className="figure-select"
+                    style={windowWidth <= 480 ? {
+                      width: '100%',
+                      padding: '12px 15px',
+                      fontSize: '16px',
+                      borderRadius: '6px',
+                      boxSizing: 'border-box',
+                      border: '1px solid #d1d5db',
+                      backgroundColor: 'white',
+                      margin: '0'
+                    } : {}}
+                  >
+                    {selectedDance === "All" ? (
+                      <option value="All">All Figures</option>
+                    ) : (
+                      availableFigures.map(figure => (
+                        <option key={figure} value={figure}>
+                          {figure === "All" ? "All Figures" : getDisplayFigureName(figure)}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Sort controls */}
+                <div 
+                  className="sort-controls"
+                  style={windowWidth <= 480 ? {
+                    display: 'flex',
+                    width: '100%',
+                    gap: '10px',
+                    alignItems: 'stretch',
+                    margin: '0'
+                  } : {}}
                 >
-                  {sortOrder === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
+                  <select 
+                    value={sortBy} 
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="sort-select"
+                    style={windowWidth <= 480 ? {
+                      flex: '1',
+                      fontSize: '16px',
+                      padding: '12px 15px',
+                      borderRadius: '6px',
+                      border: '1px solid #d1d5db',
+                      backgroundColor: 'white',
+                      boxSizing: 'border-box',
+                      margin: '0'
+                    } : {}}
+                  >
+                    <option value="date">Sort by Date</option>
+                    <option value="rating">Sort by Rating</option>
+                    <option value="user">Sort by User</option>
+                    <option value="dance">Sort by Dance</option>
+                    <option value="figure">Sort by Figure</option>
+                  </select>
+                  
+                  <button 
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="sort-order-btn"
+                    title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
+                    style={windowWidth <= 480 ? {
+                      flexShrink: '0',
+                      width: '48px',
+                      height: '48px',
+                      padding: '0',
+                      borderRadius: '6px',
+                      border: '1px solid #d1d5db',
+                      backgroundColor: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      margin: '0'
+                    } : {}}
+                  >
+                    {sortOrder === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
         </div>
-
-        {/* Charts Section - Always Visible */}
-        {chartData.length > 0 && (
-          <div className="charts-section">
-            <div className="chart-container">
-              <h3 className="chart-title">Rating Trends (Last 30 Days)</h3>
-              <div className="chart-wrapper">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#666"
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      domain={[1, 5]} 
-                      stroke="#666"
-                      fontSize={12}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        background: 'white',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                      }}
-                      formatter={(value) => [`${value.toFixed(1)}⭐`, 'Avg Rating']}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="avgRating" 
-                      stroke="#a0855b" 
-                      strokeWidth={3}
-                      dot={{ fill: '#a0855b', r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="chart-container">
-              <h3 className="chart-title">Daily Rating Count</h3>
-              <div className="chart-wrapper">
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#666"
-                      fontSize={12}
-                    />
-                    <YAxis stroke="#666" fontSize={12} />
-                    <Tooltip 
-                      contentStyle={{
-                        background: 'white',
-                        border: '1px solid #e0e0e0',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                      }}
-                      formatter={(value) => [value, 'Rating Count']}
-                    />
-                    <Bar 
-                      dataKey="count" 
-                      fill="#a0855b"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Ratings Table */}
         <div className="ratings-table-section">

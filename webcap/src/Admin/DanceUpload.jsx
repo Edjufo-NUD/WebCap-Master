@@ -620,7 +620,7 @@ const DanceUpload = () => {
               </select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="duration-performers-grid">
               <div className="form-group">
                 <label className="form-label" htmlFor="duration">
                   Duration<span className="required-asterisk">*</span>

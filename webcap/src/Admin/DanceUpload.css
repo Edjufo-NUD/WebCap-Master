@@ -579,6 +579,13 @@
   box-shadow: 0 4px 8px rgba(160, 174, 192, 0.3);
 }
 
+/* Duration and Performers Grid - Responsive */
+.duration-performers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .dance-upload-form {
@@ -642,6 +649,12 @@
   .figures-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+  
+  /* Make duration and performers stack vertically on mobile */
+  .duration-performers-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
   }
   
   /* Mobile video responsive styles */
