@@ -504,81 +504,58 @@ const DanceApproval = () => {
         </div>
       </div>
 
-      {/* Search and Filter Section */}
-      <div className="search-filter-center">
-        <div className="search-bar">
-          <Search className="search-icon" size={20} />
-          <input
-            type="text"
-            placeholder="Search dances or uploaders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input"
-          />
+      {/* Search and Controls Section - ManageDance Style */}
+      <div className="manage-dance-controls">
+        <div className="controls-left">
+          <div className="dance-search-container">
+            <Search className="search-icon" size={20} />
+            <input
+              type="text"
+              placeholder="Search dances or uploaders..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="dance-search-input"
+            />
+          </div>
+          
+          {/* Region Filter */}
+          <select
+            value={selectedRegion}
+            onChange={(e) => setSelectedRegion(e.target.value)}
+            className="filter-select"
+            style={{ 
+              color: '#000000', 
+              backgroundColor: '#ffffff',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none'
+            }}
+          >
+            <option value="All" style={{ color: '#000000', backgroundColor: '#ffffff' }}>All Regions</option>
+            <option value="Luzon" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Luzon</option>
+            <option value="Visayas" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Visayas</option>
+            <option value="Mindanao" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Mindanao</option>
+          </select>
         </div>
         
-        {/* Sort Dropdown */}
-        <div className="sort-dropdown-container" style={{ position: 'relative' }}>
-          <Filter 
-            className="filter-icon" 
-            size={20} 
-            onClick={() => setShowSortDropdown(!showSortDropdown)}
-            style={{ cursor: 'pointer' }}
-          />
-          
-          {showSortDropdown && (
-            <div
-              className="sort-dropdown"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 12px)',
-                right: 0,
-                background: 'rgba(210, 180, 140, 0.95)',
-                backdropFilter: 'blur(10px)',
-                border: '2px solid rgba(160, 133, 91, 0.3)',
-                borderRadius: '16px',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15)',
-                minWidth: '220px',
-                padding: '12px',
-                zIndex: 1000,
-                animation: 'fadeIn 0.15s ease-out'
-              }}
-            >
-              {['a-z', 'z-a', 'newest', 'oldest'].map((option) => (
-                <button
-                  key={option}
-                  onClick={() => handleSortChange(option)}
-                  style={{
-                    width: '100%',
-                    padding: '14px 18px',
-                    marginBottom: option === 'oldest' ? '0' : '8px',
-                    background: sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    color: '#ffffff',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    boxShadow: sortOption === option ? '0 2px 8px rgba(0, 0, 0, 0.2)' : 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(160, 133, 91, 0.85)';
-                    e.currentTarget.style.transform = 'translateX(-4px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = sortOption === option ? 'rgba(160, 133, 91, 0.9)' : 'rgba(160, 133, 91, 0.6)';
-                    e.currentTarget.style.transform = 'translateX(0)';
-                  }}
-                >
-                  {option === 'a-z' ? 'A-Z' : option === 'z-a' ? 'Z-A' : option === 'newest' ? 'Newest' : 'Oldest'}
-                </button>
-              ))}
-            </div>
-          )}
+        <div className="controls-right">
+          <select
+            value={sortOption}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="sort-select"
+            style={{ 
+              color: '#000000', 
+              backgroundColor: '#ffffff',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none'
+            }}
+          >
+            <option value="newest" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Newest First</option>
+            <option value="oldest" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Oldest First</option>
+            <option value="a-z" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Title A-Z</option>
+            <option value="z-a" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Title Z-A</option>
+          </select>
         </div>
       </div>
 
@@ -781,21 +758,32 @@ const DanceApproval = () => {
 
               {/* Main Video */}
               {mainVideoUrl && (
-                <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>
+                <div className="modal-section modal-video-section" style={{ 
+                  textAlign: 'center', 
+                  margin: '32px 0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
                   <h3 style={{ marginBottom: 12 }}>Cultural Dance</h3>
                   <video
                     src={mainVideoUrl}
                     controls
+                    className="main-dance-video"
                     style={{
                       width: '100%',
-                      maxWidth: 520,
+                      maxWidth: '520px',
                       height: 'auto',
-                      maxHeight: 400,
-                      borderRadius: 12,
+                      maxHeight: '400px',
+                      borderRadius: '12px',
                       background: '#000',
                       objectFit: 'contain',
-                      boxShadow: '0 4px 24px #0002',
-                      display: 'block'
+                      boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12)',
+                      display: 'block',
+                      margin: '0 auto',
+                      position: 'relative',
+                      zIndex: '1'
                     }}
                   >
                     Your browser does not support the video tag.

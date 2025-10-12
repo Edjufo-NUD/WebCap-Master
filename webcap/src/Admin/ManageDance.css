@@ -144,7 +144,8 @@
   min-width: 300px;
 }
 
-.search-container {
+.search-container,
+.dance-search-container {
   position: relative;
   flex: 1;
   max-width: 400px;
@@ -160,7 +161,8 @@
   z-index: 1;
 }
 
-.search-input {
+.search-input,
+.dance-search-input {
   width: 100%;
   padding: 12px 12px 12px 45px;
   border: 2px solid #e9ecef;
@@ -168,12 +170,76 @@
   font-size: 1rem;
   transition: all 0.3s ease;
   box-sizing: border-box;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
-.search-input:focus {
+.search-input:focus,
+.dance-search-input:focus {
   outline: none;
   border-color: #a0855b;
   box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.search-input::placeholder,
+.dance-search-input::placeholder {
+  color: #6c757d !important;
+}
+
+/* Dark mode override - ensure search stays white */
+@media (prefers-color-scheme: dark) {
+  .search-input,
+  .dance-search-input {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #e9ecef !important;
+  }
+  
+  .search-input:focus,
+  .dance-search-input:focus {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #a0855b !important;
+  }
+  
+  .search-input::placeholder,
+  .dance-search-input::placeholder {
+    color: #6c757d !important;
+  }
+}
+
+/* Force white theme for search regardless of system/app theme */
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .dance-search-input,
+.dark-mode .search-input,
+.dark-mode .dance-search-input,
+.dark .search-input,
+.dark .dance-search-input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #e9ecef !important;
+}
+
+[data-theme="dark"] .search-input:focus,
+[data-theme="dark"] .dance-search-input:focus,
+.dark-mode .search-input:focus,
+.dark-mode .dance-search-input:focus,
+.dark .search-input:focus,
+.dark .dance-search-input:focus {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #a0855b !important;
+}
+
+[data-theme="dark"] .search-input::placeholder,
+[data-theme="dark"] .dance-search-input::placeholder,
+.dark-mode .search-input::placeholder,
+.dark-mode .dance-search-input::placeholder,
+.dark .search-input::placeholder,
+.dark .dance-search-input::placeholder {
+  color: #6c757d !important;
 }
 
 .filter-select,
@@ -639,6 +705,13 @@
   }
 }
 
+/* Duration and Performers Grid - Responsive */
+.duration-performers-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
 /* ============================================ */
 /* RESPONSIVE DESIGN FOR ALL DEVICES */
 /* ============================================ */
@@ -724,7 +797,8 @@
     min-width: 250px;
   }
   
-  .search-container {
+  .search-container,
+  .dance-search-container {
     min-width: 200px;
   }
   
@@ -763,7 +837,8 @@
     justify-content: stretch;
   }
   
-  .search-container {
+  .search-container,
+  .dance-search-container {
     max-width: none;
     min-width: auto;
   }
@@ -830,6 +905,12 @@
     padding: 25px;
   }
   
+  /* Make duration and performers stack vertically on mobile */
+  .duration-performers-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  
   .modal h3 {
     font-size: 1.3rem;
   }
@@ -870,7 +951,8 @@
     padding: 15px;
   }
   
-  .search-input {
+  .search-input,
+  .dance-search-input {
     font-size: 16px; /* Prevent zoom on iOS */
   }
   

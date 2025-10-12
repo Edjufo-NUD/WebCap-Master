@@ -1143,14 +1143,14 @@ const ManageDance = () => {
 
         <div className="manage-dance-controls">
           <div className="controls-left">
-            <div className="search-container">
+            <div className="dance-search-container">
               <Search className="search-icon" size={20} />
               <input
                 type="text"
                 placeholder="Search dances..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className="dance-search-input"
               />
             </div>
             
@@ -1404,7 +1404,7 @@ const ManageDance = () => {
                 </div>
 
                 {/* Optional Fields */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                <div className="duration-performers-grid">
                   <div className="form-group">
                     <label className="form-label" htmlFor="duration">
                       Duration<span className="required-asterisk">*</span>

@@ -369,18 +369,7 @@
   gap: 12px;
 }
 
-/* Add icons to chart titles */
-.chart-subtitle::before {
-  content: '📊';
-  font-size: 16px;
-}
-
-/* Dance-specific icons */
-.mini-chart-wrapper:nth-child(1) .chart-subtitle::before { content: '🏔️'; } /* Binungey - mountain */
-.mini-chart-wrapper:nth-child(2) .chart-subtitle::before { content: '🌾'; } /* Pahid - rice */
-.mini-chart-wrapper:nth-child(3) .chart-subtitle::before { content: '🌊'; } /* Sua Ku Sua - water */
-.mini-chart-wrapper:nth-child(4) .chart-subtitle::before { content: '🌾'; } /* Tiklos - harvest */
-.mini-chart-wrapper:nth-child(5) .chart-subtitle::before { content: '👣'; } /* Tiklos Step-by-Step - steps */
+/* Chart titles without icons */
 
 /* Activity Row */
 .activity-row {
@@ -551,6 +540,86 @@
   align-items: center;
   justify-content: center;
   flex: 1;
+}
+
+/* Force all chart text to be black in any theme */
+.analytics-container .recharts-tooltip-wrapper,
+.analytics-container .recharts-tooltip-item,
+.analytics-container .recharts-tooltip-label,
+.analytics-container .recharts-tooltip-item-name,
+.analytics-container .recharts-tooltip-item-value,
+.analytics-container .recharts-cartesian-axis-tick-value,
+.analytics-container .recharts-legend-item-text,
+.analytics-container .recharts-text,
+.analytics-container text,
+.analytics-container tspan {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Force tooltip background to be white with black text */
+.analytics-container .recharts-tooltip-wrapper .recharts-default-tooltip,
+.analytics-container .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #000000 !important;
+}
+
+/* Force legend text to be black */
+.analytics-container .recharts-legend-wrapper,
+.analytics-container .recharts-legend-wrapper text,
+.analytics-container .recharts-legend-item text {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Override any dark mode styling for charts */
+[data-theme="dark"] .analytics-container .recharts-tooltip-wrapper,
+[data-theme="dark"] .analytics-container .recharts-tooltip-item,
+[data-theme="dark"] .analytics-container .recharts-tooltip-label,
+[data-theme="dark"] .analytics-container .recharts-tooltip-item-name,
+[data-theme="dark"] .analytics-container .recharts-tooltip-item-value,
+[data-theme="dark"] .analytics-container .recharts-cartesian-axis-tick-value,
+[data-theme="dark"] .analytics-container .recharts-legend-item-text,
+[data-theme="dark"] .analytics-container .recharts-text,
+[data-theme="dark"] .analytics-container text,
+[data-theme="dark"] .analytics-container tspan,
+.dark-mode .analytics-container .recharts-tooltip-wrapper,
+.dark-mode .analytics-container .recharts-tooltip-item,
+.dark-mode .analytics-container .recharts-tooltip-label,
+.dark-mode .analytics-container .recharts-tooltip-item-name,
+.dark-mode .analytics-container .recharts-tooltip-item-value,
+.dark-mode .analytics-container .recharts-cartesian-axis-tick-value,
+.dark-mode .analytics-container .recharts-legend-item-text,
+.dark-mode .analytics-container .recharts-text,
+.dark-mode .analytics-container text,
+.dark-mode .analytics-container tspan {
+  color: #000000 !important;
+  fill: #000000 !important;
+}
+
+/* Override system dark mode preferences for charts */
+@media (prefers-color-scheme: dark) {
+  .analytics-container .recharts-tooltip-wrapper,
+  .analytics-container .recharts-tooltip-item,
+  .analytics-container .recharts-tooltip-label,
+  .analytics-container .recharts-tooltip-item-name,
+  .analytics-container .recharts-tooltip-item-value,
+  .analytics-container .recharts-cartesian-axis-tick-value,
+  .analytics-container .recharts-legend-item-text,
+  .analytics-container .recharts-text,
+  .analytics-container text,
+  .analytics-container tspan {
+    color: #000000 !important;
+    fill: #000000 !important;
+  }
+  
+  .analytics-container .recharts-tooltip-wrapper .recharts-default-tooltip,
+  .analytics-container .recharts-default-tooltip {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    color: #000000 !important;
+  }
 }
 
 /* Animations */

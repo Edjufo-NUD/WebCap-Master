@@ -152,33 +152,232 @@ body, html {
 
 .search-filter-center .search-icon {
   position: absolute;
-  left: 1rem;
+  left: 1.5rem;
   top: 50%;
   transform: translateY(-50%);
   color: #6b7280;
+  z-index: 2;
 }
 
 .search-filter-center .search-input {
   width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
+  padding: 1rem 1rem 1rem 3.5rem;
   border: 2px solid #e5e7eb;
   border-radius: 50px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: #f9fafb;
-  color: #1f2937;
+  background: #ffffff !important;
+  color: #1f2937 !important;
 }
 
 .search-filter-center .search-input:focus {
   outline: none;
   border-color: #a0855b;
-  background: white;
+  background: #ffffff !important;
   box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
-  color: #1f2937;
+  color: #1f2937 !important;
 }
 
 .search-filter-center .search-input::placeholder {
-  color: #9ca3af;
+  color: #9ca3af !important;
+}
+
+/* Force white search bar in all themes */
+@media (prefers-color-scheme: dark) {
+  .search-filter-center .search-input {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-color: #e5e7eb !important;
+  }
+  
+  .search-filter-center .search-input:focus {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+  }
+  
+  .search-filter-center .search-input::placeholder {
+    color: #9ca3af !important;
+  }
+}
+
+/* Force white theme for search regardless of system/app theme */
+[data-theme="dark"] .search-filter-center .search-input,
+[data-theme="dark"] .search-filter-center .search-input:focus,
+.dark-mode .search-filter-center .search-input,
+.dark-mode .search-filter-center .search-input:focus,
+.dark .search-filter-center .search-input,
+.dark .search-filter-center .search-input:focus {
+  background: #ffffff !important;
+  color: #1f2937 !important;
+  border-color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .search-filter-center .search-input:focus,
+.dark-mode .search-filter-center .search-input:focus,
+.dark .search-filter-center .search-input:focus {
+  border-color: #a0855b !important;
+}
+
+[data-theme="dark"] .search-filter-center .search-input::placeholder,
+.dark-mode .search-filter-center .search-input::placeholder,
+.dark .search-filter-center .search-input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* ManageDance-style controls */
+.manage-dance-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.controls-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.dance-search-container {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+  min-width: 250px;
+}
+
+.dance-search-input {
+  width: 100%;
+  padding: 12px 12px 12px 45px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.dance-search-input:focus {
+  outline: none;
+  border-color: #a0855b;
+  box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.dance-search-input::placeholder {
+  color: #6c757d !important;
+}
+
+.filter-select,
+.sort-select {
+  padding: 12px 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.filter-select:focus,
+.sort-select:focus {
+  outline: none;
+  border-color: #a0855b;
+  box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+}
+
+/* Dark mode overrides for ManageDance controls */
+@media (prefers-color-scheme: dark) {
+  .dance-search-input {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #e9ecef !important;
+  }
+  
+  .dance-search-input:focus {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #a0855b !important;
+  }
+  
+  .dance-search-input::placeholder {
+    color: #6c757d !important;
+  }
+}
+
+[data-theme="dark"] .dance-search-input,
+.dark-mode .dance-search-input,
+.dark .dance-search-input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #e9ecef !important;
+}
+
+[data-theme="dark"] .dance-search-input:focus,
+.dark-mode .dance-search-input:focus,
+.dark .dance-search-input:focus {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #a0855b !important;
+}
+
+[data-theme="dark"] .dance-search-input::placeholder,
+.dark-mode .dance-search-input::placeholder,
+.dark .dance-search-input::placeholder {
+  color: #6c757d !important;
+}
+
+/* Responsive for ManageDance controls */
+@media (max-width: 768px) {
+  .manage-dance-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    padding: 20px;
+  }
+  
+  .controls-left {
+    flex-direction: column;
+    align-items: stretch;
+    min-width: auto;
+  }
+  
+  .controls-right {
+    justify-content: stretch;
+  }
+  
+  .dance-search-container {
+    max-width: none;
+    min-width: auto;
+  }
+  
+  .filter-select,
+  .sort-select {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .manage-dance-controls {
+    padding: 15px;
+  }
 }
 
 .search-filter-center .filter-icon {
@@ -225,8 +424,57 @@ body, html {
     width: auto;
   }
   
+  .search-filter-center .search-icon {
+    left: 1.2rem;
+  }
+  
+  .search-filter-center .search-input {
+    padding: 0.9rem 0.9rem 0.9rem 3.2rem;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
   .sort-dropdown-container {
     flex-shrink: 0;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .search-filter-center {
+    flex-direction: column;
+    padding: 1rem 0.5rem 0.75rem 0.5rem;
+    gap: 0.8rem;
+  }
+  
+  .search-filter-center .search-bar {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .search-filter-center .search-icon {
+    left: 1rem;
+  }
+  
+  .search-filter-center .search-input {
+    padding: 0.8rem 0.8rem 0.8rem 2.8rem;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 25px;
+  }
+  
+  .sort-dropdown-container {
+    width: 100%;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 360px) {
+  .search-filter-center .search-icon {
+    left: 0.9rem;
+  }
+  
+  .search-filter-center .search-input {
+    padding: 0.75rem 0.75rem 0.75rem 2.6rem;
+    font-size: 16px; /* Prevent zoom on iOS */
   }
 }
 
@@ -1409,6 +1657,25 @@ body, html {
   .modal-body {
     padding: 1rem;
   }
+}
+
+/* Main Video Centering - Override any conflicting styles */
+.modal-video-section {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.main-dance-video {
+  display: block !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+  max-width: 520px !important;
+  width: 100% !important;
+  height: auto !important;
 }
 
 /* Add to DanceApproval.css */

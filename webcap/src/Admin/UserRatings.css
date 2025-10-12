@@ -638,14 +638,48 @@
   border: 2px solid var(--border-color);
 }
 
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 .chart-title {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-primary) !important;
-  margin-bottom: 1rem;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.chart-date-selector {
+  display: flex;
+  align-items: center;
+}
+
+.date-range-select {
+  padding: 6px 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  color: #000000;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.date-range-select:focus {
+  outline: none;
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1);
+}
+
+.date-range-select:hover {
+  border-color: #8B5A3C;
 }
 
 .chart-wrapper {
@@ -1154,23 +1188,21 @@
     padding: 15px;
   }
   
-  .search-container {
+  .ratings-search-bar {
     width: 100%;
-    max-width: 400px;
+    min-width: unset;
+    max-width: 100%;
   }
   
   .sort-controls {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
   }
   
   .figure-select {
     width: 160px;
-  }
-  
-  .search-container {
-    width: 250px;
   }
 }
 
@@ -1264,17 +1296,17 @@
     align-items: stretch;
   }
   
-  .search-container {
+  .ratings-search-bar {
     width: 100% !important;
-    flex: none !important;
+    min-width: unset !important;
+    max-width: 100% !important;
     margin-bottom: 1rem;
   }
   
-  .search-input {
+  .ratings-search-input {
     font-size: 16px; /* Prevents zoom on iOS */
-    padding: 12px;
-    min-height: 44px;
-    width: 100%;
+    padding: 12px 0;
+    min-height: 20px;
   }
   
   .sort-controls {
@@ -1344,8 +1376,9 @@
     width: 100%;
   }
 
-  .search-container {
+  .ratings-search-bar {
     width: 100%;
+    min-width: unset;
   }
 
   .advanced-controls {
@@ -1392,6 +1425,28 @@
 
   .chart-container {
     padding: 1rem;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .chart-title {
+    font-size: 1.1rem;
+  }
+
+  .chart-date-selector {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .date-range-select {
+    min-width: 140px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
   }
 
   .chart-wrapper {
@@ -1642,14 +1697,58 @@
     flex: 1 1 100%;
   }
   
-  .search-input {
+  /* Mobile search controls alignment fixes */
+  .user-ratings-two-row-layout {
+    padding: 10px !important;
+    gap: 12px !important;
+  }
+  
+  .ratings-search-bar {
+    margin-bottom: 0 !important;
+  }
+  
+  .user-ratings-row-two {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+  }
+  
+  .figure-filter {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  .figure-filter select {
+    width: 100%;
+    padding: 12px 15px;
     font-size: 16px;
-    padding: 10px;
+    border-radius: 6px;
+  }
+  
+  .sort-controls {
+    width: 100% !important;
+    justify-content: space-between;
+    gap: 8px;
   }
   
   .sort-select {
+    flex: 1;
     font-size: 16px;
-    padding: 10px;
+    padding: 12px 15px;
+    border-radius: 6px;
+  }
+  
+  .sort-order-btn {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+    border-radius: 6px;
+  }
+  
+  .ratings-search-input {
+    font-size: 16px;
+    padding: 12px 15px 12px 45px;
   }
   
   .ratings-table th,
@@ -1765,6 +1864,80 @@
   font-weight: 600;
 }
 
+/* New dedicated search bar styles */
+.ratings-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  min-width: 300px;
+  max-width: 500px;
+  flex: 1;
+}
+
+.ratings-search-bar:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(160, 133, 91, 0.15);
+}
+
+.ratings-search-bar:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(160, 133, 91, 0.1);
+}
+
+.ratings-search-icon {
+  color: #6b7280;
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.ratings-search-bar:focus-within .ratings-search-icon {
+  color: var(--accent-color);
+}
+
+.ratings-search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #374151;
+  padding: 0;
+}
+
+.ratings-search-input::placeholder {
+  color: #9ca3af;
+}
+
+.ratings-search-clear {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.ratings-search-clear:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
 /* Inline Active Filters Styles */
 .active-filters-inline {
   display: flex;
@@ -1794,7 +1967,7 @@
   background: var(--accent-color);
   color: white;
   padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 500;
 }
@@ -1873,4 +2046,160 @@
 
 .modal-buttons button:disabled:hover {
   background: white;
+}
+
+/* ULTRA SPECIFIC FORCE TWO-ROW LAYOUT - NUCLEAR OPTION */
+.user-ratings-container .user-ratings-content .user-ratings-two-row-layout,
+.secondary-filters.user-ratings-two-row-layout {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 1rem !important;
+  padding: 15px !important;
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Search bar - FORCE 100% width */
+.user-ratings-container .ratings-search-bar,
+.user-ratings-two-row-layout .ratings-search-bar {
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: none !important;
+  order: 1 !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Second row - FORCE horizontal layout */
+.user-ratings-container .user-ratings-row-two,
+.user-ratings-two-row-layout .user-ratings-row-two {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 15px !important;
+  align-items: center !important;
+  width: 100% !important;
+  order: 2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Figure filter - FORCE 50% width (clean, no debug background) */
+.user-ratings-container .user-ratings-row-two .figure-filter,
+.user-ratings-two-row-layout .user-ratings-row-two .figure-filter {
+  width: calc(50% - 7.5px) !important;
+  max-width: calc(50% - 7.5px) !important;
+  flex: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 36px !important;
+}
+
+/* Sort controls - FORCE 50% width (clean, no debug background) */
+.user-ratings-container .user-ratings-row-two .sort-controls,
+.user-ratings-two-row-layout .user-ratings-row-two .sort-controls {
+  width: calc(50% - 7.5px) !important;
+  max-width: calc(50% - 7.5px) !important;
+  flex: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 36px !important;
+}
+
+/* Figure select - expand within container with consistent styling */
+.user-ratings-row-two .figure-filter .figure-select {
+  flex: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 8px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  background: white !important;
+  font-size: 14px !important;
+  color: #495057 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Figure select focus/active state */
+.user-ratings-row-two .figure-filter .figure-select:focus {
+  border-color: #8B5A3C !important;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1) !important;
+}
+
+/* Sort select - expand within container with consistent styling */
+.user-ratings-row-two .sort-controls .sort-select {
+  flex: 1 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 8px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  background: white !important;
+  font-size: 14px !important;
+  color: #495057 !important;
+  outline: none !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Sort select focus/active state */
+.user-ratings-row-two .sort-controls .sort-select:focus {
+  border-color: #8B5A3C !important;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1) !important;
+}
+
+/* Sort button - stay compact with consistent styling */
+.user-ratings-row-two .sort-controls .sort-order-btn {
+  flex: none !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 8px !important;
+  background: white !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Sort button hover state */
+.user-ratings-row-two .sort-controls .sort-order-btn:hover {
+  background: #f8f9fa !important;
+  border-color: #8B5A3C !important;
+}
+
+/* Sort button focus state */
+.user-ratings-row-two .sort-controls .sort-order-btn:focus {
+  border-color: #8B5A3C !important;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1) !important;
+}
+
+/* Override any responsive styles that might interfere */
+@media (min-width: 1px) {
+  .user-ratings-two-row-layout {
+    flex-direction: column !important;
+  }
+  
+  .user-ratings-row-two {
+    flex-direction: row !important;
+  }
 }
