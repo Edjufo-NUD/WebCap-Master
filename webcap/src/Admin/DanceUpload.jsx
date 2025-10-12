@@ -563,9 +563,10 @@ const DanceUpload = () => {
         {userRole === 'superadmin' && (
           <p style={{ 
             textAlign: 'center', 
-            color: '#2563eb', 
+            color: '#4a5568', 
             fontWeight: '600', 
             marginTop: '8px',
+            marginBottom: '24px',
             fontSize: '1.1rem'
           }}>
             Your dance will be published directly without approval.
