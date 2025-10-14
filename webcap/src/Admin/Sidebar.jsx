@@ -11,6 +11,7 @@ import {
   FileText,
   CheckSquare,
   AlertTriangle,
+  UserCircle,
 } from "lucide-react";
 import { supabase } from "../supabasebaseClient";
 import FLIPinoLogo from "../assets/FLIPinoNLogo.png";
@@ -277,6 +278,13 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
         </nav>
 
         <div className="sidebar-footer">
+          <div 
+            className={`sidebar-item ${activeItem === "admin-profile" ? "active" : ""}`}
+            onClick={() => handleItemClick({ id: "admin-profile", path: "/admin-profile" })}
+          >
+            <UserCircle className="sidebar-icon" size={20} />
+            <span className="sidebar-label">Profile</span>
+          </div>
           <div className="sidebar-item logout" onClick={handleLogoutClick}>
             <LogOut className="sidebar-icon" size={20} />
             <span className="sidebar-label">Logout</span>
@@ -310,19 +318,24 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
                       position: 'static',
                       marginLeft: '0'
                     }}>{pendingDancesCount}</span>
-                  )}
-                </div>
-              );
-            })}
+                )}
+              </div>
+            );
+          })}
+            <div 
+              className={`sidebar-item ${activeItem === "admin-profile" ? "active" : ""}`}
+              onClick={() => handleItemClick({ id: "admin-profile", path: "/admin-profile" })}
+            >
+              <UserCircle className="sidebar-icon" size={20} />
+              <span className="sidebar-label">Profile</span>
+            </div>
             <div className="sidebar-item logout" onClick={handleLogoutClick}>
               <LogOut className="sidebar-icon" size={20} />
               <span className="sidebar-label">Logout</span>
             </div>
           </nav>
         </div>
-      )}
-
-      {showLogoutModal && (
+      )}      {showLogoutModal && (
         <div className="logout-modal-overlay" onClick={cancelLogout}>
           <div className="logout-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="logout-modal-header">
