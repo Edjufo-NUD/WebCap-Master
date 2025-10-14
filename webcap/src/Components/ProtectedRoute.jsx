@@ -42,11 +42,43 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '50vh',
-        fontSize: '16px',
-        color: '#666'
+        width: '100vw',
+        height: '100vh',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        backgroundColor: '#f8f9fa',
+        zIndex: 9999
       }}>
-        Verifying access...
+        <div style={{
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '20px'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid #e0e0e0',
+            borderTop: '4px solid #a0855b',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <div style={{
+            fontSize: '18px',
+            color: '#666',
+            fontWeight: '500'
+          }}>Loading...</div>
+        </div>
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}
+        </style>
       </div>
     );
   }

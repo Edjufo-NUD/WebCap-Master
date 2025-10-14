@@ -1,6 +1,7 @@
 // src/pages/Culture.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../Components/Footer';
 import {
   MapPin,
   Clock,
@@ -2390,6 +2391,8 @@ const Culture = () => {
           </div>
         </button>
       )}
+
+      <Footer />
     </div>
   );
 };

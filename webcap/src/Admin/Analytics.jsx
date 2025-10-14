@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, LineChart, Line, PieChart, Pie } from "recharts";
-import { TrendingUp, Users, Activity, Trophy, BarChart3, Star } from 'lucide-react';
+import { TrendingUp, Users, Activity, Trophy, BarChart3, Star, Download } from 'lucide-react';
 import { supabase } from "../supabasebaseClient";
 import Sidebar from '../Admin/Sidebar';
 import './Analytics.css';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const BINUNGEY_FIGS = [
   "BinungeyBoyFig1.json", "BinungeyBoyFig2.json", "BinungeyBoyFig3.json",
@@ -48,6 +50,16 @@ const Analytics = () => {
   const [performanceTrend, setPerformanceTrend] = useState([]);
   const [totalSessions, setTotalSessions] = useState(0);
   const [mostPopularDance, setMostPopularDance] = useState('N/A');
+  
+  // New states for additional features
+  const [averageAge, setAverageAge] = useState(0);
+  const [genderDistribution, setGenderDistribution] = useState([]);
+  const [ageDistribution, setAgeDistribution] = useState([]);
+  const [popularDanceTrend, setPopularDanceTrend] = useState([]);
+  const [trendDateRange, setTrendDateRange] = useState("30");
+  
+  // PDF Download Modal State
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -101,6 +113,148 @@ const Analytics = () => {
     };
     fetchStats();
   }, []);
+
+  // Fetch average age and gender distribution of users who attempted dancing
+  useEffect(() => {
+    const fetchDemographics = async () => {
+      try {
+        // Get unique user IDs from user_history
+        const { data: historyData } = await supabase
+          .from('user_history')
+          .select('user_id');
+        
+        if (historyData && historyData.length > 0) {
+          const uniqueUserIds = [...new Set(historyData.map(row => row.user_id))];
+          
+          // Fetch age and gender for these users
+          const { data: userData } = await supabase
+            .from('users')
+            .select('age, gender')
+            .in('id', uniqueUserIds);
+          
+          if (userData) {
+            // Calculate average age
+            const validAges = userData.filter(u => u.age != null && u.age > 0).map(u => u.age);
+            const avgAge = validAges.length > 0 
+              ? Math.round(validAges.reduce((sum, age) => sum + age, 0) / validAges.length)
+              : 0;
+            setAverageAge(avgAge);
+            
+            // Calculate gender distribution
+            const genderCounts = {
+              'Male': 0,
+              'Female': 0,
+              'Other': 0,
+              'Prefer not to say': 0
+            };
+            
+            userData.forEach(u => {
+              if (u.gender) {
+                if (genderCounts.hasOwnProperty(u.gender)) {
+                  genderCounts[u.gender]++;
+                } else {
+                  genderCounts['Other']++;
+                }
+              }
+            });
+            
+            const genderData = Object.entries(genderCounts).map(([name, count]) => ({
+              name: name === 'Prefer not to say' ? 'Prefer not\nto say' : name,
+              count,
+              percentage: userData.length > 0 ? ((count / userData.length) * 100).toFixed(1) : 0
+            }));
+            
+            setGenderDistribution(genderData);
+            
+            // Calculate age distribution (group by age ranges)
+            const ageRanges = {
+              '13-17': 0,
+              '18-24': 0,
+              '25-34': 0,
+              '35-44': 0,
+              '45-54': 0,
+              '55+': 0
+            };
+            
+            validAges.forEach(age => {
+              if (age >= 13 && age <= 17) ageRanges['13-17']++;
+              else if (age >= 18 && age <= 24) ageRanges['18-24']++;
+              else if (age >= 25 && age <= 34) ageRanges['25-34']++;
+              else if (age >= 35 && age <= 44) ageRanges['35-44']++;
+              else if (age >= 45 && age <= 54) ageRanges['45-54']++;
+              else if (age >= 55) ageRanges['55+']++;
+            });
+            
+            const ageData = Object.entries(ageRanges).map(([range, count]) => ({
+              range,
+              count,
+              percentage: validAges.length > 0 ? ((count / validAges.length) * 100).toFixed(1) : 0
+            }));
+            
+            setAgeDistribution(ageData);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching demographics:', error);
+      }
+    };
+    
+    fetchDemographics();
+    const intervalId = setInterval(fetchDemographics, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Fetch trend data for most popular dance
+  useEffect(() => {
+    const fetchPopularDanceTrend = async () => {
+      if (mostPopularDance === 'N/A') return;
+      
+      try {
+        const { data: trendData } = await supabase
+          .from('user_history')
+          .select('attempted_at, score')
+          .eq('dance_name', mostPopularDance)
+          .order('attempted_at', { ascending: true });
+        
+        if (trendData && trendData.length > 0) {
+          // Filter by date range
+          const now = new Date();
+          let filteredData = trendData;
+          
+          if (trendDateRange !== "all") {
+            const daysAgo = parseInt(trendDateRange);
+            const cutoffDate = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000));
+            filteredData = trendData.filter(item => new Date(item.attempted_at) >= cutoffDate);
+          }
+          
+          // Group by date and calculate average score
+          const dateMap = {};
+          filteredData.forEach(item => {
+            const date = new Date(item.attempted_at).toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric' 
+            });
+            if (!dateMap[date]) {
+              dateMap[date] = { total: 0, count: 0 };
+            }
+            dateMap[date].total += item.score || 0;
+            dateMap[date].count += 1;
+          });
+          
+          const chartData = Object.entries(dateMap).map(([date, data]) => ({
+            date,
+            score: parseFloat((data.total / data.count).toFixed(2))
+          }));
+          
+          setPopularDanceTrend(chartData);
+        }
+      } catch (error) {
+        console.error('Error fetching popular dance trend:', error);
+      }
+    };
+    
+    fetchPopularDanceTrend();
+  }, [mostPopularDance, trendDateRange]);
 
   useEffect(() => {
     const fetchPopularDances = async () => {
@@ -413,6 +567,254 @@ const Analytics = () => {
     return 'Just now';
   };
 
+  // PDF Download Function
+  const downloadAnalyticsPDF = () => {
+    try {
+      console.log('Starting PDF generation...');
+      console.log('Data check:', { 
+        totalUsers, 
+        activeUsers, 
+        totalSessions, 
+        mostPopularDance,
+        totalDances,
+        averageAge,
+        genderDistributionLength: genderDistribution.length,
+        ageDistributionLength: ageDistribution.length,
+        chartDataLength: chartData.length
+      });
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPos = 20;
+      
+      console.log('PDF document initialized');
+
+    // Title
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    doc.text('Analytics Report', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Summary Statistics
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('Summary Statistics', 14, yPos);
+    yPos += 10;
+
+    autoTable(doc, {
+      startY: yPos,
+      head: [['Metric', 'Value']],
+      body: [
+        ['Total Users', totalUsers.toString()],
+        ['New Users (7 days)', activeUsers.toString()],
+        ['Total Sessions', totalSessions.toString()],
+        ['Most Popular Dance', mostPopularDance],
+        ['Total Dances', totalDances.toString()],
+        ['Average Age (Dancers)', averageAge > 0 ? averageAge.toString() : 'N/A']
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [160, 133, 91] },
+      margin: { left: 14, right: 14 }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 15;
+
+    // Gender Distribution
+    if (genderDistribution.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Gender Distribution', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Gender', 'Count', 'Percentage']],
+        body: genderDistribution.map(item => [
+          item.name,
+          item.count.toString(),
+          `${item.percentage}%`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Age Distribution
+    if (ageDistribution.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Age Distribution', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Age Range', 'Count', 'Percentage']],
+        body: ageDistribution.map(item => [
+          item.range,
+          item.count.toString(),
+          `${item.percentage}%`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Popular Dances
+    if (chartData.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Dance Popularity', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Dance Name', 'Attempts']],
+        body: chartData.map(item => [
+          item.name,
+          item.dances.toString()
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Top Performers
+    if (topPerformers.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Top Performers', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Rank', 'Name', 'Avg Score', 'Sessions']],
+        body: topPerformers.map((performer, idx) => [
+          `#${idx + 1}`,
+          performer.name,
+          `${performer.avgScore}%`,
+          performer.sessions.toString()
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Recent Activity
+    if (recentActivity.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Recent Activity', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['User', 'Action', 'Score', 'Time']],
+        body: recentActivity.slice(0, 20).map(activity => [
+          activity.userName,
+          activity.action,
+          activity.score ? `${activity.score}%` : '-',
+          activity.timeAgo
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Average Scores per Dance
+    const danceScores = [
+      { name: 'Binungey', scores: binungeyScores },
+      { name: 'Pahid', scores: pahidScores },
+      { name: 'Sua Ku Sua', scores: suaScores },
+      { name: 'Tiklos', scores: tiklosScores },
+      { name: 'Tiklos: Step-by-Step', scores: tiklosStepByStepScores }
+    ];
+
+    danceScores.forEach(dance => {
+      if (dance.scores.length > 0) {
+        if (yPos > pageHeight - 60) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text(`${dance.name} - Average Scores`, 14, yPos);
+        yPos += 10;
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Figure', 'Average Score']],
+          body: dance.scores.map(item => [
+            item.name,
+            `${item.dances}%`
+          ]),
+          theme: 'grid',
+          headStyles: { fillColor: [160, 133, 91] },
+          margin: { left: 14, right: 14 }
+        });
+
+        yPos = doc.lastAutoTable.finalY + 15;
+      }
+    });
+
+    // Save the PDF
+    console.log('Saving PDF...');
+    doc.save(`Analytics_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    console.log('PDF saved successfully');
+    setShowDownloadModal(false);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please check the console for details.');
+      setShowDownloadModal(false);
+    }
+  };
+
   return (
     <div className="analytics-container">
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
@@ -466,11 +868,20 @@ const Analytics = () => {
                 <div className="stat-label">Total Dances</div>
               </div>
             </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <Users size={24} />
+              </div>
+              <div className="stat-info">
+                <div className="stat-value">{averageAge > 0 ? averageAge : 'N/A'}</div>
+                <div className="stat-label">Avg Age (Dancers)</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Activity Feed and Top Performers Row */}
-        <div className="activity-row">
+        {/* Activity Feed, Top Performers, Gender and Age Distribution - 2x2 Grid */}
+        <div className="analytics-two-column-row">
           {/* Recent Activity Feed */}
           <div className="activity-feed">
             <div className="section-header">
@@ -528,27 +939,164 @@ const Analytics = () => {
               )}
             </div>
           </div>
+
+          {/* Gender Distribution */}
+          <div className="analytics-gender-distribution-card">
+            <div className="section-header">
+              <Users size={24} />
+              <h3>Gender Distribution</h3>
+            </div>
+            <div className="analytics-gender-chart-content">
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart 
+                  data={genderDistribution} 
+                  margin={{ top: 30, right: 20, left: 20, bottom: 55 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="name" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={60}
+                    tick={{ fontSize: 12 }}
+                    interval={0}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    label={{ 
+                      value: 'Number of Users', 
+                      angle: -90, 
+                      position: 'insideLeft', 
+                      offset: 10, 
+                      dy: 30,
+                      style: { fontSize: 12 }
+                    }}
+                  />
+                  <Tooltip 
+                    formatter={(value, name) => {
+                      const item = genderDistribution.find(d => d.count === value);
+                      return [`${value} (${item?.percentage}%)`, 'Users'];
+                    }}
+                  />
+                  <Bar dataKey="count" name="Users" radius={[4, 4, 0, 0]}>
+                    {genderDistribution.map((entry, idx) => (
+                      <Cell 
+                        key={`gender-cell-${idx}`} 
+                        fill={['#3b82f6', '#ec4899', '#8b5cf6', '#6b7280'][idx % 4]} 
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Age Distribution */}
+          <div className="analytics-age-distribution-card">
+            <div className="section-header">
+              <Users size={24} />
+              <h3>Age Distribution</h3>
+            </div>
+            <div className="analytics-age-chart-content">
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart 
+                  data={ageDistribution} 
+                  margin={{ top: 30, right: 20, left: 20, bottom: 55 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="range" 
+                    angle={-45} 
+                    textAnchor="end" 
+                    height={60}
+                    tick={{ fontSize: 12 }}
+                    interval={0}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    label={{ 
+                      value: 'Number of Users', 
+                      angle: -90, 
+                      position: 'insideLeft', 
+                      offset: 10, 
+                      dy: 30,
+                      style: { fontSize: 12 }
+                    }}
+                  />
+                  <Tooltip 
+                    formatter={(value, name) => {
+                      const item = ageDistribution.find(d => d.count === value);
+                      return [`${value} (${item?.percentage}%)`, 'Users'];
+                    }}
+                  />
+                  <Bar dataKey="count" name="Users" radius={[4, 4, 0, 0]}>
+                    {ageDistribution.map((entry, idx) => (
+                      <Cell 
+                        key={`age-cell-${idx}`} 
+                        fill={['#10b981', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6'][idx % 6]} 
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
-        {/* Popular Dances Chart */}
+        {/* Popular Dances Chart - Side by Side with Trend */}
         <div className="chart-section">
-          <h2 className="popular-dance-heading">Popular Dances</h2>
-          <p className="chart-subtext">Most Performed Dance Activities</p>
-          <div className="dashboard-chart-container">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend wrapperStyle={{ color: '#000000' }} />
-                <Bar dataKey="dances" name="Folk Dances">
-                  {chartData.map((entry, idx) => (
-                    <Cell key={`main-cell-${idx}`} fill={['#6b3916', '#e1a94f', '#4caf50', '#2196f3', '#9c27b0'][idx % 5]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <h2 className="popular-dance-heading">Popular Dances Analysis</h2>
+          <p className="chart-subtext">Most Performed Dance Activities & Trends</p>
+          
+          {/* Two Charts Side by Side Container */}
+          <div className="analytics-dual-chart-container">
+            {/* Popular Dances Bar Chart */}
+            <div className="analytics-chart-card">
+              <h3 className="analytics-chart-title">Dance Popularity</h3>
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" angle={-15} textAnchor="end" height={80} tick={{ fontSize: 11 }} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend wrapperStyle={{ color: '#000000' }} />
+                  <Bar dataKey="dances" name="Attempts">
+                    {chartData.map((entry, idx) => (
+                      <Cell key={`main-cell-${idx}`} fill={['#6b3916', '#e1a94f', '#4caf50', '#2196f3', '#9c27b0'][idx % 5]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Most Popular Dance Trend Chart */}
+            <div className="analytics-chart-card">
+              <div className="analytics-chart-header">
+                <h3>{mostPopularDance} Trend</h3>
+                <select 
+                  value={trendDateRange}
+                  onChange={(e) => setTrendDateRange(e.target.value)}
+                  className="analytics-date-select"
+                >
+                  <option value="7">Last 7 Days</option>
+                  <option value="30">Last 30 Days</option>
+                  <option value="90">Last 90 Days</option>
+                  <option value="all">All Time</option>
+                </select>
+              </div>
+              <div className="trend-chart-scroll">
+                <ResponsiveContainer width="100%" height={350} minWidth={600}>
+                  <LineChart data={popularDanceTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" angle={-15} textAnchor="end" height={80} tick={{ fontSize: 11 }} />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Legend wrapperStyle={{ color: '#000000' }} />
+                    <Line type="monotone" dataKey="score" name="Avg Score" stroke="#8b4513" strokeWidth={2} dot={{ fill: '#8b4513', r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -810,6 +1358,57 @@ const Analytics = () => {
             </div>
           </div>
         </div>
+
+        {/* Floating Download Button */}
+        <button 
+          className="floating-download-btn" 
+          onClick={() => setShowDownloadModal(true)}
+          title="Download Analytics Report"
+        >
+          <Download size={24} />
+        </button>
+
+        {/* Download Confirmation Modal */}
+        {showDownloadModal && (
+          <div className="modal-overlay" onClick={() => setShowDownloadModal(false)}>
+            <div className="download-modal-container" onClick={(e) => e.stopPropagation()}>
+              <div className="download-modal-content">
+                <div className="download-modal-header">
+                  <Download size={32} />
+                  <h2>Download Analytics Report</h2>
+                </div>
+                
+                <div className="download-modal-body">
+                  <p>This will generate a comprehensive PDF report containing:</p>
+                  <ul>
+                    <li>Summary statistics</li>
+                    <li>Gender and age distribution</li>
+                    <li>Dance popularity data</li>
+                    <li>Top performers</li>
+                    <li>Recent activity</li>
+                    <li>Average scores per dance and figure</li>
+                  </ul>
+                  <p>Do you want to continue?</p>
+                </div>
+                
+                <div className="download-modal-footer">
+                  <button 
+                    className="download-modal-btn cancel-btn" 
+                    onClick={() => setShowDownloadModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="download-modal-btn confirm-btn" 
+                    onClick={downloadAnalyticsPDF}
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

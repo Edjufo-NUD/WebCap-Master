@@ -112,6 +112,18 @@
   text-align: left;
 }
 
+/* Side by side layout for Age and Gender */
+.input-group-row {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+
+.input-group-half {
+  flex: 1;
+  text-align: left;
+}
+
 .input-label {
   display: block;
   color: white;
@@ -130,6 +142,22 @@
   background-color: white;
   color: #333;
   font-family: 'Arial', sans-serif;
+}
+
+/* Date input specific styles */
+.register-input[type="date"] {
+  cursor: pointer;
+}
+
+.register-input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.5);
+}
+
+/* Select dropdown styles */
+.register-input select,
+select.register-input {
+  cursor: pointer;
 }
 
 .register-input::placeholder {
@@ -299,6 +327,16 @@
   
   .input-group {
     margin-bottom: 8px;
+  }
+
+  /* Stack Age and Gender vertically on mobile */
+  .input-group-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .input-group-half {
+    width: 100%;
   }
 }
 

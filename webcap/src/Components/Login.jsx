@@ -18,7 +18,7 @@ const Login = () => {
     const reason = urlParams.get('reason');
     
     if (reason === 'disabled') {
-      setError("Your account has been disabled. Please contact support.");
+      setError("Your account has been disabled. Please check your email.");
     } else if (reason === 'session_expired') {
       setError("Your session has expired. Please log in again.");
     }
@@ -86,7 +86,7 @@ const Login = () => {
       // ✅ Block login only if status is Disabled (Allow Enabled and Maintenance users)
       if (userData.status.toLowerCase() === "disabled") {
         await supabase.auth.signOut(); // Clear session
-        setError("Your account is disabled. Please contact support.");
+        setError("Your account is disabled. Please check your email.");
         return;
       }
 

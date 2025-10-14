@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Heart, Star, Globe, Music, Book, MapPin, ArrowUp } from 'lucide-react';
 import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 import './About.css';
 import edrian from '../assets/edrian.jpeg';
 import anji from '../assets/anjformal.png';
@@ -214,23 +215,6 @@ const About = () => {
             </div>
           </div>
         </section>
-
-        {/* Contact Section */}
-        <section className="about-contact">
-          <div className="container">
-            <div className="contact-content">
-              <h2>Get In Touch</h2>
-              <p>
-                Have questions about Filipino culture or want to contribute to our mission? 
-                We'd love to hear from you!
-              </p>
-              <div className="contact-info">
-                <p>Email: hello@flipino.ph</p>
-                <p>Follow us on social media to stay updated on our latest cultural discoveries</p>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
 
       {/* Scroll to Top Button */}
@@ -260,6 +244,8 @@ const About = () => {
           <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
         </button>
       )}
+
+      <Footer />
     </div>
   );
 };

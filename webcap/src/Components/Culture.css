@@ -487,6 +487,14 @@
   gap: 3rem;
 }
 
+/* Center Mindanao (3rd card) */
+.region-card:nth-child(3) {
+  grid-column: 1 / -1;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 .region-card {
   background: white;
   border-radius: 20px;
@@ -713,6 +721,21 @@
   max-width: 500px;
   min-width: 350px;
   z-index: 2;
+}
+
+/* Wider timeline cards on bigger screens */
+@media (min-width: 1400px) {
+  .timeline-content {
+    max-width: 650px;
+    min-width: 450px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .timeline-content {
+    max-width: 750px;
+    min-width: 500px;
+  }
 }
 
 .timeline-content::before {
@@ -3453,8 +3476,8 @@
 
 .culture-nav-toggle svg {
   opacity: 1 !important;
-  color: black !important;
-  stroke: black !important;
+  color: white !important;
+  stroke: white !important;
   fill: none !important;
   stroke-width: 2 !important;
   width: 24px !important;
@@ -3467,8 +3490,8 @@
 
 .culture-nav-toggle:hover svg {
   opacity: 1 !important;
-  color: black !important;
-  stroke: black !important;
+  color: white !important;
+  stroke: white !important;
   fill: none !important;
   stroke-width: 2.5 !important;
 }

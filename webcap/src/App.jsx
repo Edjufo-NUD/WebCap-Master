@@ -228,7 +228,7 @@ const SessionValidator = ({ children }) => {
             fontSize: '18px',
             color: '#666',
             fontWeight: '500'
-          }}>Validating session...</div>
+          }}>Loading...</div>
         </div>
         <style>
           {`

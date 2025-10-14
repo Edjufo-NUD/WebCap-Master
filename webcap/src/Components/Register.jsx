@@ -143,6 +143,8 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
@@ -197,6 +199,36 @@ const Register = () => {
     // Username validation: min 6, max 16
     if (username.length < 6 || username.length > 16) {
       showSnackbar("Username must be between 6 and 16 characters!", "error");
+      setLoading(false);
+      return;
+    }
+
+    // Date of Birth validation (minimum age 13)
+    if (!dateOfBirth) {
+      showSnackbar("Please enter your date of birth", "error");
+      setLoading(false);
+      return;
+    }
+
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    const age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+
+    if (age < 13) {
+      showSnackbar("You must be at least 13 years old to register", "error");
+      setLoading(false);
+      return;
+    }
+
+    if (age > 120) {
+      showSnackbar("Please enter a valid date of birth", "error");
+      setLoading(false);
+      return;
+    }
+
+    // Gender validation
+    if (!gender) {
+      showSnackbar("Please select your gender", "error");
       setLoading(false);
       return;
     }
@@ -275,11 +307,17 @@ const Register = () => {
 
       // Step 3: Insert into your custom users table (mirror username from Auth)
       if (signUpData?.user?.id) {
+        const birthDate = new Date(dateOfBirth);
+        const today = new Date();
+        const calculatedAge = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+
         const { error: dbError } = await supabase.from("users").insert([
           {
             id: signUpData.user.id, // link to auth.users.id
             username: signUpData.user.user_metadata.display_name, // always mirrors Auth
             email,
+            age: calculatedAge,
+            gender,
             role: "user", // default role
             status: "Enabled", // default status - matches UserManagement system
           },
@@ -361,6 +399,37 @@ const Register = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+              </div>
+
+              {/* Age and Gender Side by Side */}
+              <div className="input-group-row">
+                <div className="input-group input-group-half">
+                  <label className="input-label">Date of Birth</label>
+                  <input
+                    type="date"
+                    className="register-input"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
+                    required
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                  />
+                </div>
+
+                <div className="input-group input-group-half">
+                  <label className="input-label">Gender</label>
+                  <select
+                    className="register-input"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    required
+                  >
+                    <option value="">Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
               </div>
 
               <div className="input-group">
