@@ -22,6 +22,11 @@ const Login = () => {
     } else if (reason === 'session_expired') {
       setError("Your session has expired. Please log in again.");
     }
+    
+    // Clean up URL parameters after showing the error
+    if (reason) {
+      window.history.replaceState({}, '', '/login');
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -35,6 +40,11 @@ const Login = () => {
     }
 
     if (email && password) {
+      // First, clear any existing session data to prevent stacking
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("currentUser");
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
