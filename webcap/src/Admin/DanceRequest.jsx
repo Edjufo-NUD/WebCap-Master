@@ -497,8 +497,8 @@ const DanceRequest = () => {
               appearance: 'none'
             }}
           >
-            <option value="newest" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Newest First</option>
-            <option value="oldest" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Oldest First</option>
+            <option value="newest" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Newest</option>
+            <option value="oldest" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Oldest</option>
             <option value="a-z" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Title A-Z</option>
             <option value="z-a" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Title Z-A</option>
           </select>

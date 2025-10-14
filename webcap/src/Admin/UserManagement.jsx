@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../Admin/Sidebar";
 import { supabase } from "../supabasebaseClient";
+import emailjs from '@emailjs/browser';
 import "./UserManagementScoped.css";
 
 const UserManagement = () => {
@@ -22,7 +23,15 @@ const UserManagement = () => {
   const [showStopCountdownModal, setShowStopCountdownModal] = useState(false);
   const [countdownSeconds, setCountdownSeconds] = useState(null);
   const [countdownInterval, setCountdownInterval] = useState(null);
+  const [disableReason, setDisableReason] = useState("");
+  const [previousStatus, setPreviousStatus] = useState(null);
+  const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
   const usersPerPage = 10;
+
+  // EmailJS Configuration - Replace with your actual values
+  const EMAILJS_SERVICE_ID = 'service_x9ew4ba';  // Replace this
+  const EMAILJS_TEMPLATE_ID = 'template_tbjdbwb'; // Replace this
+  const EMAILJS_PUBLIC_KEY = 'gzYE5BQzMAtfzjsyo';   // Replace this
 
   // Show notification function
   const showNotification = (message, type = 'success') => {
@@ -114,7 +123,7 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     const { data, error } = await supabase
       .from("users")
-      .select("id, username, email, role, status");
+      .select("id, username, email, age, gender, role, status");
     if (!error) {
       setUsers(
         (data || [])
@@ -123,6 +132,8 @@ const UserManagement = () => {
             id: u.id,
             name: u.username,
             email: u.email,
+            age: u.age,
+            gender: u.gender,
             role: (u.role || "user").toLowerCase(),
             status: u.status || "Enabled",
           }))
@@ -132,6 +143,8 @@ const UserManagement = () => {
 
   const handleEditUser = (user) => {
     setEditingUser({ ...user });
+    setPreviousStatus(user.status);
+    setDisableReason("");
     setShowEditModal(true);
   };
 
@@ -153,6 +166,21 @@ const UserManagement = () => {
   };
 
   const saveUserChanges = async () => {
+    // Check if status is being changed to Disabled and reason is required
+    if (editingUser.status === "Disabled" && previousStatus !== "Disabled") {
+      if (!disableReason.trim()) {
+        showNotification("Please provide a reason for disabling this account", 'error');
+        return;
+      }
+    }
+
+    // Show confirmation modal
+    setShowSaveConfirmModal(true);
+  };
+
+  const confirmSaveUserChanges = async () => {
+    setShowSaveConfirmModal(false);
+
     const { error } = await supabase
       .from("users")
       .update({
@@ -162,13 +190,70 @@ const UserManagement = () => {
       .eq("id", editingUser.id);
 
     if (!error) {
+      // If status changed to Disabled, send email notification
+      if (editingUser.status === "Disabled" && previousStatus !== "Disabled") {
+        try {
+          // Send email directly using EmailJS
+          const templateParams = {
+            to_email: editingUser.email,
+            username: editingUser.name,
+            reason: disableReason.trim()
+          };
+
+          const response = await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            templateParams,
+            EMAILJS_PUBLIC_KEY
+          );
+
+          console.log('Email sent successfully:', response);
+          showNotification("User disabled and notification email sent successfully", 'success');
+        } catch (emailErr) {
+          console.error('Email error:', emailErr);
+          showNotification("User disabled successfully, but email notification failed to send", 'warning');
+        }
+      } 
+      // If status changed from Disabled to Enabled, send re-enable email
+      else if (editingUser.status === "Enabled" && previousStatus === "Disabled") {
+        try {
+          // Send re-enable email using EmailJS
+          const templateParams = {
+            to_email: editingUser.email,
+            username: editingUser.name,
+            message: "Your WebCap account has been re-enabled by an administrator. You can now log in and access all features."
+          };
+
+          const response = await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            'template_vpsytan', // Re-enable template
+            templateParams,
+            EMAILJS_PUBLIC_KEY
+          );
+
+          console.log('Re-enable email sent successfully:', response);
+          showNotification("User re-enabled and notification email sent successfully", 'success');
+        } catch (emailErr) {
+          console.error('Re-enable email error:', emailErr);
+          showNotification("User re-enabled successfully, but email notification failed to send", 'warning');
+        }
+      } 
+      else {
+        showNotification("User updated successfully", 'success');
+      }
+
       setShowEditModal(false);
       setEditingUser(null);
+      setDisableReason("");
+      setPreviousStatus(null);
       fetchUsers();
-      showNotification("User updated successfully", 'success');
     } else {
       showNotification("Failed to update user", 'error');
     }
+  };
+
+  const cancelSaveUserChanges = () => {
+    setShowSaveConfirmModal(false);
   };
 
   const handleInputChange = (field, value) => {
@@ -359,8 +444,8 @@ const UserManagement = () => {
       user.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const admins = filteredUsers.filter((user) => user.role.toLowerCase() === "admin");
-  const regularUsers = filteredUsers.filter((user) => user.role.toLowerCase() === "user");
+  const admins = filteredUsers.filter((user) => user.role.toLowerCase() === "admin" && user.status !== "Disabled");
+  const regularUsers = filteredUsers.filter((user) => user.role.toLowerCase() === "user" && user.status !== "Disabled");
 
   const currentAdminsCount = admins.length;
   const currentUsersCount = regularUsers.length;
@@ -821,6 +906,12 @@ const UserManagement = () => {
               <p>
                 <strong>Email:</strong> {editingUser.email}
               </p>
+              <p>
+                <strong>Age:</strong> {editingUser.age || 'N/A'}
+              </p>
+              <p>
+                <strong>Gender:</strong> {editingUser.gender || 'N/A'}
+              </p>
             </div>
             <div className="um-form-group">
               <label>Role:</label>
@@ -843,6 +934,43 @@ const UserManagement = () => {
                 <option value="Maintenance">Maintenance</option>
               </select>
             </div>
+            
+            {/* Show reason textarea only when changing to Disabled status */}
+            {editingUser.status === "Disabled" && previousStatus !== "Disabled" && (
+              <div className="um-form-group">
+                <label style={{ color: '#dc3545', fontWeight: '600' }}>
+                  Reason for Disabling Account: <span style={{ color: '#dc3545' }}>*</span>
+                </label>
+                <textarea
+                  value={disableReason}
+                  onChange={(e) => setDisableReason(e.target.value)}
+                  placeholder="Please provide a clear reason for disabling this account. This will be sent to the user's email."
+                  rows="4"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    borderRadius: '6px',
+                    border: '1px solid #ddd',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    minHeight: '80px',
+                    backgroundColor: '#ffffff',
+                    color: '#000000'
+                  }}
+                  required
+                />
+                <small style={{ 
+                  display: 'block', 
+                  marginTop: '6px', 
+                  color: '#666',
+                  fontSize: '12px'
+                }}>
+                  An email will be sent to <strong>{editingUser.email}</strong> with this reason.
+                </small>
+              </div>
+            )}
+
             <div className="um-modal-actions">
               <button type="button" className="um-btn um-btn-save" onClick={saveUserChanges}>
                 Save Changes
@@ -850,7 +978,11 @@ const UserManagement = () => {
               <button
                 type="button"
                 className="um-btn um-btn-cancel"
-                onClick={() => setShowEditModal(false)}
+                onClick={() => {
+                  setShowEditModal(false);
+                  setDisableReason("");
+                  setPreviousStatus(null);
+                }}
               >
                 Cancel
               </button>
@@ -963,6 +1095,53 @@ const UserManagement = () => {
                 onClick={cancelStopCountdown}
               >
                 Continue Countdown
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Save Changes Confirmation Modal */}
+      {showSaveConfirmModal && (
+        <div className="um-logout-modal-overlay" onClick={cancelSaveUserChanges}>
+          <div className="um-logout-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="um-logout-modal-header">
+              <div className="um-logout-modal-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+              </div>
+              <h3 className="um-logout-modal-title">
+                Confirm Save Changes
+              </h3>
+            </div>
+            
+            <div className="um-logout-modal-body">
+              <p className="um-logout-modal-message">
+                Are you sure you want to save these changes to <strong>{editingUser?.name}</strong>'s account?
+                {editingUser?.status === "Disabled" && previousStatus !== "Disabled" && (
+                  <span style={{ display: 'block', marginTop: '10px', color: '#dc3545' }}>
+                    ⚠️ This will disable the account and send an email notification.
+                  </span>
+                )}
+              </p>
+            </div>
+            
+            <div className="um-logout-modal-actions">
+              <button 
+                className="um-logout-modal-confirm"
+                onClick={confirmSaveUserChanges}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                </svg>
+                Save Changes
+              </button>
+              <button 
+                className="um-logout-modal-cancel"
+                onClick={cancelSaveUserChanges}
+              >
+                Cancel
               </button>
             </div>
           </div>

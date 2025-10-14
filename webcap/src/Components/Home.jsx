@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Calendar, BookOpen, ChevronRight, Star, X, MapPin, Clock, ArrowUp, UserPlus, LogIn, Check } from 'lucide-react';
 import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 import './Home.css';
 import home1Image from '../assets/home1.jpg';
 import home2Image from '../assets/home2.jpg';
@@ -80,41 +81,13 @@ const Home = () => {
       costumes: 'Colorful traditional Ilocano attire with wide-brimmed hats',
       isFeatured: true,
       figureVideos: [
-        {
-          id: 'binungey-fig-1',
-          figure_number: 1,
-          video_url: BinungeyFig1
-        },
-        {
-          id: 'binungey-fig-2',
-          figure_number: 2,
-          video_url: BinungeyFig2
-        },
-        {
-          id: 'binungey-fig-3',
-          figure_number: 3,
-          video_url: BinungeyFig3
-        },
-        {
-          id: 'binungey-fig-4',
-          figure_number: 4,
-          video_url: BinungeyFig4
-        },
-        {
-          id: 'binungey-fig-5',
-          figure_number: 5,
-          video_url: BinungeyFig5
-        },
-        {
-          id: 'binungey-fig-6',
-          figure_number: 6,
-          video_url: BinungeyFig6
-        },
-        {
-          id: 'binungey-fig-7',
-          figure_number: 7,
-          video_url: BinungeyFig7
-        }
+        { id: 'binungey-fig-1', figure_number: 1, video_url: BinungeyFig1 },
+        { id: 'binungey-fig-2', figure_number: 2, video_url: BinungeyFig2 },
+        { id: 'binungey-fig-3', figure_number: 3, video_url: BinungeyFig3 },
+        { id: 'binungey-fig-4', figure_number: 4, video_url: BinungeyFig4 },
+        { id: 'binungey-fig-5', figure_number: 5, video_url: BinungeyFig5 },
+        { id: 'binungey-fig-6', figure_number: 6, video_url: BinungeyFig6 },
+        { id: 'binungey-fig-7', figure_number: 7, video_url: BinungeyFig7 }
       ]
     },
     {
@@ -139,36 +112,12 @@ const Home = () => {
       costumes: 'Traditional Filipino attire with cultural significance',
       isFeatured: true,
       figureVideos: [
-        {
-          id: 'pahid-fig-1',
-          figure_number: 1,
-          video_url: PahidFig1
-        },
-        {
-          id: 'pahid-fig-2',
-          figure_number: 2,
-          video_url: PahidFig2
-        },
-        {
-          id: 'pahid-fig-3',
-          figure_number: 3,
-          video_url: PahidFig3
-        },
-        {
-          id: 'pahid-fig-4',
-          figure_number: 4,
-          video_url: PahidFig4
-        },
-        {
-          id: 'pahid-fig-5',
-          figure_number: 5,
-          video_url: PahidFig5
-        },
-        {
-          id: 'pahid-fig-6',
-          figure_number: 6,
-          video_url: PahidFig6
-        }
+        { id: 'pahid-fig-1', figure_number: 1, video_url: PahidFig1 },
+        { id: 'pahid-fig-2', figure_number: 2, video_url: PahidFig2 },
+        { id: 'pahid-fig-3', figure_number: 3, video_url: PahidFig3 },
+        { id: 'pahid-fig-4', figure_number: 4, video_url: PahidFig4 },
+        { id: 'pahid-fig-5', figure_number: 5, video_url: PahidFig5 },
+        { id: 'pahid-fig-6', figure_number: 6, video_url: PahidFig6 }
       ]
     },
     {
@@ -193,56 +142,16 @@ const Home = () => {
       costumes: 'Elaborate Muslim royal attire with intricate embroidery',
       isFeatured: true,
       figureVideos: [
-        {
-          id: 'suakusua-fig-1',
-          figure_number: 1,
-          video_url: SuaKuSuaFig1
-        },
-        {
-          id: 'suakusua-fig-2',
-          figure_number: 2,
-          video_url: SuaKuSuaFig2
-        },
-        {
-          id: 'suakusua-fig-3',
-          figure_number: 3,
-          video_url: SuaKuSuaFig3
-        },
-        {
-          id: 'suakusua-fig-4',
-          figure_number: 4,
-          video_url: SuaKuSuaFig4
-        },
-        {
-          id: 'suakusua-fig-5',
-          figure_number: 5,
-          video_url: SuaKuSuaFig5
-        },
-        {
-          id: 'suakusua-fig-6',
-          figure_number: 6,
-          video_url: SuaKuSuaFig6
-        },
-        {
-          id: 'suakusua-fig-7',
-          figure_number: 7,
-          video_url: SuaKuSuaFig7
-        },
-        {
-          id: 'suakusua-fig-8',
-          figure_number: 8,
-          video_url: SuaKuSuaFig8
-        },
-        {
-          id: 'suakusua-fig-9',
-          figure_number: 9,
-          video_url: SuaKuSuaFig9
-        },
-        {
-          id: 'suakusua-fig-10',
-          figure_number: 10,
-          video_url: SuaKuSuaFig10
-        }
+        { id: 'suakusua-fig-1', figure_number: 1, video_url: SuaKuSuaFig1 },
+        { id: 'suakusua-fig-2', figure_number: 2, video_url: SuaKuSuaFig2 },
+        { id: 'suakusua-fig-3', figure_number: 3, video_url: SuaKuSuaFig3 },
+        { id: 'suakusua-fig-4', figure_number: 4, video_url: SuaKuSuaFig4 },
+        { id: 'suakusua-fig-5', figure_number: 5, video_url: SuaKuSuaFig5 },
+        { id: 'suakusua-fig-6', figure_number: 6, video_url: SuaKuSuaFig6 },
+        { id: 'suakusua-fig-7', figure_number: 7, video_url: SuaKuSuaFig7 },
+        { id: 'suakusua-fig-8', figure_number: 8, video_url: SuaKuSuaFig8 },
+        { id: 'suakusua-fig-9', figure_number: 9, video_url: SuaKuSuaFig9 },
+        { id: 'suakusua-fig-10', figure_number: 10, video_url: SuaKuSuaFig10 }
       ]
     },
     {
@@ -267,31 +176,14 @@ const Home = () => {
       costumes: 'Simple rural Filipino clothing reflecting farming attire',
       isFeatured: true,
       figureVideos: [
-        {
-          id: 'tiklos-fig-1',
-          figure_number: 1,
-          video_url: TiklosFig1
-        },
-        {
-          id: 'tiklos-fig-2',
-          figure_number: 2,
-          video_url: TiklosFig2
-        },
-        {
-          id: 'tiklos-fig-3',
-          figure_number: 3,
-          video_url: TiklosFig3
-        },
-        {
-          id: 'tiklos-fig-4',
-          figure_number: 4,
-          video_url: TiklosFig4
-        }
+        { id: 'tiklos-fig-1', figure_number: 1, video_url: TiklosFig1 },
+        { id: 'tiklos-fig-2', figure_number: 2, video_url: TiklosFig2 },
+        { id: 'tiklos-fig-3', figure_number: 3, video_url: TiklosFig3 },
+        { id: 'tiklos-fig-4', figure_number: 4, video_url: TiklosFig4 }
       ]
     }
   ];
 
-  // Debug image imports
   useEffect(() => {
     console.log('Image imports:', {
       home1Image,
@@ -308,7 +200,6 @@ const Home = () => {
     })));
   }, []);
 
-  // Check authentication status
   useEffect(() => {
     const checkAuthStatus = () => {
       const accessToken = localStorage.getItem("access_token");
@@ -335,7 +226,6 @@ const Home = () => {
     };
   }, []);
 
-  // Auto-slide carousel
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
@@ -344,7 +234,6 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [carouselImages.length]);
 
-  // Show scroll-to-top button when scrolled down
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 300);
@@ -353,7 +242,6 @@ const Home = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Control body scroll for login invitation modal
   useEffect(() => {
     if (showLoginInvitation) {
       document.body.style.overflow = 'hidden';
@@ -365,6 +253,23 @@ const Home = () => {
       document.body.style.overflow = 'unset';
     };
   }, [showLoginInvitation]);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) {
+          modalContent.scrollTop = 0;
+        }
+      }, 50);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -437,7 +342,6 @@ const Home = () => {
       <div className="bg-shape hexagon" style={{ top: '30%', right: '2%' }}></div>
       <div className="bg-shape octagon" style={{ top: '80%', right: '1%' }}></div>
 
-      {/* Additional visible decorative elements */}
       <div className="visible-decoration" style={{ 
         position: 'absolute', 
         top: '20%', 
@@ -530,7 +434,6 @@ const Home = () => {
                   <div className="dance-overlay">
                     <div className="dance-badges">
                       <span className="region-badge-new">{dance.island}</span>
-                      <span className="difficulty-badge-new">{dance.difficulty}</span>
                     </div>
                   </div>
                 </div>
@@ -565,8 +468,6 @@ const Home = () => {
               );
             })}
           </div>
-          
-
         </div>
       </section>
 
@@ -608,7 +509,8 @@ const Home = () => {
               overflow: 'hidden',
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
-              position: 'relative'
+              position: 'relative',
+              flexShrink: 0
             }}>
               {selectedDance.image ? (
                 <img
@@ -656,11 +558,6 @@ const Home = () => {
                 <p className="modal-subtitle" style={{ margin: 0 }}>Traditional Filipino Folk Dance</p>
                 <div className="modal-meta-badges">
                   <span className="region-badge">{selectedDance.island}</span>
-                  {selectedDance.difficulty && (
-                    <span className={`difficulty ${selectedDance.difficulty.toLowerCase()}`}>
-                      {selectedDance.difficulty}
-                    </span>
-                  )}
                   <span className="featured-badge-modal">Featured</span>
                 </div>
               </div>
@@ -678,7 +575,6 @@ const Home = () => {
                   <div><strong>Duration:</strong> {selectedDance.duration}</div>
                   <div><strong>Performers:</strong> {selectedDance.performers}</div>
                   <div><strong>Origin:</strong> {selectedDance.origin}</div>
-                  <div><strong>Difficulty:</strong> {selectedDance.difficulty}</div>
                 </div>
               </div>
               
@@ -720,9 +616,10 @@ const Home = () => {
                   <h3>Figures</h3>
                   <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gridTemplateColumns: selectedDance.figureVideos.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
                     gap: '24px',
-                    margin: '1rem 0'
+                    margin: '1rem 0',
+                    justifyItems: selectedDance.figureVideos.length === 1 ? 'center' : 'stretch'
                   }}>
                     {selectedDance.figureVideos.map((fig) => (
                       <div key={fig.id} className="figure-box">
@@ -750,38 +647,37 @@ const Home = () => {
                 </div>
               )}
             
-            {/* Close Button at Bottom */}
-            <div style={{
-              padding: '24px',
-              textAlign: 'center',
-              borderTop: '1px solid #e5e7eb'
-            }}>
-              <button
-                onClick={closeModal}
-                style={{
-                  background: '#a0855b',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  minWidth: '120px'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = '#8b7355';
-                  e.target.style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = '#a0855b';
-                  e.target.style.transform = 'translateY(0)';
-                }}
-              >
-                Close
-              </button>
-            </div>
+              <div style={{
+                padding: '24px',
+                textAlign: 'center',
+                borderTop: '1px solid #e5e7eb'
+              }}>
+                <button
+                  onClick={closeModal}
+                  style={{
+                    background: '#a0855b',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    minWidth: '120px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#8b7355';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#a0855b';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -916,6 +812,8 @@ const Home = () => {
           <ArrowUp size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24} color="#ffffff" />
         </button>
       )}
+
+      <Footer />
     </div>
   );
 };

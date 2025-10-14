@@ -3,7 +3,9 @@ import Sidebar from "../Admin/Sidebar";
 import "./UserRatings.css";
 import { supabase } from "../supabasebaseClient";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { TrendingUp, Search, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, BarChart3, Users, Star, Activity } from 'lucide-react';
+import { TrendingUp, Search, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, BarChart3, Users, Star, Activity, Download } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const UserRatings = () => {
   const [activeItem, setActiveItem] = useState("user-ratings");
@@ -25,6 +27,9 @@ const UserRatings = () => {
   // Page jump modal states
   const [showPageModal, setShowPageModal] = useState(false);
   const [jumpToPage, setJumpToPage] = useState("");
+  
+  // PDF Download Modal State
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
   
   // Screen size for responsive styling
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -320,6 +325,198 @@ const UserRatings = () => {
   function getDisplayFigureName(name) {
     return figureNameMap[name] || name;
   }
+
+  // PDF Download Function
+  const downloadRatingsPDF = () => {
+    try {
+      console.log('Starting PDF generation for User Ratings...');
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPos = 20;
+      
+      console.log('PDF document initialized');
+
+    // Title
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    doc.text('User Ratings Report', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Summary Statistics
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('Summary Statistics', 14, yPos);
+    yPos += 10;
+
+    const avgRating = filteredData.length > 0 
+      ? (filteredData.reduce((sum, r) => sum + r.rating, 0) / filteredData.length).toFixed(1)
+      : "0.0";
+
+    autoTable(doc, {
+      startY: yPos,
+      head: [['Metric', 'Value']],
+      body: [
+        ['Total Ratings', feedbackList.length.toString()],
+        ['Filtered Ratings', filteredData.length.toString()],
+        ['Average Rating', `${avgRating} / 5 stars`],
+        ['Dance Types', (danceCategories.length - 1).toString()],
+        ['Active Filters', selectedDance !== "All" || selectedFigure !== "All" || debouncedSearchTerm ? 'Yes' : 'None']
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [160, 133, 91] },
+      margin: { left: 14, right: 14 }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 15;
+
+    // Applied Filters
+    if (selectedDance !== "All" || selectedFigure !== "All" || debouncedSearchTerm) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Active Filters', 14, yPos);
+      yPos += 10;
+
+      const filterRows = [];
+      if (selectedDance !== "All") filterRows.push(['Dance', selectedDance]);
+      if (selectedFigure !== "All") filterRows.push(['Figure', getDisplayFigureName(selectedFigure)]);
+      if (debouncedSearchTerm) filterRows.push(['Search Term', debouncedSearchTerm]);
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Filter Type', 'Value']],
+        body: filterRows,
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Ratings Data
+    if (filteredData.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Ratings Data', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Timestamp', 'User', 'Dance', 'Figure', 'Rating']],
+        body: filteredData.map(fb => [
+          fb.submitted_at ? new Date(fb.submitted_at).toLocaleString() : 'N/A',
+          fb.users?.username || fb.user_id,
+          extractDanceName(fb.figure_name),
+          getDisplayFigureName(fb.figure_name),
+          `${fb.rating} / 5`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 8 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Ratings by Dance
+    const danceRatings = {};
+    filteredData.forEach(fb => {
+      const dance = extractDanceName(fb.figure_name);
+      if (!danceRatings[dance]) {
+        danceRatings[dance] = { total: 0, count: 0 };
+      }
+      danceRatings[dance].total += fb.rating;
+      danceRatings[dance].count += 1;
+    });
+
+    if (Object.keys(danceRatings).length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Average Ratings by Dance', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Dance', 'Average Rating', 'Total Ratings']],
+        body: Object.entries(danceRatings).map(([dance, data]) => [
+          dance,
+          `${(data.total / data.count).toFixed(1)} / 5 stars`,
+          data.count.toString()
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 15;
+    }
+
+    // Feedback with text comments
+    const feedbackWithText = filteredData.filter(fb => fb.text_feedback);
+    if (feedbackWithText.length > 0) {
+      if (yPos > pageHeight - 60) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      doc.setFontSize(14);
+      doc.setFont(undefined, 'bold');
+      doc.text('Detailed Feedback Comments', 14, yPos);
+      yPos += 10;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['User', 'Dance', 'Figure', 'Rating', 'Feedback']],
+        body: feedbackWithText.map(fb => [
+          fb.users?.username || fb.user_id,
+          extractDanceName(fb.figure_name),
+          getDisplayFigureName(fb.figure_name),
+          `${fb.rating} / 5`,
+          fb.text_feedback.substring(0, 100) + (fb.text_feedback.length > 100 ? '...' : '')
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [160, 133, 91] },
+        margin: { left: 14, right: 14 },
+        styles: { fontSize: 8 },
+        columnStyles: {
+          4: { cellWidth: 80 }
+        }
+      });
+    }
+
+    // Save the PDF
+    console.log('Saving PDF...');
+    doc.save(`User_Ratings_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    console.log('PDF saved successfully');
+    setShowDownloadModal(false);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please check the console for details.');
+      setShowDownloadModal(false);
+    }
+  };
 
   return (
     <div className="user-ratings-container">
@@ -847,6 +1044,56 @@ const UserRatings = () => {
                     className="primary"
                   >
                     Go
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Download Button */}
+        <button 
+          className="floating-download-btn" 
+          onClick={() => setShowDownloadModal(true)}
+          title="Download Ratings Report"
+        >
+          <Download size={24} />
+        </button>
+
+        {/* Download Confirmation Modal */}
+        {showDownloadModal && (
+          <div className="modal-overlay" onClick={() => setShowDownloadModal(false)}>
+            <div className="download-modal-container" onClick={(e) => e.stopPropagation()}>
+              <div className="download-modal-content">
+                <div className="download-modal-header">
+                  <Download size={32} />
+                  <h2>Download Ratings Report</h2>
+                </div>
+                
+                <div className="download-modal-body">
+                  <p>This will generate a comprehensive PDF report containing:</p>
+                  <ul>
+                    <li>Summary statistics</li>
+                    <li>Active filter information</li>
+                    <li>Complete ratings data table</li>
+                    <li>Average ratings by dance type</li>
+                    <li>Detailed feedback comments</li>
+                  </ul>
+                  <p>Do you want to continue?</p>
+                </div>
+                
+                <div className="download-modal-footer">
+                  <button 
+                    className="download-modal-btn cancel-btn" 
+                    onClick={() => setShowDownloadModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="download-modal-btn confirm-btn" 
+                    onClick={downloadRatingsPDF}
+                  >
+                    Download PDF
                   </button>
                 </div>
               </div>

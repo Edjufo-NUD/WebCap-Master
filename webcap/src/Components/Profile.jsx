@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Calendar, Edit3, Save, X, Lock, BarChart3, TrendingUp, Target, Activity, ChevronDown, ChevronUp } from 'lucide-react';
 import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
 import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 import './Profile.css';
 import { supabase } from '../supabasebaseClient';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
@@ -230,23 +231,6 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
       {/* Expanded Details */}
       {isExpanded && (
         <>
-          {/* Progress Bar */}
-      <div style={{
-        background: '#f3f4f6',
-        borderRadius: '8px',
-        height: '8px',
-        marginBottom: '1rem',
-        overflow: 'hidden'
-      }}>
-        <div style={{
-          background: `linear-gradient(90deg, ${completionRate === 100 ? '#10b981' : completionRate > 50 ? '#f59e0b' : '#ef4444'}, ${completionRate === 100 ? '#059669' : completionRate > 50 ? '#d97706' : '#dc2626'})`,
-          height: '100%',
-          width: `${completionRate}%`,
-          transition: 'width 0.3s ease',
-          borderRadius: '8px'
-        }} />
-      </div>
-
       {/* Table Container */}
       <div style={{
         overflowX: 'auto',
@@ -442,7 +426,9 @@ const Profile = () => {
   const [profileData, setProfileData] = useState({
     name: '',
     email: '',
-    joinDate: ''
+    joinDate: '',
+    age: '',
+    gender: ''
   });
   const [editData, setEditData] = useState({ ...profileData });
   const [loading, setLoading] = useState(false);
@@ -645,7 +631,7 @@ const Profile = () => {
       // Fetch user profile
       const { data: userData } = await supabase
         .from('users')
-        .select('username, email, created_at')
+        .select('username, email, age, gender, created_at')
         .eq('id', user.id)
         .single();
 
@@ -653,6 +639,8 @@ const Profile = () => {
         setProfileData({
           name: userData.username,
           email: userData.email,
+          age: userData.age,
+          gender: userData.gender,
           joinDate: new Date(userData.created_at).toLocaleString('default', { month: 'long', year: 'numeric' })
         });
       }
@@ -997,6 +985,22 @@ const Profile = () => {
                   Email Address
                 </label>
                 <div className="field-value">{profileData.email}</div>
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">
+                  <User size={16} />
+                  Age
+                </label>
+                <div className="field-value">{profileData.age || 'N/A'}</div>
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">
+                  <User size={16} />
+                  Gender
+                </label>
+                <div className="field-value">{profileData.gender || 'N/A'}</div>
               </div>
 
               <div className="field-group">
@@ -1624,6 +1628,8 @@ const Profile = () => {
           }
         } 
       `}</style>
+
+      <Footer />
     </div>
   );
 };

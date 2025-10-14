@@ -1054,22 +1054,29 @@ const ManageDance = () => {
     // Check for existing media deletions
     const hasMediaDeletions = deletedPreviewVideo || (deletedDanceImage && deletedDanceImage !== false) || deletedFigureVideos.length > 0;
     
-    // Format current duration from form components
+    // Format current duration from form components (trim extra spaces)
     const hours = parseInt(editForm.durationHours) || 0;
     const minutes = parseInt(editForm.durationMinutes) || 0;
     const seconds = parseInt(editForm.durationSeconds) || 0;
-    const formattedDuration = hours > 0 
-      ? `${hours}h ${minutes}m ${seconds}s`
-      : minutes > 0 
-      ? `${minutes}m ${seconds}s`
-      : `${seconds}s`;
+    
+    let formattedDuration = '';
+    if (hours > 0) {
+      formattedDuration = `${hours}h ${minutes}m ${seconds}s`;
+    } else if (minutes > 0) {
+      formattedDuration = `${minutes}m ${seconds}s`;
+    } else {
+      formattedDuration = `${seconds}s`;
+    }
+    
+    // Normalize both durations for comparison (remove extra spaces, lowercase)
+    const normalizeDuration = (dur) => (dur || '').trim().replace(/\s+/g, ' ').toLowerCase();
     
     const hasFormChanges = (
       (editForm.title || '').trim() !== (selectedDance.title || '').trim() ||
       (editForm.region || '').trim() !== (selectedDance.region || selectedDance.island || selectedDance.category || '').trim() ||
       (editForm.history || '').trim() !== (selectedDance.history || '').trim() ||
       (editForm.references || '').trim() !== (selectedDance.references || '').trim() ||
-      formattedDuration !== (selectedDance.duration || '').trim() ||
+      normalizeDuration(formattedDuration) !== normalizeDuration(selectedDance.duration) ||
       (editForm.performers || '').trim() !== (selectedDance.performers || '').trim() ||
       (editForm.music || '').trim() !== (selectedDance.music || '').trim() ||
       (editForm.costumes || '').trim() !== (selectedDance.costumes || '').trim()
@@ -1191,8 +1198,8 @@ const ManageDance = () => {
                 appearance: 'none'
               }}
             >
-              <option value="dateAdded-desc" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Newest First</option>
-              <option value="dateAdded-asc" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Oldest First</option>
+              <option value="dateAdded-desc" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Newest</option>
+              <option value="dateAdded-asc" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Oldest</option>
               <option value="title-asc" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Title A-Z</option>
               <option value="title-desc" style={{ color: '#000000', backgroundColor: '#ffffff' }}>Title Z-A</option>
             </select>

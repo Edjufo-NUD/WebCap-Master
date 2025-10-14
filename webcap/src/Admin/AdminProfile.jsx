@@ -59,6 +59,8 @@ const AdminProfile = () => {
   const [email, setEmail] = useState("");
   const [dateJoined, setDateJoined] = useState("");
   const [userId, setUserId] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
 
   // Edit states
   const [editedUsername, setEditedUsername] = useState("");
@@ -80,7 +82,7 @@ const AdminProfile = () => {
       try {
         const { data, error } = await supabase
           .from("users")
-          .select("id, username, created_at")
+          .select("id, username, age, gender, created_at")
           .eq("email", currentUser.email)
           .single();
 
@@ -89,6 +91,8 @@ const AdminProfile = () => {
         setUserId(data.id);
         setUsername(data.username || "");
         setEditedUsername(data.username || "");
+        setAge(data.age || "");
+        setGender(data.gender || "");
         
         // Format date
         const date = new Date(data.created_at);
@@ -291,6 +295,24 @@ const AdminProfile = () => {
                     Email
                   </label>
                   <div className="admin-field-value">{email}</div>
+                </div>
+
+                {/* Age (Read-only) */}
+                <div className="admin-field-group">
+                  <label className="admin-field-label">
+                    <User size={16} />
+                    Age
+                  </label>
+                  <div className="admin-field-value">{age || 'N/A'}</div>
+                </div>
+
+                {/* Gender (Read-only) */}
+                <div className="admin-field-group">
+                  <label className="admin-field-label">
+                    <User size={16} />
+                    Gender
+                  </label>
+                  <div className="admin-field-value">{gender || 'N/A'}</div>
                 </div>
 
                 {/* Date Joined (Read-only) */}
