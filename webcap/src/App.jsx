@@ -28,24 +28,82 @@ const SessionValidator = ({ children }) => {
   const [shouldRedirect, setShouldRedirect] = useState(false);
   
   useEffect(() => {
+    let isInitialValidation = true;
+    
     const validateSession = async () => {
       const accessToken = localStorage.getItem("access_token");
       const userId = localStorage.getItem("user_id");
+      
+      console.log("[SessionValidator] Starting validation. Online:", navigator.onLine, "HasToken:", !!accessToken);
       
       if (!accessToken || !userId) {
         setIsValidating(false);
         return;
       }
+      
+      // If browser is offline, skip validation entirely
+      if (!navigator.onLine) {
+        console.warn("[SessionValidator] Browser is offline - skipping validation, keeping session");
+        setIsValidating(false);
+        return;
+      }
+      
+      // Skip showing loading screen for periodic validations
+      if (!isInitialValidation) {
+        // Validation happens in background, don't show loading
+      }
 
       try {
-        // Check if user still exists and get their current status
-        const { data: userData, error } = await supabase
+        // Add timeout to prevent hanging on network issues
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 5000)
+        );
+        
+        const supabasePromise = supabase
           .from("users")
           .select("status, role, username")
           .eq("id", userId)
           .single();
+        
+        // Race between timeout and actual request
+        const result = await Promise.race([supabasePromise, timeoutPromise]);
+        const { data: userData, error } = result;
+        
+        console.log("[SessionValidator] Supabase response:", { userData, error });
 
-        if (error || !userData) {
+        if (error) {
+          // Check if it's a network error - if so, skip validation and keep session
+          const errorString = JSON.stringify(error).toLowerCase();
+          const errorMessage = (error.message || '').toLowerCase();
+          const isNetworkError = 
+            errorMessage.includes('fetch') ||
+            errorMessage.includes('network') ||
+            errorMessage.includes('failed to fetch') ||
+            errorMessage.includes('load failed') ||
+            errorMessage.includes('networkerror') ||
+            errorString.includes('fetch') ||
+            errorString.includes('network') ||
+            error.code === 'PGRST301' ||
+            error.name === 'FetchError' ||
+            !navigator.onLine; // Browser is offline
+          
+          if (isNetworkError) {
+            console.warn("Network error during session validation - keeping session intact", error);
+            setIsValidating(false);
+            return;
+          }
+          
+          // For other errors (user not found, etc.), clear session
+          console.error("User data fetch error:", error);
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("user_id");
+          localStorage.removeItem("currentUser");
+          await supabase.auth.signOut();
+          window.location.href = '/login?reason=session_expired';
+          return;
+        }
+
+        if (!userData) {
           // User doesn't exist anymore, clear session
           localStorage.removeItem("access_token");
           localStorage.removeItem("user_id");
@@ -81,8 +139,34 @@ const SessionValidator = ({ children }) => {
         }
 
       } catch (error) {
-        console.error("Session validation error:", error);
-        // On error, clear session to be safe
+        console.error("[SessionValidator] Caught error:", error);
+        
+        // Check if it's a network-related error or timeout
+        const errorString = JSON.stringify(error).toLowerCase();
+        const errorMessage = (error.message || '').toLowerCase();
+        const isNetworkError = 
+          errorMessage.includes('fetch') ||
+          errorMessage.includes('network') ||
+          errorMessage.includes('failed to fetch') ||
+          errorMessage.includes('load failed') ||
+          errorMessage.includes('networkerror') ||
+          errorMessage.includes('timeout') ||
+          errorString.includes('fetch') ||
+          errorString.includes('network') ||
+          error.name === 'FetchError' ||
+          error.name === 'TypeError' || // Often thrown for network issues
+          !navigator.onLine; // Browser is offline
+        
+        console.log("[SessionValidator] Is network error:", isNetworkError);
+        
+        if (isNetworkError) {
+          console.warn("[SessionValidator] Network error - keeping session intact", error);
+          setIsValidating(false);
+          return;
+        }
+        
+        // For non-network errors, clear session to be safe
+        console.error("[SessionValidator] Non-network error - clearing session");
         localStorage.removeItem("access_token");
         localStorage.removeItem("user_id");
         localStorage.removeItem("currentUser");
@@ -91,6 +175,7 @@ const SessionValidator = ({ children }) => {
         return;
       } finally {
         setIsValidating(false);
+        isInitialValidation = false;
       }
     };
 
@@ -109,18 +194,50 @@ const SessionValidator = ({ children }) => {
     };
   }, []);
 
-  // Show loading while validating
+  // Show loading while validating (only for initial validation, not periodic checks)
   if (isValidating) {
     return (
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        width: '100vw',
         height: '100vh',
-        fontSize: '18px',
-        color: '#666'
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        backgroundColor: '#f8f9fa',
+        zIndex: 9999
       }}>
-        Validating session...
+        <div style={{
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '20px'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid #e0e0e0',
+            borderTop: '4px solid #a0855b',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <div style={{
+            fontSize: '18px',
+            color: '#666',
+            fontWeight: '500'
+          }}>Validating session...</div>
+        </div>
+        <style>
+          {`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}
+        </style>
       </div>
     );
   }

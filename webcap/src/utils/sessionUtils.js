@@ -36,14 +36,51 @@ export const validateUserSession = async () => {
 
   const userId = localStorage.getItem("user_id");
   
+  // Check if browser is offline first
+  if (!navigator.onLine) {
+    console.warn("[SessionUtils] Browser is offline - skipping validation, assuming session is valid");
+    return { isValid: true, skipped: true };
+  }
+  
   try {
-    const { data: userData, error } = await supabase
+    // Add timeout to prevent hanging
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Request timeout')), 5000)
+    );
+    
+    const supabasePromise = supabase
       .from("users")
       .select("status, role, username, email")
       .eq("id", userId)
       .single();
+    
+    const result = await Promise.race([supabasePromise, timeoutPromise]);
+    const { data: userData, error } = result;
 
-    if (error || !userData) {
+    if (error) {
+      // Check if it's a network error
+      const errorString = JSON.stringify(error).toLowerCase();
+      const errorMessage = (error.message || '').toLowerCase();
+      const isNetworkError = 
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('network') ||
+        errorMessage.includes('failed to fetch') ||
+        errorMessage.includes('load failed') ||
+        errorMessage.includes('networkerror') ||
+        errorString.includes('fetch') ||
+        errorString.includes('network') ||
+        error.code === 'PGRST301' ||
+        error.name === 'FetchError';
+      
+      if (isNetworkError) {
+        console.warn("[SessionUtils] Network error during validation - keeping session intact");
+        return { isValid: true, skipped: true };
+      }
+      
+      return { isValid: false, reason: 'user_not_found' };
+    }
+
+    if (!userData) {
       return { isValid: false, reason: 'user_not_found' };
     }
 
@@ -66,7 +103,28 @@ export const validateUserSession = async () => {
 
     return { isValid: true, userData };
   } catch (error) {
-    console.error("Session validation error:", error);
+    console.error("[SessionUtils] Session validation error:", error);
+    
+    // Check if it's a network-related error or timeout
+    const errorString = JSON.stringify(error).toLowerCase();
+    const errorMessage = (error.message || '').toLowerCase();
+    const isNetworkError = 
+      errorMessage.includes('fetch') ||
+      errorMessage.includes('network') ||
+      errorMessage.includes('failed to fetch') ||
+      errorMessage.includes('load failed') ||
+      errorMessage.includes('networkerror') ||
+      errorMessage.includes('timeout') ||
+      errorString.includes('fetch') ||
+      errorString.includes('network') ||
+      error.name === 'FetchError' ||
+      error.name === 'TypeError';
+    
+    if (isNetworkError) {
+      console.warn("[SessionUtils] Network error - keeping session intact");
+      return { isValid: true, skipped: true };
+    }
+    
     return { isValid: false, reason: 'validation_error' };
   }
 };
