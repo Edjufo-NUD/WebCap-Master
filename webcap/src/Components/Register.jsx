@@ -281,7 +281,7 @@ const Register = () => {
             username: signUpData.user.user_metadata.display_name, // always mirrors Auth
             email,
             role: "user", // default role
-            status: "active", // default status
+            status: "Enabled", // default status - matches UserManagement system
           },
         ]);
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndakHamakaLogo from "../assets/FLIPinoNLogo.png";
@@ -11,6 +11,18 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // Check if user was redirected due to session invalidation
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reason = urlParams.get('reason');
+    
+    if (reason === 'disabled') {
+      setError("Your account has been disabled. Please contact support.");
+    } else if (reason === 'session_expired') {
+      setError("Your session has expired. Please log in again.");
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
