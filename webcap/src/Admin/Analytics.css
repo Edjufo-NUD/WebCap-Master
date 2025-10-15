@@ -843,6 +843,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
 .analytics-chart-card:hover {
@@ -897,32 +898,39 @@
 /* Trend Chart Scroll Wrapper */
 .trend-chart-scroll {
   width: 100%;
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for trend chart - Always visible */
+.trend-chart-scroll::-webkit-scrollbar {
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 5px;
+}
+
+.trend-chart-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 5px;
+  border: 2px solid #f1f5f9;
+}
+
+.trend-chart-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Firefox scrollbar */
+.trend-chart-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f1f5f9;
 }
 
 @media (max-width: 768px) {
   .trend-chart-scroll {
     overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-  }
-  
-  /* Custom scrollbar for trend chart */
-  .trend-chart-scroll::-webkit-scrollbar {
-    height: 10px;
-    background: #f1f5f9;
-    border-radius: 5px;
-  }
-  
-  .trend-chart-scroll::-webkit-scrollbar-thumb {
-    background: #94a3b8;
-    border-radius: 5px;
-    border: 2px solid #f1f5f9;
-  }
-  
-  .trend-chart-scroll::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+    overflow-y: hidden;
   }
 }
 

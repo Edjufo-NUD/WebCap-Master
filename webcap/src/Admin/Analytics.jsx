@@ -941,106 +941,139 @@ const Analytics = () => {
           </div>
 
           {/* Gender Distribution */}
-          <div className="analytics-gender-distribution-card">
-            <div className="section-header">
-              <Users size={24} />
-              <h3>Gender Distribution</h3>
-            </div>
-            <div className="analytics-gender-chart-content">
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart 
-                  data={genderDistribution} 
-                  margin={{ top: 30, right: 20, left: 20, bottom: 55 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={60}
-                    tick={{ fontSize: 12 }}
-                    interval={0}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12 }}
-                    label={{ 
-                      value: 'Number of Users', 
-                      angle: -90, 
-                      position: 'insideLeft', 
-                      offset: 10, 
-                      dy: 30,
-                      style: { fontSize: 12 }
-                    }}
-                  />
-                  <Tooltip 
-                    formatter={(value, name) => {
-                      const item = genderDistribution.find(d => d.count === value);
-                      return [`${value} (${item?.percentage}%)`, 'Users'];
-                    }}
-                  />
-                  <Bar dataKey="count" name="Users" radius={[4, 4, 0, 0]}>
-                    {genderDistribution.map((entry, idx) => (
-                      <Cell 
-                        key={`gender-cell-${idx}`} 
-                        fill={['#3b82f6', '#ec4899', '#8b5cf6', '#6b7280'][idx % 4]} 
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+<div className="analytics-gender-distribution-card">
+  <div className="section-header">
+    <Users size={24} />
+    <h3>Gender Distribution</h3>
+  </div>
+  <div className="analytics-gender-chart-content">
+    <ResponsiveContainer width="100%" height={400}>
+      <PieChart>
+        <Pie
+          data={genderDistribution.filter(item => item.count > 0)}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={false}
+          outerRadius={120}
+          innerRadius={0}
+          fill="#8884d8"
+          dataKey="count"
+          animationBegin={0}
+          animationDuration={800}
+          animationEasing="ease-out"
+          activeShape={{
+            outerRadius: 135,
+            stroke: '#fff',
+            strokeWidth: 3,
+            filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.2))'
+          }}
+        >
+          {genderDistribution.filter(item => item.count > 0).map((entry, idx) => (
+            <Cell 
+              key={`gender-cell-${idx}`} 
+              fill={['#3b82f6', '#ec4899', '#8b5cf6', '#6b7280'][idx % 4]}
+              style={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            />
+          ))}
+        </Pie>
+        <Tooltip 
+          contentStyle={{
+            backgroundColor: '#ffffff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            padding: '12px'
+          }}
+          formatter={(value, name, props) => {
+            const item = props.payload;
+            return [
+              `${value} (${item.percentage}%)`,
+              item.name
+            ];
+          }}
+        />
+        <Legend 
+          formatter={(value, entry) => {
+            const { payload } = entry;
+            return `${value}: ${payload.count} (${payload.percentage}%)`;
+          }}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+</div>
 
           {/* Age Distribution */}
-          <div className="analytics-age-distribution-card">
-            <div className="section-header">
-              <Users size={24} />
-              <h3>Age Distribution</h3>
-            </div>
-            <div className="analytics-age-chart-content">
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart 
-                  data={ageDistribution} 
-                  margin={{ top: 30, right: 20, left: 20, bottom: 55 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="range" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={60}
-                    tick={{ fontSize: 12 }}
-                    interval={0}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12 }}
-                    label={{ 
-                      value: 'Number of Users', 
-                      angle: -90, 
-                      position: 'insideLeft', 
-                      offset: 10, 
-                      dy: 30,
-                      style: { fontSize: 12 }
-                    }}
-                  />
-                  <Tooltip 
-                    formatter={(value, name) => {
-                      const item = ageDistribution.find(d => d.count === value);
-                      return [`${value} (${item?.percentage}%)`, 'Users'];
-                    }}
-                  />
-                  <Bar dataKey="count" name="Users" radius={[4, 4, 0, 0]}>
-                    {ageDistribution.map((entry, idx) => (
-                      <Cell 
-                        key={`age-cell-${idx}`} 
-                        fill={['#10b981', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6'][idx % 6]} 
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+<div className="analytics-age-distribution-card">
+  <div className="section-header">
+    <Users size={24} />
+    <h3>Age Distribution</h3>
+  </div>
+  <div className="analytics-age-chart-content">
+    <ResponsiveContainer width="100%" height={400}>
+      <PieChart>
+        <Pie
+          data={ageDistribution.filter(item => item.count > 0)}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={false}
+          outerRadius={120}
+          innerRadius={0}
+          fill="#8884d8"
+          dataKey="count"
+          nameKey="range"
+          animationBegin={0}
+          animationDuration={800}
+          animationEasing="ease-out"
+          activeShape={{
+            outerRadius: 135,
+            stroke: '#fff',
+            strokeWidth: 3,
+            filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.2))'
+          }}
+        >
+          {ageDistribution.filter(item => item.count > 0).map((entry, idx) => (
+            <Cell 
+              key={`age-cell-${idx}`} 
+              fill={['#ff6b6b', '#ffa500', '#ffd700', '#32cd32', '#1e90ff', '#9370db'][idx % 6]}
+              style={{ 
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+            />
+          ))}
+        </Pie>
+        <Tooltip 
+          contentStyle={{
+            backgroundColor: '#ffffff',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            padding: '12px'
+          }}
+          formatter={(value, name, props) => {
+            const item = props.payload;
+            return [
+              `${value} (${item.percentage}%)`,
+              `Age ${item.range}`
+            ];
+          }}
+        />
+        <Legend 
+          formatter={(value, entry) => {
+            const { payload } = entry;
+            return `Age ${value}: ${payload.count} (${payload.percentage}%)`;
+          }}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+</div>
         </div>
 
         {/* Popular Dances Chart - Side by Side with Trend */}
