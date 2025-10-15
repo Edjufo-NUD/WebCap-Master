@@ -509,10 +509,14 @@ input[type="button"].btn-outline:hover {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .featured-badge {
-  display: block;
+  display: inline-block;
   background: linear-gradient(135deg, #a0855b, #cd853f);
   color: white;
   padding: 0.6rem 1.8rem;
@@ -520,14 +524,38 @@ input[type="button"].btn-outline:hover {
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 1px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   box-shadow: 0 4px 15px rgba(160, 133, 91, 0.3);
-  position: static;
+  position: relative;
   overflow: hidden;
   animation: badgeGlow 3s ease-in-out infinite;
   width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+}
+
+/* UNIQUE CLASS FOR HOME PAGE - CENTERED BADGE */
+.home-featured-badge-centered {
+  display: block !important;
+  margin: 0 auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  width: fit-content !important;
+  float: none !important;
+  position: relative !important;
+}
+
+.home .home-featured-badge-centered,
+section.featured .home-featured-badge-centered,
+.featured-hero .home-featured-badge-centered,
+.featured-hero-content .home-featured-badge-centered {
+  display: block !important;
+  margin: 0 auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  width: fit-content !important;
+  float: none !important;
+  position: relative !important;
 }
 
 .featured-badge::before {
@@ -557,7 +585,7 @@ input[type="button"].btn-outline:hover {
 }
 
 .featured-main-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 700;
   color: #1f2937;
   margin-top: 0;
@@ -568,7 +596,7 @@ input[type="button"].btn-outline:hover {
 }
 
 .featured-hero-desc {
-  font-size: 1.125rem;
+  font-size: clamp(0.9rem, 2vw, 1.125rem);
   color: #6b7280;
   line-height: 1.6;
   max-width: 600px;
@@ -1737,40 +1765,33 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
   
   .featured-hero {
     margin-bottom: 2rem;
-    padding: 0 1rem;
-  }
-  
-  .featured-badge {
-    margin-bottom: 1.5rem !important;
-    display: block !important;
-    position: static !important;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .featured-main-title {
-    font-size: 1.75rem;
-    margin-top: 0 !important;
-    margin-bottom: 1rem;
-    line-height: 1.3;
-    position: relative;
-    z-index: 2;
-    clear: both;
-    padding-top: 0 !important;
-  }
-  
-  .featured-hero-desc {
-    font-size: 1rem;
-    margin-top: 1rem !important;
+    padding: 0 1.5rem;
   }
   
   .featured-hero-content {
-    padding: 0 1rem !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0 !important;
+    padding: 0 1rem;
+    max-width: 100%;
+  }
+  
+  .featured-badge {
+    display: inline-block;
+    margin: 0 auto 1.5rem auto;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .featured-main-title {
+    font-size: clamp(1.5rem, 5vw, 1.75rem);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    padding: 0 0.5rem;
+  }
+  
+  .featured-hero-desc {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.5;
+    padding: 0 0.5rem;
   }
   
   /* Centering is now handled by base styles - no overrides needed */
@@ -1811,39 +1832,33 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
 @media (max-width: 480px) {
   .featured-hero {
     margin-bottom: 1.5rem;
-    padding: 0 0.5rem;
-  }
-  
-  .featured-badge {
-    margin-bottom: 1.25rem !important;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.8rem;
-    display: block !important;
-    position: static !important;
-  }
-  
-  .featured-main-title {
-    font-size: 1.5rem;
-    margin-top: 0 !important;
-    margin-bottom: 1rem;
-    position: relative;
-    z-index: 2;
-    clear: both;
-    padding-top: 0 !important;
-  }
-  
-  .featured-hero-desc {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-top: 1rem !important;
+    padding: 0 1rem;
   }
   
   .featured-hero-content {
-    padding: 0 0.5rem !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0 !important;
+    padding: 0 0.5rem;
+    max-width: 100%;
+  }
+  
+  .featured-badge {
+    display: inline-block;
+    margin: 0 auto 1rem auto;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .featured-main-title {
+    font-size: clamp(1.25rem, 6vw, 1.5rem);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+    padding: 0 0.25rem;
+  }
+  
+  .featured-hero-desc {
+    font-size: clamp(0.85rem, 3vw, 0.9rem);
+    line-height: 1.5;
+    padding: 0 0.25rem;
   }
   
   /* Centering is now handled by base styles - no overrides needed */

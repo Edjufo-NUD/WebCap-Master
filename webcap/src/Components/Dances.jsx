@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Play, MapPin, ArrowUp } from 'lucide-react';
 import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 import './Dances.css';
 import { supabase } from '../supabasebaseClient';
 import tiklosImage from '../assets/tiklos.png';
@@ -1005,6 +1006,8 @@ const Dances = () => {
           </div>
         </div>
       )}
+
+      <Footer />
     </div>
   );
 };
