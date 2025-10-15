@@ -687,10 +687,28 @@ const UserRatings = () => {
         <div className="controls-section">
           <div className="filter-row">
             <div className="dance-filters">
-              <div className="filter-label">
+              <div 
+                className="filter-label"
+                style={{
+                  ...(windowWidth <= 768 && {
+                    fontSize: windowWidth <= 480 ? '14px' : '15px',
+                    marginBottom: '8px'
+                  })
+                }}
+              >
                 Dance Filter:
               </div>
-              <div className="filter-buttons">
+              <div 
+                className="filter-buttons"
+                style={{
+                  ...(windowWidth <= 768 && {
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: windowWidth <= 480 ? '8px' : '10px',
+                    width: '100%'
+                  })
+                }}
+              >
                 {danceCategories.map(dance => (
                   <button
                     key={dance}
@@ -705,6 +723,22 @@ const UserRatings = () => {
                         setSortOrder("desc");
                       }
                     }}
+                    style={{
+                      ...(windowWidth <= 768 && {
+                        padding: windowWidth <= 480 ? '10px 14px' : '10px 16px',
+                        fontSize: windowWidth <= 480 ? '13px' : '14px',
+                        borderRadius: '6px',
+                        border: '2px solid #e5e7eb',
+                        backgroundColor: selectedDance === dance ? '#a0855b' : 'white',
+                        color: selectedDance === dance ? 'white' : '#6b7280',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        whiteSpace: 'nowrap',
+                        flex: windowWidth <= 480 ? '1 1 auto' : 'none',
+                        minWidth: windowWidth <= 480 ? '0' : 'auto'
+                      })
+                    }}
                   >
                     {dance}
                   </button>
@@ -712,8 +746,30 @@ const UserRatings = () => {
               </div>
               
               {/* Active Filters - Inline Display */}
-              <div className="active-filters-inline">
-                <span className="active-filters-label">Active Filters:</span>
+              <div 
+                className="active-filters-inline"
+                style={{
+                  ...(windowWidth <= 768 && {
+                    marginTop: '12px',
+                    fontSize: windowWidth <= 480 ? '12px' : '13px',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    alignItems: 'center'
+                  })
+                }}
+              >
+                <span 
+                  className="active-filters-label"
+                  style={{
+                    ...(windowWidth <= 768 && {
+                      fontSize: windowWidth <= 480 ? '12px' : '13px',
+                      fontWeight: '600'
+                    })
+                  }}
+                >
+                  Active Filters:
+                </span>
                 <div className="active-filters-list">
                   {selectedDance !== "All" || selectedFigure !== "All" || debouncedSearchTerm ? (
                     <>
@@ -738,9 +794,17 @@ const UserRatings = () => {
               {/* Row 1: Search bar (takes full width) */}
               <div 
                 className="ratings-search-bar"
-                style={windowWidth <= 480 ? {
-                  fontSize: '16px'
-                } : {}}
+                style={{
+                  ...(windowWidth <= 768 && {
+                    width: '100%',
+                    maxWidth: '100%',
+                    margin: '0 0 12px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    position: 'relative',
+                    fontSize: windowWidth <= 480 ? '16px' : '14px'
+                  })
+                }}
               >
                 <Search size={16} className="ratings-search-icon" />
                 <input
@@ -749,10 +813,14 @@ const UserRatings = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="ratings-search-input"
-                  style={windowWidth <= 480 ? {
-                    fontSize: '16px',
-                    padding: '12px 40px 12px 45px'
-                  } : {}}
+                  style={{
+                    ...(windowWidth <= 768 && {
+                      fontSize: windowWidth <= 480 ? '16px' : '14px',
+                      padding: windowWidth <= 480 ? '12px 40px 12px 45px' : '10px 35px 10px 40px',
+                      width: '100%',
+                      boxSizing: 'border-box'
+                    })
+                  }}
                 />
                 {searchTerm && (
                   <button 
@@ -768,39 +836,48 @@ const UserRatings = () => {
               {/* Row 2: Figure dropdown and Sort controls side by side */}
               <div 
                 className="user-ratings-row-two"
-                style={windowWidth <= 480 ? {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                  alignItems: 'stretch',
-                  width: '100%'
-                } : {}}
+                style={{
+                  ...(windowWidth <= 768 && {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    alignItems: 'stretch',
+                    width: '100%'
+                  })
+                }}
               >
                 {/* Always show Figure dropdown */}
                 <div 
                   className="figure-filter"
-                  style={windowWidth <= 480 ? {
-                    width: '100%',
-                    margin: '0',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  } : {}}
+                  style={{
+                    ...(windowWidth <= 768 && {
+                      width: '100%',
+                      maxWidth: '100%',
+                      margin: '0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '5px'
+                    })
+                  }}
                 >
                   {windowWidth > 480 && <label>Figure:</label>}
                   <select 
                     value={selectedFigure} 
                     onChange={(e) => setSelectedFigure(e.target.value)}
                     className="figure-select"
-                    style={windowWidth <= 480 ? {
-                      width: '100%',
-                      padding: '12px 15px',
-                      fontSize: '16px',
-                      borderRadius: '6px',
-                      boxSizing: 'border-box',
-                      border: '1px solid #d1d5db',
-                      backgroundColor: 'white',
-                      margin: '0'
-                    } : {}}
+                    style={{
+                      ...(windowWidth <= 768 && {
+                        width: '100%',
+                        maxWidth: '100%',
+                        padding: windowWidth <= 480 ? '12px 15px' : '10px 12px',
+                        fontSize: windowWidth <= 480 ? '16px' : '14px',
+                        borderRadius: '6px',
+                        boxSizing: 'border-box',
+                        border: '1px solid #d1d5db',
+                        backgroundColor: 'white',
+                        margin: '0'
+                      })
+                    }}
                   >
                     {selectedDance === "All" ? (
                       <option value="All">All Figures</option>
@@ -817,28 +894,33 @@ const UserRatings = () => {
                 {/* Sort controls */}
                 <div 
                   className="sort-controls"
-                  style={windowWidth <= 480 ? {
-                    display: 'flex',
-                    width: '100%',
-                    gap: '10px',
-                    alignItems: 'stretch',
-                    margin: '0'
-                  } : {}}
+                  style={{
+                    ...(windowWidth <= 768 && {
+                      display: 'flex',
+                      width: '100%',
+                      maxWidth: '100%',
+                      gap: '10px',
+                      alignItems: 'stretch',
+                      margin: '0'
+                    })
+                  }}
                 >
                   <select 
                     value={sortBy} 
                     onChange={(e) => setSortBy(e.target.value)}
                     className="sort-select"
-                    style={windowWidth <= 480 ? {
-                      flex: '1',
-                      fontSize: '16px',
-                      padding: '12px 15px',
-                      borderRadius: '6px',
-                      border: '1px solid #d1d5db',
-                      backgroundColor: 'white',
-                      boxSizing: 'border-box',
-                      margin: '0'
-                    } : {}}
+                    style={{
+                      ...(windowWidth <= 768 && {
+                        flex: '1',
+                        fontSize: windowWidth <= 480 ? '16px' : '14px',
+                        padding: windowWidth <= 480 ? '12px 15px' : '10px 12px',
+                        borderRadius: '6px',
+                        border: '1px solid #d1d5db',
+                        backgroundColor: 'white',
+                        boxSizing: 'border-box',
+                        margin: '0'
+                      })
+                    }}
                   >
                     <option value="date">Sort by Date</option>
                     <option value="rating">Sort by Rating</option>
@@ -851,19 +933,23 @@ const UserRatings = () => {
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                     className="sort-order-btn"
                     title={`Sort ${sortOrder === 'asc' ? 'Descending' : 'Ascending'}`}
-                    style={windowWidth <= 480 ? {
-                      flexShrink: '0',
-                      width: '48px',
-                      height: '48px',
-                      padding: '0',
-                      borderRadius: '6px',
-                      border: '1px solid #d1d5db',
-                      backgroundColor: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0'
-                    } : {}}
+                    style={{
+                      ...(windowWidth <= 768 && {
+                        width: windowWidth <= 480 ? '50px' : '45px',
+                        height: windowWidth <= 480 ? '50px' : '45px',
+                        minWidth: windowWidth <= 480 ? '50px' : '45px',
+                        padding: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '6px',
+                        border: '1px solid #d1d5db',
+                        backgroundColor: 'white',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        margin: '0'
+                      })
+                    }}
                   >
                     {sortOrder === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>

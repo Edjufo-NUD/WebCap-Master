@@ -53,6 +53,7 @@ const AdminProfile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ show: false, message: "", type: "" });
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // User data
   const [username, setUsername] = useState("");
@@ -108,6 +109,12 @@ const AdminProfile = () => {
     };
 
     loadUserData();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const showSnackbar = (message, type) => {
@@ -237,23 +244,63 @@ const AdminProfile = () => {
   return (
     <>
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
-      <div className="admin-profile-page">
-        <div className="admin-profile-wrapper">
-          <div className="admin-profile-header">
-            <h1 className="admin-profile-main-title">Admin Profile</h1>
-            <p className="admin-profile-subtitle">Manage your account information</p>
+      <div className="admin-profile-page" style={{
+        ...(windowWidth <= 768 && {
+          marginLeft: 0,
+          marginTop: '70px',
+          padding: windowWidth <= 480 ? '0.75rem' : '1rem',
+          paddingTop: windowWidth <= 480 ? '1rem' : '1.5rem',
+          width: '100vw',
+          height: 'auto',
+          minHeight: 'calc(100vh - 70px)',
+          overflowY: 'auto',
+          overflowX: 'hidden'
+        })
+      }}>
+        <div className="admin-profile-wrapper" style={{
+          ...(windowWidth <= 768 && {
+            padding: windowWidth <= 480 ? '0.25rem' : '0.5rem',
+            maxWidth: '100%',
+            marginTop: 0
+          })
+        }}>
+          <div className="admin-profile-header" style={{
+            ...(windowWidth <= 768 && {
+              marginBottom: windowWidth <= 480 ? '1.25rem' : '1.5rem',
+              marginTop: 0,
+              paddingTop: 0
+            })
+          }}>
+            <h1 className="admin-profile-main-title" style={{
+              ...(windowWidth <= 768 && {
+                fontSize: windowWidth <= 480 ? '1.5rem' : '1.75rem'
+              })
+            }}>Admin Profile</h1>
           </div>
 
-          <div className="admin-profile-card">
+          <div className="admin-profile-card" style={{
+            ...(windowWidth <= 768 && {
+              minHeight: 'auto',
+              borderRadius: windowWidth <= 480 ? '8px' : '12px'
+            })
+          }}>
             {loading && (
               <div className="admin-loading-overlay">
                 <div className="admin-spinner"></div>
               </div>
             )}
 
-            <div className="admin-profile-info">
+            <div className="admin-profile-info" style={{
+              ...(windowWidth <= 768 && {
+                padding: windowWidth <= 480 ? '1rem' : '1.25rem'
+              })
+            }}>
               {/* Profile Fields */}
-              <div className="admin-profile-fields">
+              <div className="admin-profile-fields" style={{
+                ...(windowWidth <= 768 && {
+                  gap: windowWidth <= 480 ? '1.25rem' : '1.5rem'
+                })
+              }}>
                 {/* Username */}
                 <div className="admin-field-group">
                   <label className="admin-field-label">

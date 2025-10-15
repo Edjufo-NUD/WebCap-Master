@@ -55,6 +55,7 @@ const Home = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showLoginInvitation, setShowLoginInvitation] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const carouselImages = [home1Image, home2Image, home3Image];
 
@@ -198,6 +199,12 @@ const Home = () => {
       image: dance.image,
       imageType: typeof dance.image
     })));
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -399,10 +406,49 @@ const Home = () => {
 
       <section className="featured">
         <div className="featured-hero">
-          <div className="featured-hero-content">
-            <span className="featured-badge">✨ FEATURED COLLECTION</span>
-            <h2 className="featured-main-title">Filipino Folk Dances</h2>
-            <p className="featured-hero-desc">Experience the rich cultural tapestry of the Philippines through our curated selection of traditional dances</p>
+          <div className="featured-hero-content" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            width: '100%',
+            maxWidth: '100%',
+            padding: windowWidth <= 480 ? '0 1rem' : windowWidth <= 768 ? '0 1.5rem' : '0 2rem'
+          }}>
+            <span className="home-featured-badge-centered" style={{
+              display: 'block !important',
+              margin: '0 auto !important',
+              marginLeft: 'auto !important',
+              marginRight: 'auto !important',
+              marginBottom: windowWidth <= 480 ? '1rem' : '1.5rem',
+              textAlign: 'center !important',
+              width: 'fit-content !important',
+              padding: windowWidth <= 480 ? '0.4rem 1.2rem' : windowWidth <= 768 ? '0.5rem 1.5rem' : '0.6rem 1.8rem',
+              fontSize: windowWidth <= 480 ? '0.75rem' : windowWidth <= 768 ? '0.8rem' : '0.875rem',
+              background: 'linear-gradient(135deg, #a0855b, #cd853f)',
+              color: 'white',
+              borderRadius: '30px',
+              fontWeight: '600',
+              letterSpacing: '1px',
+              boxShadow: '0 4px 15px rgba(160, 133, 91, 0.3)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>✨ FEATURED COLLECTION</span>
+            <h2 className="featured-main-title" style={{
+              textAlign: 'center',
+              width: '100%',
+              margin: '0 auto 1rem auto',
+              fontSize: windowWidth <= 480 ? 'clamp(1.25rem, 6vw, 1.5rem)' : windowWidth <= 768 ? 'clamp(1.5rem, 5vw, 1.75rem)' : 'clamp(1.5rem, 4vw, 2.5rem)',
+              padding: windowWidth <= 480 ? '0 0.25rem' : windowWidth <= 768 ? '0 0.5rem' : '0'
+            }}>Filipino Folk Dances</h2>
+            <p className="featured-hero-desc" style={{
+              textAlign: 'center',
+              width: '100%',
+              margin: '0 auto',
+              fontSize: windowWidth <= 480 ? 'clamp(0.85rem, 3vw, 0.9rem)' : windowWidth <= 768 ? 'clamp(0.9rem, 2.5vw, 1rem)' : 'clamp(0.9rem, 2vw, 1.125rem)',
+              padding: windowWidth <= 480 ? '0 0.25rem' : windowWidth <= 768 ? '0 0.5rem' : '0'
+            }}>Experience the rich cultural tapestry of the Philippines through our curated selection of traditional dances</p>
           </div>
         </div>
         
