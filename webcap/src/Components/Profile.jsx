@@ -1281,33 +1281,6 @@ const Profile = () => {
                 </div>
               )}
             </div>
-
-            {/* Additional Analytics */}
-            {analyticsData.improvementTrend && (
-              <div style={{
-                background: analyticsData.improvementTrend.direction === 'up' ? 
-                  'linear-gradient(135deg, #10b981, #059669)' : 
-                  analyticsData.improvementTrend.direction === 'down' ?
-                  'linear-gradient(135deg, #ef4444, #dc2626)' :
-                  'linear-gradient(135deg, #6b7280, #4b5563)',
-                borderRadius: '12px',
-                padding: '1rem',
-                color: 'white',
-                maxWidth: '300px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <TrendingUp size={16} />
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600' }}>Progress Trend</span>
-                </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.25rem' }}>
-                  {analyticsData.improvementTrend.direction === 'up' ? '📈 Improving' : 
-                   analyticsData.improvementTrend.direction === 'down' ? '📉 Declining' : '➡️ Stable'}
-                </div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
-                  {analyticsData.improvementTrend.value > 0 ? '+' : ''}{analyticsData.improvementTrend.value}%
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Dance Progress Section */}
