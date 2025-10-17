@@ -2957,3 +2957,235 @@ input[type="button"]:not([class*="nav"]):not([class*="menu"]):hover,
     border-radius: 12px;
   }
 }
+
+/* QR Code Section Styles - Add this to your Home.css */
+
+/* Update culture-content to use grid layout */
+.culture-content-with-qr {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.qr-code-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(160, 133, 91, 0.15);
+  border: 2px solid rgba(160, 133, 91, 0.1);
+  transition: all 0.3s ease;
+  max-width: 320px;
+  width: 100%;
+  animation: fadeInRight 0.8s ease-out;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.qr-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(160, 133, 91, 0.25);
+}
+
+.qr-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(160, 133, 91, 0.1);
+}
+
+.qr-icon {
+  color: #a0855b;
+  flex-shrink: 0;
+}
+
+.qr-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.qr-body {
+  text-align: center;
+}
+
+.qr-code-wrapper {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  display: inline-block;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.qr-code-wrapper #qrcode {
+  display: inline-block;
+}
+
+.qr-code-wrapper #qrcode img {
+  display: block;
+  margin: 0 auto;
+}
+
+.qr-instructions {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.qr-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(45deg, #a0855b, #8b7355);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(160, 133, 91, 0.3);
+  text-decoration: none;
+}
+
+.qr-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(160, 133, 91, 0.4);
+  background: linear-gradient(45deg, #8b7355, #a0855b);
+}
+
+.qr-download-btn:active {
+  transform: translateY(0);
+}
+
+.qr-info {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(160, 133, 91, 0.1);
+}
+
+.qr-info p {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Responsive Design for QR Code Section */
+@media (max-width: 1024px) {
+  .culture-content-with-qr {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .qr-code-container {
+    order: 2;
+  }
+  
+  .culture-text {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .culture-content-with-qr {
+    gap: 2rem;
+  }
+  
+  .qr-card {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .qr-header h3 {
+    font-size: 1.125rem;
+  }
+  
+  .qr-code-wrapper {
+    padding: 1.25rem;
+  }
+  
+  .qr-code-wrapper #qrcode img {
+    max-width: 160px;
+    height: auto;
+  }
+  
+  .qr-download-btn {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.8rem;
+  }
+  
+  .qr-info {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .qr-card {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+  
+  .qr-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .qr-header h3 {
+    font-size: 1rem;
+  }
+  
+  .qr-code-wrapper {
+    padding: 1rem;
+  }
+  
+  .qr-code-wrapper #qrcode img {
+    max-width: 140px;
+    height: auto;
+  }
+  
+  .qr-instructions {
+    font-size: 0.8rem;
+  }
+  
+  .qr-download-btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .qr-info p {
+    font-size: 0.7rem;
+  }
+}

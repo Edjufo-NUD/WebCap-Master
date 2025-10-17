@@ -149,16 +149,6 @@ const DanceProgressTable = ({ danceName, figureScores, danceData }) => {
           gap: '1rem',
           flexWrap: 'wrap'
         }}>
-          <span style={{
-            background: '#a0855b',
-            color: 'white',
-            padding: '0.25rem 0.75rem',
-            borderRadius: '12px',
-            fontSize: '0.8rem',
-            fontWeight: '600'
-          }}>
-            {finalScore}% Final
-          </span>
           {isExpanded ? <ChevronUp size={20} style={{ color: '#a0855b' }} /> : <ChevronDown size={20} style={{ color: '#a0855b' }} />}
         </div>
       </div>
@@ -1259,27 +1249,25 @@ const Profile = () => {
               </div>
 
               {/* Average Score */}
-              {averageScore !== null && (
-                <div style={{
-                  background: '#f8fafc',
-                  borderRadius: '12px',
-                  padding: '1rem',
-                  textAlign: 'center',
-                  border: '1px solid #e5e7eb'
+              <div style={{
+                background: '#f8fafc',
+                borderRadius: '12px',
+                padding: '1rem',
+                textAlign: 'center',
+                border: '1px solid #e5e7eb'
+              }}>
+                <div style={{ 
+                  fontSize: '1.75rem', 
+                  fontWeight: '700', 
+                  color: averageScore !== null ? (averageScore >= 80 ? '#10b981' : averageScore >= 60 ? '#f59e0b' : '#ef4444') : '#9ca3af',
+                  marginBottom: '0.25rem' 
                 }}>
-                  <div style={{ 
-                    fontSize: '1.75rem', 
-                    fontWeight: '700', 
-                    color: averageScore >= 80 ? '#10b981' : averageScore >= 60 ? '#f59e0b' : '#ef4444',
-                    marginBottom: '0.25rem' 
-                  }}>
-                    {averageScore}%
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600', textTransform: 'uppercase' }}>
-                    Avg Score
-                  </div>
+                  {averageScore !== null ? `${averageScore}%` : '—'}
                 </div>
-              )}
+                <div style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600', textTransform: 'uppercase' }}>
+                  Avg Score
+                </div>
+              </div>
             </div>
           </div>
 

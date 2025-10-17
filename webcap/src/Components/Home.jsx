@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Calendar, BookOpen, ChevronRight, Star, X, MapPin, Clock, ArrowUp, UserPlus, LogIn, Check } from 'lucide-react';
+import { Users, Calendar, BookOpen, ChevronRight, Star, X, MapPin, Clock, ArrowUp, UserPlus, LogIn, Check, Download, Smartphone } from 'lucide-react';
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import './Home.css';
@@ -56,8 +56,12 @@ const Home = () => {
   const [showLoginInvitation, setShowLoginInvitation] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [qrGenerated, setQrGenerated] = useState(false);
 
   const carouselImages = [home1Image, home2Image, home3Image];
+
+  // APK Download URL
+  const APK_URL = 'https://drive.google.com/file/d/1yZlFllc77tB8SnJPmOO8a2FL8EmLt8Jt/view?usp=drive_link';
 
   const featuredDances = [
     {
@@ -277,6 +281,37 @@ const Home = () => {
       document.body.style.overflow = 'unset';
     };
   }, [isModalOpen]);
+
+  // Generate QR Code
+  useEffect(() => {
+    if (!qrGenerated && typeof window !== 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.async = true;
+      script.onload = () => {
+        const qrElement = document.getElementById('qrcode');
+        if (qrElement && window.QRCode && !qrGenerated) {
+          qrElement.innerHTML = '';
+          new window.QRCode(qrElement, {
+            text: APK_URL,
+            width: 180,
+            height: 180,
+            colorDark: '#a0855b',
+            colorLight: '#ffffff',
+            correctLevel: window.QRCode.CorrectLevel.H
+          });
+          setQrGenerated(true);
+        }
+      };
+      document.body.appendChild(script);
+      
+      return () => {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      };
+    }
+  }, [qrGenerated, APK_URL]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -519,7 +554,7 @@ const Home = () => {
 
       <section className="culture-preview">
         <div className="container">
-          <div className="culture-content">
+          <div className="culture-content-with-qr">
             <div className="culture-text">
               <h2 className="culture-title">Rich Cultural Heritage</h2>
               <p className="culture-description">
@@ -540,6 +575,34 @@ const Home = () => {
                 Explore Dance Tradition
                 <ChevronRight size={20} />
               </button>
+            </div>
+
+            <div className="qr-code-container">
+              <div className="qr-card">
+                <div className="qr-header">
+                  <Smartphone size={24} className="qr-icon" />
+                  <h3>Download Our App</h3>
+                </div>
+                
+                <div className="qr-body">
+                  <div className="qr-code-wrapper">
+                    <div id="qrcode"></div>
+                  </div>
+                  
+                  <p className="qr-instructions">
+                    Scan QR code to download the FLIPino mobile app
+                  </p>
+                  
+                  <a 
+                    href={APK_URL} 
+                    className="qr-download-btn"
+                    download
+                  >
+                    <Download size={18} />
+                    Direct Download
+                  </a>
+                </div>
+              </div>
             </div>
 
           </div>

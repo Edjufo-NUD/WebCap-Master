@@ -274,7 +274,7 @@ const DanceUpload = () => {
         { field: 'title', name: 'Dance Title' },
         { field: 'references', name: 'References' },
         { field: 'region', name: 'Island' },
-        { field: 'durationMinutes', name: 'Duration (Minutes)' },
+        { field: 'durationSeconds', name: 'Duration (Seconds)' },
         { field: 'performers', name: 'Number of Performers' },
         { field: 'music', name: 'Music & Instruments' },
         { field: 'costumes', name: 'Traditional Costumes' }
@@ -300,8 +300,8 @@ const DanceUpload = () => {
       const minutes = parseInt(formData.durationMinutes) || 0;
       const seconds = parseInt(formData.durationSeconds) || 0;
 
-      if (minutes === 0 && seconds === 0) {
-        showNotification('Please specify a valid duration. At least minutes or seconds must be greater than 0.', 'error');
+      if (seconds === 0) {
+        showNotification('Please specify seconds for the duration. Seconds is required.', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -635,7 +635,7 @@ const DanceUpload = () => {
                       className="form-input"
                       value={formData.durationHours || ''}
                       onChange={handleInputChange}
-                      placeholder="0"
+                      placeholder="#"
                       min="0"
                       max="5"
                       step="1"
@@ -652,11 +652,10 @@ const DanceUpload = () => {
                       className="form-input"
                       value={formData.durationMinutes || ''}
                       onChange={handleInputChange}
-                      placeholder="5"
+                      placeholder="#"
                       min="0"
                       max="59"
                       step="1"
-                      required
                       disabled={isSubmitting}
                       style={{ width: '70px', padding: '12px 8px' }}
                     />
@@ -670,10 +669,11 @@ const DanceUpload = () => {
                       className="form-input"
                       value={formData.durationSeconds || ''}
                       onChange={handleInputChange}
-                      placeholder="30"
+                      placeholder="#"
                       min="0"
                       max="59"
                       step="1"
+                      required
                       disabled={isSubmitting}
                       style={{ width: '70px', padding: '12px 8px' }}
                     />
@@ -694,7 +694,7 @@ const DanceUpload = () => {
                     className="form-input"
                     value={formData.performers}
                     onChange={handleInputChange}
-                    placeholder="4"
+                    placeholder="#"
                     min="1"
                     max="50"
                     step="1"

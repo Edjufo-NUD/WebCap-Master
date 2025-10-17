@@ -1428,7 +1428,7 @@ const ManageDance = () => {
                             ...editForm,
                             durationHours: parseInt(e.target.value) || 0
                           })}
-                          placeholder="0"
+                          placeholder="#"
                           min="0"
                           max="5"
                           step="1"
@@ -1447,11 +1447,10 @@ const ManageDance = () => {
                             ...editForm,
                             durationMinutes: parseInt(e.target.value) || 0
                           })}
-                          placeholder="5"
+                          placeholder="#"
                           min="0"
                           max="59"
                           step="1"
-                          required
                           style={{ width: '70px', padding: '12px 8px' }}
                         />
                         <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>m</span>
@@ -1467,10 +1466,11 @@ const ManageDance = () => {
                             ...editForm,
                             durationSeconds: parseInt(e.target.value) || 0
                           })}
-                          placeholder="30"
+                          placeholder="#"
                           min="0"
                           max="59"
                           step="1"
+                          required
                           style={{ width: '70px', padding: '12px 8px' }}
                         />
                         <span style={{ fontSize: '0.9rem', color: '#718096', fontWeight: '500' }}>s</span>
@@ -1490,7 +1490,7 @@ const ManageDance = () => {
                         className="form-input"
                         value={editForm.performers}
                         onChange={(e) => handleEditFormChange('performers', e.target.value)}
-                        placeholder="4"
+                        placeholder="#"
                         min="1"
                         max="50"
                         step="1"
