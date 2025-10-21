@@ -64,27 +64,29 @@ const Home = () => {
   const APK_URL = 'https://drive.google.com/file/d/1yZlFllc77tB8SnJPmOO8a2FL8EmLt8Jt/view?usp=drive_link';
 
   const featuredDances = [
-    {
-      id: 'featured-1',
-      title: 'Binungey',
-      name: 'Binungey',
-      island: 'Luzon',
-      region: 'Abra',
-      province: 'Abra',
-      image: binungeyImage,
-      image_url: binungeyImage,
-      description: 'A traditional dance from Abra celebrating harvest and community unity.',
-      history: 'A traditional dance from Abra celebrating harvest and community unity. This dance represents the joy and gratitude of farmers during harvest season. Performers wear traditional Ilocano costumes and use farming tools as props.',
-      references: 'Traditional Ilocano folk music with gongs and drums. Colorful traditional Ilocano attire with wide-brimmed hats.',
-      main_video_url: BinungeyMainVideo,
-      difficulty: 'Intermediate',
-      duration: '4-6 minutes',
-      performers: '6-8 dancers',
-      origin: 'Northern Luzon',
-      significance: 'This dance represents the joy and gratitude of farmers during harvest season. Performers wear traditional Ilocano costumes and use farming tools as props.',
-      music: 'Traditional Ilocano folk music with gongs and drums',
-      costumes: 'Colorful traditional Ilocano attire with wide-brimmed hats',
-      isFeatured: true,
+    
+      {
+        id: 'featured-1',
+        title: 'Binungey',
+        name: 'Binungey',
+        island: 'Luzon',
+        region: 'Pangasinan',
+        province: 'Pangasinan',
+        image: binungeyImage,
+        image_url: binungeyImage,
+        description: 'A folk dance from Pangasinan that dramatizes the preparation of binungey, a traditional rice cake steamed in bamboo.',
+        history: 'A folk dance from Pangasinan, Western Luzon, that dramatizes the preparation of binungey — a traditional rice cake steamed in bamboo. The dance honors local food traditions, showcasing the cultural identity and everyday labor of the Pangasinense people.',
+        references: 'Rhythmic folk music typical of Pangasinan with native percussion. Kimona with serpentina skirt and tapis for women, camisa de chino and plain trousers for men.',
+        main_video_url: BinungeyMainVideo,
+        difficulty: 'Intermediate',
+        duration: '4-6 minutes',
+        performers: '6-8 dancers',
+        origin: 'Western Luzon (Province of Pangasinan)',
+        significance: 'This dance represents the local tradition of preparing binungey, a delicacy made from sticky rice and coconut milk cooked in bamboo tubes. It emphasizes themes of community cooperation, cultural heritage, and regional identity in Pangasinan.',
+        music: 'Rhythmic folk music typical of Pangasinan, often performed with native percussion instruments',
+        costumes: 'Women: Kimona with serpentina skirt and tapis. Men: Camisa de chino and plain trousers.',
+        referenceLink: 'https://baguioheraldexpressonline.com/psinan-hosts-regl-sem-on-philippine-folkdance/',
+        isFeatured: true,
       figureVideos: [
         { id: 'binungey-fig-1', figure_number: 1, video_url: BinungeyFig1 },
         { id: 'binungey-fig-2', figure_number: 2, video_url: BinungeyFig2 },
@@ -99,22 +101,23 @@ const Home = () => {
       id: 'featured-4',
       title: 'Pahid',
       name: 'Pahid',
-      island: 'Luzon',
-      region: 'Northern Luzon',
-      province: 'Northern Luzon',
+      island: 'Visayas',
+      region: 'Capiz and Aklan',
+      province: 'Capiz and Aklan',
       image: pahidImage,
       image_url: pahidImage,
-      description: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage.',
-      history: 'A traditional Filipino folk dance that showcases graceful movements and cultural heritage. This dance demonstrates the refined artistry and storytelling tradition of Filipino culture through expressive choreography.',
-      references: 'Traditional Filipino folk music with indigenous instruments. Traditional Filipino attire with cultural significance.',
+      description: 'A folk dance from the Visayan region whose name means "to wipe/brush off" and depicts the act of wiping mud off bare feet as visitors enter a home.',
+      history: 'A folk dance from the Visayan region of the Philippines (notably in the provinces of Capiz and Aklan) whose name means "to wipe/brush off" (from pahid, meaning "wipe off") and is said to depict the act of wiping mud off bare feet as visitors enter a home.',
+      references: 'Typically in 3/4 time in two parts (A & B) for one version of the dance. Peasant kimona and patadyong (or similar peasant attire) with a scarf for girls; Camisa de chino with colored peasant pants, performed barefoot for boys.',
       main_video_url: PahidMainVideo,
       difficulty: 'Intermediate',
       duration: '4-6 minutes',
       performers: '4-8 dancers',
-      origin: 'Northern Luzon',
-      significance: 'This dance represents the artistic expression and cultural storytelling traditions of the Filipino people, showcasing graceful movements and cultural heritage.',
+      origin: 'Visayas',
+      significance: 'This dance represents a gesture of courtesy and hospitality: as farmers or guests enter with muddy feet, they wipe them before entering the home. The wiping motion is dramatized in dance form.',
       music: 'Traditional Filipino folk music with indigenous instruments',
       costumes: 'Traditional Filipino attire with cultural significance',
+      referenceLink: 'https://www.scribd.com/document/49774671/PE-dances-1',
       isFeatured: true,
       figureVideos: [
         { id: 'pahid-fig-1', figure_number: 1, video_url: PahidFig1 },
@@ -126,26 +129,28 @@ const Home = () => {
       ]
     },
     {
-      id: 'featured-2',
-      title: 'Sua Ku Sua',
-      name: 'Sua Ku Sua',
-      island: 'Mindanao',
-      region: 'Jolo, Sulu',
-      province: 'Jolo, Sulu',
-      image: null,
-      image_url: null,
-      description: 'A courtship dance from the Tausug people of Sulu.',
-      history: 'A courtship dance from the Tausug people of Sulu. A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
-      references: 'Traditional Tausug kulintang ensemble. Elaborate Muslim royal attire with intricate embroidery.',
-      main_video_url: '',
-      difficulty: 'Advanced',
-      duration: '5-7 minutes',
-      performers: '2-4 dancers',
-      origin: 'Mindanao',
-      significance: 'A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
-      music: 'Traditional Tausug kulintang ensemble',
-      costumes: 'Elaborate Muslim royal attire with intricate embroidery',
-      isFeatured: true,
+      
+        id: 'featured-2',
+        title: 'Sua Ku Sua',
+        name: 'Sua Ku Sua',
+        island: 'Mindanao',
+        region: 'Jolo, Sulu',
+        province: 'Jolo, Sulu',
+        image: null,
+        image_url: null,
+        description: 'A courtship dance of the Tausug people of Jolo, Sulu. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree".',
+        history: 'A courtship dance of the Tausug people of Jolo, Sulu in the southern Philippines. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree" (from sua meaning "pomelo" and ku meaning "mine") and the dance was originally inspired by the pomelo tree — its slender branches and leaves likened to the virtue and beauty of a lady.',
+        references: 'Accompanied by song and fan-movements; instrumentation not always detailed but rooted in the Tausug coastal/lowland Muslim tradition. Dancers hold two white fans, which suggest the leaves of the pomelo tree swaying in the wind.',
+        main_video_url: '',
+        difficulty: 'Advanced',
+        duration: '5-7 minutes',
+        performers: '2-4 dancers',
+        origin: 'Jolo, Sulu (Mindanao / Sulu Archipelago)',
+        significance: 'The dance celebrates the relationship of the Tausug community with the pomelo tree — an important fruit/livelihood in the region. The movements and props (notably white fans) mimic the swaying of its leaves, and the dance serves as a graceful expression of courtship and aesthetic values in Tausug culture.',
+        music: 'Accompanied by song and fan-movements; instrumentation not always detailed but rooted in the Tausug coastal/lowland Muslim tradition',
+        costumes: 'Elaborate Muslim royal attire with intricate embroidery',
+        referenceLink: 'https://www.scribd.com/document/683615342/Sua-Ku-Sua',
+        isFeatured: true,
       figureVideos: [
         { id: 'suakusua-fig-1', figure_number: 1, video_url: SuaKuSuaFig1 },
         { id: 'suakusua-fig-2', figure_number: 2, video_url: SuaKuSuaFig2 },
@@ -179,6 +184,7 @@ const Home = () => {
       significance: 'Represents the Filipino spirit of bayanihan (community cooperation) where neighbors help each other during planting and harvesting seasons.',
       music: 'Lively Visayan folk music with traditional instruments',
       costumes: 'Simple rural Filipino clothing reflecting farming attire',
+      referenceLink: 'https://folkdanceworld.com/2019/12/13/tiklos-philippine-folk-dance.html',
       isFeatured: true,
       figureVideos: [
         { id: 'tiklos-fig-1', figure_number: 1, video_url: TiklosFig1 },
@@ -697,6 +703,36 @@ const Home = () => {
                 <p><strong>Music:</strong> {selectedDance.music}</p>
                 <p><strong>Costumes:</strong> {selectedDance.costumes}</p>
               </div>
+
+              {selectedDance.referenceLink && (
+                <div className="modal-section">
+                  <h3>Reference</h3>
+                  <p>
+                    <a 
+                      href={selectedDance.referenceLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      style={{
+                        color: '#a0855b',
+                        textDecoration: 'none',
+                        fontWeight: '500',
+                        borderBottom: '1px solid #a0855b',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.color = '#8b7355';
+                        e.target.style.borderBottomColor = '#8b7355';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.color = '#a0855b';
+                        e.target.style.borderBottomColor = '#a0855b';
+                      }}
+                    >
+                      Learn more about {selectedDance.name} →
+                    </a>
+                  </p>
+                </div>
+              )}
 
               {selectedDance.main_video_url && (
                 <div className="modal-section" style={{ textAlign: 'center', margin: '32px 0' }}>

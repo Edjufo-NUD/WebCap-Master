@@ -1,3 +1,5 @@
+// Dances.jsx (full updated)
+
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Play, MapPin, ArrowUp } from 'lucide-react';
 import Navbar from '../Components/Navbar';
@@ -62,22 +64,29 @@ const featuredDances = [
   {
     id: 'featured-1',
     title: 'Binungey',
+    name: 'Binungey',
     island: 'Luzon',
-    province: 'Abra',
+    region: 'Pangasinan',
+    province: 'Pangasinan',
     image_url: binungeyImage,
+    description:
+      'A folk dance from Pangasinan that dramatizes the preparation of binungey, a traditional rice cake steamed in bamboo.',
     history:
-      'A traditional dance from Abra celebrating harvest and community unity. This dance represents the joy and gratitude of farmers during harvest season. Performers wear traditional Ilocano costumes and use farming tools as props.',
+      'A folk dance from Pangasinan, Western Luzon, that dramatizes the preparation of binungey — a traditional rice cake steamed in bamboo. The dance honors local food traditions, showcasing the cultural identity and everyday labor of the Pangasinense people.',
     references:
-      'Traditional Ilocano folk music with gongs and drums. Colorful traditional Ilocano attire with wide-brimmed hats.',
+      'Rhythmic folk music typical of Pangasinan with native percussion. Kimona with serpentina skirt and tapis for women, camisa de chino and plain trousers for men.',
     main_video_url: BinungeyMainVideo,
     difficulty: 'Intermediate',
     duration: '4-6 minutes',
     performers: '6-8 dancers',
-    origin: 'Northern Luzon',
+    origin: 'Western Luzon (Province of Pangasinan)',
     significance:
-      'This dance represents the joy and gratitude of farmers during harvest season. Performers wear traditional Ilocano costumes and use farming tools as props.',
-    music: 'Traditional Ilocano folk music with gongs and drums',
-    costumes: 'Colorful traditional Ilocano attire with wide-brimmed hats',
+      'This dance represents the local tradition of preparing binungey, a delicacy made from sticky rice and coconut milk cooked in bamboo tubes. It emphasizes themes of community cooperation, cultural heritage, and regional identity in Pangasinan.',
+    music:
+      'Rhythmic folk music typical of Pangasinan, often performed with native percussion instruments',
+    costumes: 'Women: Kimona with serpentina skirt and tapis. Men: Camisa de chino and plain trousers.',
+    referenceLink:
+      'https://baguioheraldexpressonline.com/psinan-hosts-regl-sem-on-philippine-folkdance/',
     isFeatured: true,
     created_at: '2024-01-15T10:00:00Z',
     figureVideos: [
@@ -93,22 +102,28 @@ const featuredDances = [
   {
     id: 'featured-4',
     title: 'Pahid',
-    island: 'Luzon',
-    province: 'Northern Luzon',
+    name: 'Pahid',
+    island: 'Visayas',
+    region: 'Capiz and Aklan',
+    province: 'Capiz and Aklan',
     image_url: pahidImage,
+    description:
+      'A folk dance from the Visayan region whose name means "to wipe/brush off" and depicts the act of wiping mud off bare feet as visitors enter a home.',
     history:
-      'A traditional Filipino folk dance that showcases graceful movements and cultural heritage. This dance demonstrates the refined artistry and storytelling tradition of Filipino culture through expressive choreography.',
+      'A folk dance from the Visayan region of the Philippines (notably in the provinces of Capiz and Aklan) whose name means "to wipe/brush off" (from pahid, meaning "wipe off") and is said to depict the act of wiping mud off bare feet as visitors enter a home.',
     references:
-      'Traditional Filipino folk music with indigenous instruments. Traditional Filipino attire with cultural significance.',
+      'Typically in 3/4 time in two parts (A & B) for one version of the dance. Peasant kimona and patadyong (or similar peasant attire) with a scarf for girls; Camisa de chino with colored peasant pants, performed barefoot for boys.',
     main_video_url: PahidMainVideo,
     difficulty: 'Intermediate',
     duration: '4-6 minutes',
     performers: '4-8 dancers',
-    origin: 'Northern Luzon',
+    origin: 'Visayas',
     significance:
-      'This dance represents the artistic expression and cultural storytelling traditions of the Filipino people, showcasing graceful movements and cultural heritage.',
+      'This dance represents a gesture of courtesy and hospitality: as farmers or guests enter with muddy feet, they wipe them before entering the home. The wiping motion is dramatized in dance form.',
     music: 'Traditional Filipino folk music with indigenous instruments',
-    costumes: 'Traditional Filipino attire with cultural significance',
+    costumes:
+      'Peasant kimona and patadyong (or similar peasant attire) with a scarf for girls; Camisa de chino with colored peasant pants, performed barefoot for boys',
+    referenceLink: 'https://www.scribd.com/document/49774671/PE-dances-1',
     isFeatured: true,
     created_at: '2024-02-20T14:30:00Z',
     figureVideos: [
@@ -127,22 +142,24 @@ const featuredDances = [
     island: 'Mindanao',
     region: 'Jolo, Sulu',
     province: 'Jolo, Sulu',
-    image: null,
     image_url: null,
-    description: 'A courtship dance from the Tausug people of Sulu.',
+    description:
+      'A courtship dance of the Tausug people of Jolo, Sulu. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree".',
     history:
-      'A courtship dance from the Tausug people of Sulu. A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
+      'A courtship dance of the Tausug people of Jolo, Sulu in the southern Philippines. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree" (from sua meaning "pomelo" and ku meaning "mine") and the dance was originally inspired by the pomelo tree — its slender branches and leaves likened to the virtue and beauty of a lady.',
     references:
-      'Traditional Tausug kulintang ensemble. Elaborate Muslim royal attire with intricate embroidery.',
+      'Accompanied by song and fan-movements; instrumentation not always detailed but rooted in the Tausug coastal/lowland Muslim tradition. Dancers hold two white fans, which suggest the leaves of the pomelo tree swaying in the wind.',
     main_video_url: '',
     difficulty: 'Advanced',
     duration: '5-7 minutes',
     performers: '2-4 dancers',
-    origin: 'Mindanao',
+    origin: 'Jolo, Sulu (Mindanao / Sulu Archipelago)',
     significance:
-      'A graceful courtship dance that tells the story of a prince wooing a princess. The dance showcases the refined culture of the Tausug people.',
-    music: 'Traditional Tausug kulintang ensemble',
+      'The dance celebrates the relationship of the Tausug community with the pomelo tree — an important fruit/livelihood in the region. The movements and props (notably white fans) mimic the swaying of its leaves, and the dance serves as a graceful expression of courtship and aesthetic values in Tausug culture.',
+    music:
+      'Accompanied by song and fan-movements; instrumentation not always detailed but rooted in the Tausug coastal/lowland Muslim tradition',
     costumes: 'Elaborate Muslim royal attire with intricate embroidery',
+    referenceLink: 'https://www.scribd.com/document/683615342/Sua-Ku-Sua',
     isFeatured: true,
     created_at: '2024-03-10T09:15:00Z',
     figureVideos: [
@@ -161,9 +178,12 @@ const featuredDances = [
   {
     id: 'featured-3',
     title: 'Tiklos',
+    name: 'Tiklos',
     island: 'Visayas',
+    region: 'Leyte',
     province: 'Leyte',
     image_url: tiklosImage,
+    description: 'A dance depicting the Bayanihan spirit of community cooperation.',
     history:
       'A dance depicting the Bayanihan spirit of community cooperation. Represents the Filipino spirit of bayanihan (community cooperation) where neighbors help each other during planting and harvesting seasons.',
     references:
@@ -177,6 +197,8 @@ const featuredDances = [
       'Represents the Filipino spirit of bayanihan (community cooperation) where neighbors help each other during planting and harvesting seasons.',
     music: 'Lively Visayan folk music with traditional instruments',
     costumes: 'Simple rural Filipino clothing reflecting farming attire',
+    referenceLink:
+      'https://folkdanceworld.com/2019/12/13/tiklos-philippine-folk-dance.html',
     isFeatured: true,
     created_at: '2024-04-05T16:45:00Z',
     figureVideos: [
@@ -228,7 +250,7 @@ const Dances = () => {
       const { data: dancesData, error: dancesError } = await supabase
         .from('dances')
         .select(
-          'id, title, island, references, history, main_video_url, duration, performers, music, costumes, created_at'
+          'id, title, island, references, history, main_video_url, duration, performers, music, costumes, created_at, reference_link, reference_url'
         )
         .eq('status', 'approved')
         .order('created_at', { ascending: false });
@@ -437,7 +459,11 @@ const Dances = () => {
     };
   }, [showPreview]);
 
-  const displayOrNA = (value) => (value && value.trim() ? value : 'N/A');
+  const displayOrNA = (value) => (value && String(value).trim() ? value : 'N/A');
+
+  // ---- NEW: Resolve a reference URL from any possible field name ----
+  const getReferenceUrl = (dance) =>
+    dance?.referenceLink || dance?.reference_url || dance?.reference_link || '';
 
   return (
     <div className="dances-page">
@@ -672,33 +698,32 @@ const Dances = () => {
 
       {showScrollTop && !showPreview && !showVideoModal && (
         <button
-        className="scroll-to-top-btn"
-        onClick={scrollToTop}
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          zIndex: 9999,
-          background: '#a0855b',
-          border: '1.5px solid #a0855b',  // ← fixed
-          borderRadius: '50%',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
-          height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'opacity 0.2s, width 0.2s, height 0.2s',
-        }}
-        aria-label="Scroll to top"
-      >
-        <ArrowUp
-          size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24}
-          color="#ffffff"
-        />
-      </button>
-      
+          className="scroll-to-top-btn"
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            zIndex: 9999,
+            background: '#a0855b',
+            border: '1.5px solid #a0855b', // ← fixed
+            borderRadius: '50%',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            width: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            height: window.innerWidth < 480 ? 38 : window.innerWidth < 900 ? 44 : 54,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'opacity 0.2s, width 0.2s, height 0.2s',
+          }}
+          aria-label="Scroll to top"
+        >
+          <ArrowUp
+            size={window.innerWidth < 480 ? 16 : window.innerWidth < 900 ? 20 : 24}
+            color="#ffffff"
+          />
+        </button>
       )}
 
       {showVideoModal && videoModalUrl && (
@@ -865,6 +890,37 @@ const Dances = () => {
                       <strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}
                     </p>
                   </div>
+
+                  {/* NEW: Reference link for featured dances */}
+                  {getReferenceUrl(selectedDance) && (
+                    <div className="modal-section">
+                      <h3>Reference</h3>
+                      <p>
+                        <a
+                          href={getReferenceUrl(selectedDance)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: '#a0855b',
+                            textDecoration: 'none',
+                            fontWeight: '500',
+                            borderBottom: '1px solid #a0855b',
+                            transition: 'all 0.3s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.color = '#8b7355';
+                            e.target.style.borderBottomColor = '#8b7355';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.color = '#a0855b';
+                            e.target.style.borderBottomColor = '#a0855b';
+                          }}
+                        >
+                          Learn more about {selectedDance.title} →
+                        </a>
+                      </p>
+                    </div>
+                  )}
                 </>
               ) : (
                 <>
@@ -910,6 +966,37 @@ const Dances = () => {
                       {displayOrNA(selectedDance.references)}
                     </p>
                   </div>
+
+                  {/* NEW: Reference link for non-featured dances */}
+                  {getReferenceUrl(selectedDance) && (
+                    <div className="modal-section" style={{ marginTop: '-8px' }}>
+                      <h3 style={{ marginTop: 0 }}>Reference</h3>
+                      <p>
+                        <a
+                          href={getReferenceUrl(selectedDance)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: '#a0855b',
+                            textDecoration: 'none',
+                            fontWeight: '500',
+                            borderBottom: '1px solid #a0855b',
+                            transition: 'all 0.3s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.color = '#8b7355';
+                            e.target.style.borderBottomColor = '#8b7355';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.color = '#a0855b';
+                            e.target.style.borderBottomColor = '#a0855b';
+                          }}
+                        >
+                          Learn more about {selectedDance.title} →
+                        </a>
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -1006,7 +1093,6 @@ const Dances = () => {
           </div>
         </div>
       )}
-
       <Footer />
     </div>
   );

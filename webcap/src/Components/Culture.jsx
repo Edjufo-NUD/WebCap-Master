@@ -2371,6 +2371,7 @@ const Culture = () => {
           onClick={scrollToTop}
           aria-label="Scroll to top"
         >
+          
           <svg className="progress-ring" width="60" height="60" viewBox="0 0 60 60">
             <circle
               className="progress-ring-circle"
@@ -2391,6 +2392,371 @@ const Culture = () => {
           </div>
         </button>
       )}
+
+      {/* Enhanced References Section */}
+      <section 
+        id="references" 
+        style={{
+          background: '#ffffff',
+          padding: '5rem 0 4rem',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Decorative Pattern Overlay */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(160, 133, 91, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(219, 39, 119, 0.03) 0%, transparent 50%)',
+          zIndex: 0
+        }} />
+
+        <div className="container" style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 1.5rem',
+          position: 'relative',
+          zIndex: 1
+        }}>
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '50px',
+              marginBottom: '1.5rem',
+              boxShadow: '0 4px 15px rgba(160, 133, 91, 0.3)'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span style={{ 
+                color: '#ffffff',
+                fontSize: '0.875rem', 
+                fontWeight: '700',
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase'
+              }}>
+                Academic Sources
+              </span>
+            </div>
+            <h2 style={{ 
+              background: 'linear-gradient(135deg, #a0855b, #c4a678, #db2777)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontSize: '2.75rem', 
+              fontWeight: '800',
+              marginBottom: '1rem',
+              letterSpacing: '-0.02em'
+            }}>
+              References & Citations
+            </h2>
+            <p style={{
+              color: '#4a5568',
+              fontSize: '1.15rem',
+              maxWidth: '700px',
+              margin: '0 auto',
+              lineHeight: '1.7',
+              fontWeight: '400'
+            }}>
+              Scholarly sources and cultural institutions that informed this comprehensive guide to Filipino folk dance traditions
+            </p>
+          </div>
+
+          {/* References Grid - Responsive: 4 cols on XL, 3 on L, 2 on M, 1 on SM */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '2rem',
+            marginBottom: '3rem',
+            maxWidth: '1600px',
+            margin: '0 auto 3rem'
+          }}
+          className="cultureReferencesGrid"
+          >
+            <style>{`
+              @media (max-width: 1600px) {
+                .cultureReferencesGrid {
+                  grid-template-columns: repeat(4, 1fr) !important;
+                  max-width: 1400px;
+                }
+              }
+              @media (max-width: 1400px) {
+                .cultureReferencesGrid {
+                  grid-template-columns: repeat(3, 1fr) !important;
+                  max-width: 1200px;
+                }
+              }
+              @media (max-width: 1024px) {
+                .cultureReferencesGrid {
+                  grid-template-columns: repeat(2, 1fr) !important;
+                  gap: 1.5rem !important;
+                }
+              }
+              @media (max-width: 768px) {
+                .cultureReferencesGrid {
+                  grid-template-columns: 1fr !important;
+                  gap: 1.25rem !important;
+                }
+              }
+            `}</style>
+            {[
+              {
+                number: '01',
+                title: 'Cultural Center of the Philippines',
+                subtitle: 'Educational Performing Arts',
+                link: 'https://epa.culturalcenter.gov.ph/6/',
+              },
+              {
+                number: '02',
+                title: 'Pandanggo Folk Dance',
+                subtitle: 'Wikipedia Encyclopedia',
+                link: 'https://en.wikipedia.org/wiki/Pandanggo',
+              },
+              {
+                number: '03',
+                title: 'Sayaw Sa Bangko History',
+                subtitle: 'Yodisphere Cultural Archives',
+                link: 'https://www.yodisphere.com/2023/09/Sayaw-Sa-Bangko-Folk-Dance-History.html',
+              },
+              {
+                number: '04',
+                title: 'Itik-Itik Dance Tradition',
+                subtitle: 'Wikipedia Encyclopedia',
+                link: 'https://en.wikipedia.org/wiki/Itik-itik',
+              },
+              {
+                number: '05',
+                title: 'Cariñosa National Dance',
+                subtitle: 'Wikipedia Encyclopedia',
+                link: 'https://en.wikipedia.org/wiki/Cari%C3%B1osa',
+              },
+              {
+                number: '06',
+                title: 'Rigodon Ballroom Tradition',
+                subtitle: 'The Philippine Star',
+                link: 'https://www.philstar.com/other-sections/starweek-magazine/2008/06/08/66579/elegant-cherished-tradition',
+              },
+              {
+                number: '07',
+                title: 'Western Musical Influence',
+                subtitle: 'National Commission for Culture and the Arts',
+                link: 'https://ncca.gov.ph/about-ncca-3/subcommissions/subcommission-on-the-arts-sca/music/westernized-musical-traditions-in-the-philippines/',
+              },
+              {
+                number: '08',
+                title: 'Cordillera Indigenous Dance',
+                subtitle: 'Mabikas Foundation',
+                link: 'https://mabikas-foundation.org/wp-content/uploads/2021/02/performing_indigeneity_in_the_cordillera_dance_community_and_power_in_the_highlands_of_luzon.pdf',
+              }
+            ].map((ref, index) => (
+              <div
+                key={index}
+                style={{
+                  background: '#ffffff',
+                  borderRadius: '20px',
+                  padding: '2rem',
+                  border: '2px solid transparent',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-12px) scale(1.02)';
+                  e.currentTarget.style.boxShadow = '0 20px 50px rgba(0, 0, 0, 0.25)';
+                  e.currentTarget.style.borderColor = '#c4a678';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.15)';
+                  e.currentTarget.style.borderColor = 'transparent';
+                }}
+              >
+                {/* Gradient Top Border */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '5px',
+                  background: 'linear-gradient(90deg, #a0855b, #c4a678, #db2777)',
+                }} />
+
+                {/* Card Content Wrapper */}
+                <div style={{ flex: '1', display: 'flex', flexDirection: 'column' }}>
+                  {/* Reference Number */}
+                  <div style={{ 
+                    marginBottom: '1.25rem',
+                    marginTop: '0.5rem'
+                  }}>
+                    <div style={{
+                      width: '45px',
+                      height: '45px',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.875rem',
+                      fontWeight: '800',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 15px rgba(160, 133, 91, 0.3)'
+                    }}>
+                      {ref.number}
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    fontSize: '1.35rem',
+                    fontWeight: '800',
+                    marginBottom: '0.5rem',
+                    lineHeight: '1.3'
+                  }}>
+                    {ref.title}
+                  </h3>
+
+                  {/* Subtitle - Flex grow to push button down */}
+                  <p style={{
+                    color: '#db2777',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    marginBottom: '1.5rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    flex: '1'
+                  }}>
+                    {ref.subtitle}
+                  </p>
+                </div>
+
+                {/* Link Button - Always at bottom */}
+                <a
+                  href={ref.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+                    color: '#ffffff',
+                    fontSize: '0.875rem',
+                    fontWeight: '700',
+                    textDecoration: 'none',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '50px',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 4px 15px rgba(160, 133, 91, 0.3)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.gap = '0.75rem';
+                    e.currentTarget.style.transform = 'translateX(5px)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(160, 133, 91, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.gap = '0.5rem';
+                    e.currentTarget.style.transform = 'translateX(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(160, 133, 91, 0.3)';
+                  }}
+                >
+                  <span>View Source</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* Citation Note */}
+          <div style={{
+            background: '#ffffff',
+            border: '3px solid #c4a678',
+            borderRadius: '20px',
+            padding: '2rem 2.5rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '1.5rem',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Decorative Corner Accent */}
+            <div style={{
+              position: 'absolute',
+              top: '-30px',
+              right: '-30px',
+              width: '100px',
+              height: '100px',
+              background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+              borderRadius: '50%',
+              opacity: 0.1
+            }} />
+            
+            <div style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: '0 4px 15px rgba(160, 133, 91, 0.3)'
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </div>
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <h4 style={{
+                background: 'linear-gradient(135deg, #a0855b, #c4a678)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                fontSize: '1.25rem',
+                fontWeight: '800',
+                marginBottom: '0.75rem',
+                letterSpacing: '-0.01em'
+              }}>
+                Academic Integrity Notice
+              </h4>
+              <p style={{
+                color: '#4a5568',
+                fontSize: '1rem',
+                lineHeight: '1.8',
+                margin: 0
+              }}>
+                All information presented in this cultural guide has been carefully researched and cited from reputable academic sources, 
+                cultural institutions, and scholarly publications. We acknowledge and honor the contributions of these organizations 
+                in preserving and documenting Filipino cultural heritage.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>
