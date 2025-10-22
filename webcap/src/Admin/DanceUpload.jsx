@@ -26,6 +26,13 @@ const DanceUpload = () => {
   const [notification, setNotification] = useState(null);
   const [showNavigationModal, setShowNavigationModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(null);
+  const [totalUploadSize, setTotalUploadSize] = useState(0);
+
+  // File upload size constants
+  const MAX_TOTAL_SIZE = 1024 * 1024 * 1024; // 1GB total
+  const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB per video
+  const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB per image
+  const MAX_FIGURE_VIDEOS = 10; // Maximum number of figure videos
 
   // Get current user role to determine if approval is needed
   const currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -85,11 +92,6 @@ const DanceUpload = () => {
   };
 
   const handleFileUpload = (file, type) => {
-    // File validation constants
-    const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB
-    const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-    const MAX_FIGURE_VIDEOS = 10; // Maximum number of figure videos
-    
     // Validate file type
     if (type === 'preview' || type === 'figures') {
       if (!file.type.startsWith('video/')) {
@@ -120,6 +122,14 @@ const DanceUpload = () => {
       return;
     }
     
+    // Check total upload size limit (1GB)
+    const newTotalSize = totalUploadSize + file.size;
+    if (newTotalSize > MAX_TOTAL_SIZE) {
+      const remainingMB = ((MAX_TOTAL_SIZE - totalUploadSize) / (1024 * 1024)).toFixed(2);
+      showNotification(`Total upload size limit exceeded! You have ${remainingMB} MB remaining. Please remove some files or upload smaller files.`, 'error');
+      return;
+    }
+    
     // Additional validation for figure videos limit
     if (type === 'figures' && figureVideos.length >= MAX_FIGURE_VIDEOS) {
       showNotification(`Maximum ${MAX_FIGURE_VIDEOS} figure videos allowed. Please remove some videos before adding new ones.`, 'error');
@@ -145,8 +155,10 @@ const DanceUpload = () => {
           // Remove previous video URL to prevent memory leaks
           if (previewVideo) {
             URL.revokeObjectURL(previewVideo.url);
+            setTotalUploadSize(prev => prev - previewVideo.file.size);
           }
           setPreviewVideo({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+          setTotalUploadSize(prev => prev + file.size);
           break;
         case 'figures':
           const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -158,13 +170,16 @@ const DanceUpload = () => {
             size: formatFileSize(file.size)
           };
           setFigureVideos(prev => [...prev, newFigure]);
+          setTotalUploadSize(prev => prev + file.size);
           break;
         case 'image':
           // Remove previous image URL to prevent memory leaks
           if (danceImage) {
             URL.revokeObjectURL(danceImage.url);
+            setTotalUploadSize(prev => prev - danceImage.file.size);
           }
           setDanceImage({ file, url: fileUrl, name: file.name, size: formatFileSize(file.size) });
+          setTotalUploadSize(prev => prev + file.size);
           break;
         default:
           showNotification('Unknown file type. Please try again.', 'error');
@@ -190,6 +205,7 @@ const DanceUpload = () => {
       // Revoke the object URL to free up memory
       URL.revokeObjectURL(videoToRemove.url);
       setFigureVideos(prev => prev.filter(video => video.id !== id));
+      setTotalUploadSize(prev => prev - videoToRemove.file.size);
     }
     // Clear the file input to allow re-uploading the same file
     const figuresInput = document.getElementById('figures-input');
@@ -199,6 +215,7 @@ const DanceUpload = () => {
   const removePreviewVideo = () => {
     if (previewVideo) {
       URL.revokeObjectURL(previewVideo.url);
+      setTotalUploadSize(prev => prev - previewVideo.file.size);
       setPreviewVideo(null);
       // Clear the file input to allow re-uploading the same file
       const previewInput = document.getElementById('preview-video-input');
@@ -209,6 +226,7 @@ const DanceUpload = () => {
   const removeDanceImage = () => {
     if (danceImage) {
       URL.revokeObjectURL(danceImage.url);
+      setTotalUploadSize(prev => prev - danceImage.file.size);
       setDanceImage(null);
       // Clear the file input to allow re-uploading the same file
       const imageInput = document.getElementById('image-input');
@@ -274,7 +292,6 @@ const DanceUpload = () => {
         { field: 'title', name: 'Dance Title' },
         { field: 'references', name: 'References' },
         { field: 'region', name: 'Island' },
-        { field: 'durationSeconds', name: 'Duration (Seconds)' },
         { field: 'performers', name: 'Number of Performers' },
         { field: 'music', name: 'Music & Instruments' },
         { field: 'costumes', name: 'Traditional Costumes' }
@@ -300,8 +317,9 @@ const DanceUpload = () => {
       const minutes = parseInt(formData.durationMinutes) || 0;
       const seconds = parseInt(formData.durationSeconds) || 0;
 
-      if (seconds === 0) {
-        showNotification('Please specify seconds for the duration. Seconds is required.', 'error');
+      // At least one duration field must be filled
+      if (hours === 0 && minutes === 0 && seconds === 0) {
+        showNotification('Please specify at least one duration value (hours, minutes, or seconds).', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -673,7 +691,6 @@ const DanceUpload = () => {
                       min="0"
                       max="59"
                       step="1"
-                      required
                       disabled={isSubmitting}
                       style={{ width: '70px', padding: '12px 8px' }}
                     />
@@ -718,16 +735,22 @@ const DanceUpload = () => {
               <label className="form-label" htmlFor="music">
                 Music & Instruments<span className="required-asterisk">*</span>
               </label>
-              <input
-                type="text"
+              <textarea
                 id="music"
                 name="music"
-                className="form-input"
+                className="form-textarea"
                 value={formData.music}
                 onChange={handleInputChange}
                 placeholder="e.g. Traditional Tausug kulintang ensemble"
+                rows="3"
                 required
                 disabled={isSubmitting}
+                style={{
+                  minHeight: '80px',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  resize: 'vertical'
+                }}
               />
             </div>
 
@@ -735,16 +758,22 @@ const DanceUpload = () => {
               <label className="form-label" htmlFor="costumes">
                 Traditional Costumes<span className="required-asterisk">*</span>
               </label>
-              <input
-                type="text"
+              <textarea
                 id="costumes"
                 name="costumes"
-                className="form-input"
+                className="form-textarea"
                 value={formData.costumes}
                 onChange={handleInputChange}
                 placeholder="e.g. Elaborate Muslim royal attire with intricate embroidery"
+                rows="3"
                 required
                 disabled={isSubmitting}
+                style={{
+                  minHeight: '80px',
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  resize: 'vertical'
+                }}
               />
             </div>
 
@@ -1111,6 +1140,55 @@ const DanceUpload = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Upload Size Indicator */}
+      <div style={{
+        position: 'fixed',
+        bottom: '30px',
+        right: '30px',
+        backgroundColor: (() => {
+          const usedPercentage = (totalUploadSize / MAX_TOTAL_SIZE) * 100;
+          if (usedPercentage >= 90) return '#ef4444'; // Red
+          if (usedPercentage >= 70) return '#f97316'; // Orange
+          if (usedPercentage >= 50) return '#eab308'; // Yellow
+          return '#22c55e'; // Green
+        })(),
+        color: 'white',
+        padding: '15px 20px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        fontSize: '14px',
+        fontWeight: '500',
+        zIndex: 1000,
+        transition: 'all 0.3s ease',
+        minWidth: '220px'
+      }}>
+        <svg 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <div style={{ fontSize: '12px', opacity: 0.9 }}>
+            {(totalUploadSize / (1024 * 1024)).toFixed(1)} MB / 1024 MB
+          </div>
+          <div style={{ fontSize: '11px', opacity: 0.8 }}>
+            {((MAX_TOTAL_SIZE - totalUploadSize) / (1024 * 1024)).toFixed(1)} MB remaining
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
