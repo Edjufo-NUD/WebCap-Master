@@ -10,7 +10,7 @@ import home3Image from '../assets/home3.jpg';
 import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
 import pahidImage from '../assets/Pahid.png';
-import suakusuaImage from '../assets/suakusua.png';
+import suakusuaImage from '../assets/sks.png';
 
 // Import video files
 import BinungeyMainVideo from '../assets/Videos/Binungey.mp4';
