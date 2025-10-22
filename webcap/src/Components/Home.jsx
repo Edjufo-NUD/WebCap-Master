@@ -10,6 +10,7 @@ import home3Image from '../assets/home3.jpg';
 import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
 import pahidImage from '../assets/Pahid.png';
+import suakusuaImage from '../assets/suakusua.png';
 
 // Import video files
 import BinungeyMainVideo from '../assets/Videos/Binungey.mp4';
@@ -136,8 +137,8 @@ const Home = () => {
         island: 'Mindanao',
         region: 'Jolo, Sulu',
         province: 'Jolo, Sulu',
-        image: null,
-        image_url: null,
+        image: suakusuaImage,
+        image_url: suakusuaImage,
         description: 'A courtship dance of the Tausug people of Jolo, Sulu. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree".',
         history: 'A courtship dance of the Tausug people of Jolo, Sulu in the southern Philippines. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree" (from sua meaning "pomelo" and ku meaning "mine") and the dance was originally inspired by the pomelo tree — its slender branches and leaves likened to the virtue and beauty of a lady.',
         references: 'Accompanied by song and fan-movements; instrumentation not always detailed but rooted in the Tausug coastal/lowland Muslim tradition. Dancers hold two white fans, which suggest the leaves of the pomelo tree swaying in the wind.',

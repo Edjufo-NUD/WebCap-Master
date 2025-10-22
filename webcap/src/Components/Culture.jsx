@@ -2518,8 +2518,8 @@ const Culture = () => {
               {
                 number: '02',
                 title: 'Pandanggo Folk Dance',
-                subtitle: 'Wikipedia Encyclopedia',
-                link: 'https://en.wikipedia.org/wiki/Pandanggo',
+                subtitle: 'Reference.com History',
+                link: 'https://www.reference.com/history-geography/history-pandanggo-sa-ilaw-ac48f5cbb2522b2c',
               },
               {
                 number: '03',
@@ -2530,14 +2530,14 @@ const Culture = () => {
               {
                 number: '04',
                 title: 'Itik-Itik Dance Tradition',
-                subtitle: 'Wikipedia Encyclopedia',
-                link: 'https://en.wikipedia.org/wiki/Itik-itik',
+                subtitle: 'DanceUs Cultural Guide',
+                link: 'https://www.danceus.org/style/itik-itik-dance-in-philippines/',
               },
               {
                 number: '05',
                 title: 'Cariñosa National Dance',
-                subtitle: 'Wikipedia Encyclopedia',
-                link: 'https://en.wikipedia.org/wiki/Cari%C3%B1osa',
+                subtitle: 'DanceUs Cultural Guide',
+                link: 'https://www.danceus.org/style/carinosa-dance-in-philippines/',
               },
               {
                 number: '06',
