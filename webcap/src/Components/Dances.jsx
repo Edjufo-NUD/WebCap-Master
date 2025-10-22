@@ -9,6 +9,7 @@ import { supabase } from '../supabasebaseClient';
 import tiklosImage from '../assets/tiklos.png';
 import binungeyImage from '../assets/binungeybg.png';
 import pahidImage from '../assets/Pahid.png';
+import suakusuaImage from '../assets/suakusua.png';
 
 // Videos (kept as in your version)
 import BinungeyMainVideo from '../assets/Videos/Binungey.mp4';
@@ -142,7 +143,7 @@ const featuredDances = [
     island: 'Mindanao',
     region: 'Jolo, Sulu',
     province: 'Jolo, Sulu',
-    image_url: null,
+    image_url: suakusuaImage,
     description:
       'A courtship dance of the Tausug people of Jolo, Sulu. The title "Sua-Ku-Sua" translates roughly to "My Pomelo Tree".',
     history:
@@ -351,37 +352,35 @@ const Dances = () => {
 
   // ---------- SORT ----------
   const dateVal = (d) => {
-    if (!d?.created_at) return new Date('2020-01-01').getTime(); // Default old date for items without timestamp
-    return new Date(d.created_at).getTime();
+    if (!d?.created_at) return 0;
+    const timestamp = new Date(d.created_at).getTime();
+    return isNaN(timestamp) ? 0 : timestamp;
   };
 
-  const compareByOption = (a, b) => {
-    switch (sortOption) {
-      case 'a-z':
-        return (a.title || '').localeCompare(b.title || '');
-      case 'z-a':
-        return (b.title || '').localeCompare(a.title || '');
-      case 'latest':
-        return dateVal(b) - dateVal(a); // newest first
-      case 'oldest':
-        return dateVal(a) - dateVal(b); // oldest first
-      default:
-        return 0;
-    }
-  };
-
-  // If user hasn't explicitly selected a sort option, keep featured on top for all regions
-  const sortedDances = [...filteredDances].sort((a, b) => {
-    if (!userHasSelectedSort) {
-      // Featured dances stay on top
+  // Sorting logic - COMPLETELY REWRITTEN
+  let sortedDances = [...filteredDances];
+  
+  if (!userHasSelectedSort) {
+    // Default: Featured first, then by date (newest first)
+    sortedDances.sort((a, b) => {
       if (a.isFeatured && !b.isFeatured) return -1;
       if (!a.isFeatured && b.isFeatured) return 1;
-      // Within each group, sort by date (latest first)
       return dateVal(b) - dateVal(a);
+    });
+  } else {
+    // User selected a sort option
+    if (sortOption === 'a-z') {
+      sortedDances.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    } else if (sortOption === 'z-a') {
+      sortedDances.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+    } else if (sortOption === 'latest') {
+      // Sort ALL dances by date - newest first (mix featured and database)
+      sortedDances.sort((a, b) => dateVal(b) - dateVal(a));
+    } else if (sortOption === 'oldest') {
+      // Sort ALL dances by date - oldest first (mix featured and database)
+      sortedDances.sort((a, b) => dateVal(a) - dateVal(b));
     }
-    // When user has explicitly selected a sort option, apply it to all dances
-    return compareByOption(a, b);
-  });
+  }
 
   // ---------- UI HANDLERS ----------
   const handleSortChange = (option) => {
@@ -402,7 +401,7 @@ const Dances = () => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       // Close only when clicking outside the wrapper we control
-      if (showSortDropdown && !e.target.closest('.sort-dropdown-container')) {
+      if (showSortDropdown && !e.target.closest('.dances-sort-button-container')) {
         setShowSortDropdown(false);
       }
     };
