@@ -246,11 +246,11 @@ const Dances = () => {
     const fetchDances = async () => {
       setLoading(true);
 
-      // fetch dances WITH created_at
+      // fetch dances WITH created_at (only approved dances)
       const { data: dancesData, error: dancesError } = await supabase
         .from('dances')
         .select(
-          'id, title, island, references, history, main_video_url, duration, performers, music, costumes, created_at, reference_link, reference_url'
+          'id, title, island, references, history, main_video_url, duration, performers, music, costumes, created_at'
         )
         .eq('status', 'approved')
         .order('created_at', { ascending: false });
@@ -259,6 +259,13 @@ const Dances = () => {
         .from('dance_images')
         .select('dance_id, image_url, position')
         .order('position', { ascending: true });
+
+      if (dancesError) {
+        console.error('Error fetching dances:', dancesError);
+      }
+      if (imagesError) {
+        console.error('Error fetching images:', imagesError);
+      }
 
       if (!dancesError && !imagesError) {
         const imageMap = {};
@@ -494,7 +501,7 @@ const Dances = () => {
 
             <div className="dances-mobile-controls-row">
               {/* WRAPPED for click-outside correctness */}
-              <div className="sort-dropdown-container" style={{ position: 'relative' }}>
+              <div className="dances-sort-button-container" style={{ position: 'relative' }}>
                 <div
                   className="dances-filter-circle-button"
                   onClick={() => setShowSortDropdown(!showSortDropdown)}
@@ -507,8 +514,8 @@ const Dances = () => {
                     className="sort-dropdown"
                     style={{
                       position: 'absolute',
-                      top: 'calc(100% + 12px)',
-                      left: 0,
+                      top: 'calc(100% + 8px)',
+                      left: '0',
                       background: 'rgba(210, 180, 140, 0.95)',
                       backdropFilter: 'blur(10px)',
                       border: '2px solid rgba(160, 133, 91, 0.3)',
@@ -849,7 +856,7 @@ const Dances = () => {
             <div className="modal-body" style={{ padding: 24 }}>
               <div className="modal-section">
                 <h3>History</h3>
-                <p>{selectedDance.history}</p>
+                <p style={{ whiteSpace: 'pre-line' }}>{selectedDance.history}</p>
               </div>
 
               {selectedDance.isFeatured ? (
@@ -883,10 +890,10 @@ const Dances = () => {
 
                   <div className="modal-section">
                     <h3>Music & Costumes</h3>
-                    <p>
+                    <p style={{ whiteSpace: 'pre-line' }}>
                       <strong>Music:</strong> {displayOrNA(selectedDance.music)}
                     </p>
-                    <p>
+                    <p style={{ whiteSpace: 'pre-line' }}>
                       <strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}
                     </p>
                   </div>
@@ -947,10 +954,10 @@ const Dances = () => {
                   </div>
                   <div className="modal-section">
                     <h3>Music & Costumes</h3>
-                    <p>
+                    <p style={{ whiteSpace: 'pre-line' }}>
                       <strong>Music:</strong> {displayOrNA(selectedDance.music)}
                     </p>
-                    <p>
+                    <p style={{ whiteSpace: 'pre-line' }}>
                       <strong>Costumes:</strong> {displayOrNA(selectedDance.costumes)}
                     </p>
                   </div>

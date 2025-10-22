@@ -249,30 +249,37 @@ body, html {
     flex-direction: row;
     gap: 0.5rem;
     align-items: center;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
   }
   
   .dances-region-buttons-wrapper {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 0.4rem;
     align-items: center;
     flex: 1;
     justify-content: flex-start;
-    overflow-x: auto;
   }
   
   .dances-sort-button-container {
     margin-right: 0 !important;
     order: 0;
     flex-shrink: 0;
+    position: relative;
   }
   
   .dances-filter-circle-button {
     width: 36px;
     height: 36px;
     padding: 6px;
+  }
+  
+  .sort-dropdown {
+    left: 0 !important;
+    right: auto !important;
+    transform: none !important;
+    min-width: 180px !important;
+    max-width: calc(100vw - 40px) !important;
   }
   
   .dances-region-btn {
